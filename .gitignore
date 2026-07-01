@@ -1,0 +1,29 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+dist-ssr
+
+# Environment variables
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Test coverage
+coverage
+
+# TanStack Router 자동 생성 파일은 커밋 대상입니다
+# routeTree.gen.ts 는 .gitignore 제외

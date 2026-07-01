@@ -1,0 +1,77 @@
+import path from 'path'
+import { defineConfig } from 'vite'
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+import { VitePWA } from 'vite-plugin-pwa'
+
+export default defineConfig({
+  plugins: [
+    TanStackRouterVite({ routesDirectory: 'src/routes' }),
+    react(),
+    tailwindcss(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      devOptions: { enabled: true },
+      includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png'],
+      manifest: {
+        name: 'SoloRoad - 솔로더',
+        short_name: '솔로더',
+        description: '혼자 여행하는 사람을 위한 AI 여행지 추천 서비스',
+        theme_color: '#0f172a',
+        background_color: '#ffffff',
+        display: 'standalone',
+        orientation: 'portrait',
+        scope: '/',
+        start_url: '/',
+        lang: 'ko',
+        dir: 'ltr',
+        categories: ['travel', 'lifestyle'],
+        icons: [
+          {
+            src: '/icons/icon-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+          },
+          {
+            src: '/icons/icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable',
+          },
+          {
+            src: '/icons/apple-touch-icon.png',
+            sizes: '180x180',
+            type: 'image/png',
+          },
+        ],
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https?:\/\/.*\/api\/v1\/health$/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-health-cache',
+              expiration: { maxEntries: 1, maxAgeSeconds: 60 },
+            },
+          },
+        ],
+        navigateFallback: 'index.html',
+      },
+    }),
+  ],
+  resolve: {
+    alias: { '@': path.resolve(__dirname, './src') },
+  },
+  server: {
+    port: 5173,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+    },
+  },
+})
