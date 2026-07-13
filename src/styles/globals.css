@@ -1,7 +1,152 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+@theme {
+  /* DESIGN.md 색상 토큰 */
+  --color-surface: #f5fafe;
+  --color-surface-dim: #d5dbde;
+  --color-surface-bright: #f5fafe;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #eff4f8;
+  --color-surface-container: #e9eff2;
+  --color-surface-container-high: #e3e9ec;
+  --color-surface-container-highest: #dee3e7;
+  --color-on-surface: #171c1f;
+  --color-on-surface-variant: #3f484b;
+  --color-inverse-surface: #2b3134;
+  --color-inverse-on-surface: #ecf1f5;
+  --color-outline: #6f797c;
+  --color-outline-variant: #bec8cb;
+  --color-surface-tint: #006879;
+  --color-primary: #00515f;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #006b7d;
+  --color-on-primary-container: #9be9fe;
+  --color-inverse-primary: #84d2e6;
+  --color-secondary: #89502e;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #feb289;
+  --color-on-secondary-container: #794222;
+  --color-tertiary: #484a4b;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #5f6263;
+  --color-on-tertiary-container: #dcdedf;
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  --color-primary-fixed: #aaedff;
+  --color-primary-fixed-dim: #84d2e6;
+  --color-on-primary-fixed: #001f26;
+  --color-on-primary-fixed-variant: #004e5c;
+  --color-secondary-fixed: #ffdbca;
+  --color-secondary-fixed-dim: #ffb68f;
+  --color-on-secondary-fixed: #331200;
+  --color-on-secondary-fixed-variant: #6d3919;
+  --color-tertiary-fixed: #e1e3e4;
+  --color-tertiary-fixed-dim: #c5c7c8;
+  --color-on-tertiary-fixed: #191c1d;
+  --color-on-tertiary-fixed-variant: #454748;
+  --color-background: #f5fafe;
+  --color-on-background: #171c1f;
+  --color-surface-variant: #dee3e7;
+
+  /* shadcn/ui semantic 토큰 -> DESIGN.md 토큰 매핑 */
+  --color-foreground: var(--color-on-surface);
+  --color-card: var(--color-surface-container-lowest);
+  --color-card-foreground: var(--color-on-surface);
+  --color-popover: var(--color-surface-container-lowest);
+  --color-popover-foreground: var(--color-on-surface);
+  --color-primary-foreground: var(--color-on-primary);
+  --color-secondary-foreground: var(--color-on-secondary);
+  --color-muted: var(--color-surface-container);
+  --color-muted-foreground: var(--color-on-surface-variant);
+  --color-accent: var(--color-surface-container-high);
+  --color-accent-foreground: var(--color-on-surface);
+  --color-destructive: var(--color-error);
+  --color-destructive-foreground: var(--color-on-error);
+  --color-border: var(--color-outline-variant);
+  --color-input: var(--color-outline-variant);
+  --color-ring: var(--color-primary);
+
+  /* 타이포그래피 */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --text-headline-xl: 32px;
+  --text-headline-xl--line-height: 40px;
+  --text-headline-xl--letter-spacing: -0.02em;
+  --text-headline-xl--font-weight: 700;
+
+  --text-headline-lg: 24px;
+  --text-headline-lg--line-height: 32px;
+  --text-headline-lg--letter-spacing: -0.01em;
+  --text-headline-lg--font-weight: 600;
+
+  --text-headline-lg-mobile: 20px;
+  --text-headline-lg-mobile--line-height: 28px;
+  --text-headline-lg-mobile--letter-spacing: -0.01em;
+  --text-headline-lg-mobile--font-weight: 600;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 24px;
+  --text-body-md--letter-spacing: 0em;
+  --text-body-md--font-weight: 400;
+
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-body-sm--letter-spacing: 0em;
+  --text-body-sm--font-weight: 400;
+
+  --text-label-md: 12px;
+  --text-label-md--line-height: 16px;
+  --text-label-md--letter-spacing: 0.02em;
+  --text-label-md--font-weight: 600;
+
+  --text-label-caps: 11px;
+  --text-label-caps--line-height: 14px;
+  --text-label-caps--letter-spacing: 0.05em;
+  --text-label-caps--font-weight: 700;
+
+  /* radius */
+  --radius: 0.5rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  /* named spacing */
+  --spacing-base: 4px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-margin-mobile: 20px;
+  --spacing-gutter-mobile: 12px;
+}
 
 @layer base {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
   }
+
+  body {
+    @apply bg-background text-on-surface font-sans;
+  }
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility glass-effect {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }

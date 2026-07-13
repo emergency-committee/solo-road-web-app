@@ -1,0 +1,7 @@
+export { ProfileHeader } from './components/ProfileHeader'
+export { ProfileStatsGrid } from './components/ProfileStatsGrid'
+export { ProfileMenuList } from './components/ProfileMenuList'
+export type { ProfileMenuItem } from './components/ProfileMenuList'
+export { PermissionToggleCard } from './components/PermissionToggleCard'
+export { mockUserProfile, mockPermissionSettings } from './mocks/profile-mocks'
+export type { UserProfile, PermissionSetting } from './types/profile.types'
