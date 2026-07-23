@@ -138,6 +138,44 @@
   body {
     @apply bg-background text-on-surface font-sans;
   }
+
+  :root {
+    --mobile-frame-width: 430px;
+  }
+
+  .app-frame {
+    margin-inline: auto;
+    max-width: var(--mobile-frame-width);
+    background: var(--color-background);
+    min-height: 100dvh;
+  }
+
+  /*
+   * 430px보다 넓은 화면(데스크탑)에서만 프레임을 "휴대폰 화면"처럼 만든다.
+   * transform은 fixed 자손들의 containing block을 뷰포트 → 이 요소로 바꾸는 표준 트릭인데,
+   * 프레임이 문서 스크롤을 그대로 따라가면 BottomNav 같은 fixed 요소가 뷰포트가 아니라
+   * "프레임 박스 하단"에 고정돼 콘텐츠가 길어지면 화면 밖으로 밀려난다.
+   * 그래서 프레임 자체를 고정 높이 + 내부 스크롤 컨테이너로 만들어야
+   * fixed(=absolute처럼 동작) 자손이 프레임의 화면상 위치에 계속 고정된다.
+   * 모바일 실기기에서는 이 블록이 적용되지 않아 기존 문서 스크롤/네이티브 fixed 동작이 그대로 유지된다.
+   */
+  @media (min-width: 431px) {
+    body {
+      background: var(--color-surface-dim);
+    }
+
+    .app-frame {
+      transform: translateZ(0);
+      position: relative;
+      isolation: isolate;
+      height: 100dvh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      box-shadow:
+        0 0 0 1px var(--color-outline-variant),
+        0 24px 48px -12px rgb(0 0 0 / 0.25);
+    }
+  }
 }
 
 @utility no-scrollbar {
