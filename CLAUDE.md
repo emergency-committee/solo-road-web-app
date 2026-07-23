@@ -19,6 +19,10 @@
 | PWA | vite-plugin-pwa (Workbox autoUpdate) |
 | 코드 품질 | oxlint + Prettier |
 
+## 디자인 시스템
+
+UI 작업 시 [`DESIGN.md`](./DESIGN.md)의 색상/타이포그래피/spacing/컴포넌트 규칙을 따릅니다.
+
 ## 백엔드 API
 
 레포: `solo-road-ai-server` (FastAPI, 포트 8000)

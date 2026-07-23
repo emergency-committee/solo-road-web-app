@@ -1,18 +1,7 @@
+import { useSessionStore } from '@/shared/auth/session-store'
+import { buildHeaders } from './build-headers'
+import { BASE_URL } from './config'
 import { ApiError } from './errors'
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ''
-const API_KEY = import.meta.env.VITE_API_KEY
-
-function buildHeaders(extra?: HeadersInit): Headers {
-  const headers = new Headers({
-    'Content-Type': 'application/json',
-    'X-API-Key': API_KEY,
-  })
-  if (extra) {
-    new Headers(extra).forEach((value, key) => headers.set(key, value))
-  }
-  return headers
-}
 
 export async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const { headers: extraHeaders, ...rest } = options
@@ -23,6 +12,9 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 
   if (!response.ok) {
     const body = await response.text()
+    if (response.status === 401) {
+      useSessionStore.getState().clearSession()
+    }
     throw new ApiError(response.status, body)
   }
 

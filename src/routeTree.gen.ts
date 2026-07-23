@@ -9,13 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShellRouteImport } from './routes/_shell'
 import { Route as RecommendIndexRouteImport } from './routes/recommend/index'
-import { Route as CourseIndexRouteImport } from './routes/course/index'
+import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
+import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as ShellIndexRouteImport } from './routes/_shell/index'
+import { Route as PlacePlaceIdRouteImport } from './routes/place/$placeId'
+import { Route as ShellMyIndexRouteImport } from './routes/_shell/my/index'
+import { Route as ShellMapIndexRouteImport } from './routes/_shell/map/index'
+import { Route as ShellCourseIndexRouteImport } from './routes/_shell/course/index'
+import { Route as ShellMySavedPlacesRouteImport } from './routes/_shell/my/saved-places'
+import { Route as ShellMySavedCoursesRouteImport } from './routes/_shell/my/saved-courses'
+import { Route as ShellMyReviewsRouteImport } from './routes/_shell/my/reviews'
+import { Route as ShellMyPreferencesRouteImport } from './routes/_shell/my/preferences'
+import { Route as ShellMyPermissionsRouteImport } from './routes/_shell/my/permissions'
+import { Route as ShellCourseCreateRouteImport } from './routes/_shell/course/create'
+import { Route as ShellCourseCourseIdIndexRouteImport } from './routes/_shell/course/$courseId/index'
+import { Route as ShellCourseCourseIdEditRouteImport } from './routes/_shell/course/$courseId/edit'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ShellRoute = ShellRouteImport.update({
+  id: '/_shell',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RecommendIndexRoute = RecommendIndexRouteImport.update({
@@ -23,49 +36,212 @@ const RecommendIndexRoute = RecommendIndexRouteImport.update({
   path: '/recommend/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CourseIndexRoute = CourseIndexRouteImport.update({
+const OnboardingIndexRoute = OnboardingIndexRouteImport.update({
+  id: '/onboarding/',
+  path: '/onboarding/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginIndexRoute = LoginIndexRouteImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShellIndexRoute = ShellIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ShellRoute,
+} as any)
+const PlacePlaceIdRoute = PlacePlaceIdRouteImport.update({
+  id: '/place/$placeId',
+  path: '/place/$placeId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShellMyIndexRoute = ShellMyIndexRouteImport.update({
+  id: '/my/',
+  path: '/my/',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellMapIndexRoute = ShellMapIndexRouteImport.update({
+  id: '/map/',
+  path: '/map/',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellCourseIndexRoute = ShellCourseIndexRouteImport.update({
   id: '/course/',
   path: '/course/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellMySavedPlacesRoute = ShellMySavedPlacesRouteImport.update({
+  id: '/my/saved-places',
+  path: '/my/saved-places',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellMySavedCoursesRoute = ShellMySavedCoursesRouteImport.update({
+  id: '/my/saved-courses',
+  path: '/my/saved-courses',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellMyReviewsRoute = ShellMyReviewsRouteImport.update({
+  id: '/my/reviews',
+  path: '/my/reviews',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellMyPreferencesRoute = ShellMyPreferencesRouteImport.update({
+  id: '/my/preferences',
+  path: '/my/preferences',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellMyPermissionsRoute = ShellMyPermissionsRouteImport.update({
+  id: '/my/permissions',
+  path: '/my/permissions',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellCourseCreateRoute = ShellCourseCreateRouteImport.update({
+  id: '/course/create',
+  path: '/course/create',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellCourseCourseIdIndexRoute =
+  ShellCourseCourseIdIndexRouteImport.update({
+    id: '/course/$courseId/',
+    path: '/course/$courseId/',
+    getParentRoute: () => ShellRoute,
+  } as any)
+const ShellCourseCourseIdEditRoute = ShellCourseCourseIdEditRouteImport.update({
+  id: '/course/$courseId/edit',
+  path: '/course/$courseId/edit',
+  getParentRoute: () => ShellRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/course/': typeof CourseIndexRoute
+  '/': typeof ShellIndexRoute
+  '/place/$placeId': typeof PlacePlaceIdRoute
+  '/login/': typeof LoginIndexRoute
+  '/onboarding/': typeof OnboardingIndexRoute
   '/recommend/': typeof RecommendIndexRoute
+  '/course/create': typeof ShellCourseCreateRoute
+  '/my/permissions': typeof ShellMyPermissionsRoute
+  '/my/preferences': typeof ShellMyPreferencesRoute
+  '/my/reviews': typeof ShellMyReviewsRoute
+  '/my/saved-courses': typeof ShellMySavedCoursesRoute
+  '/my/saved-places': typeof ShellMySavedPlacesRoute
+  '/course/': typeof ShellCourseIndexRoute
+  '/map/': typeof ShellMapIndexRoute
+  '/my/': typeof ShellMyIndexRoute
+  '/course/$courseId/edit': typeof ShellCourseCourseIdEditRoute
+  '/course/$courseId/': typeof ShellCourseCourseIdIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/course': typeof CourseIndexRoute
+  '/place/$placeId': typeof PlacePlaceIdRoute
+  '/': typeof ShellIndexRoute
+  '/login': typeof LoginIndexRoute
+  '/onboarding': typeof OnboardingIndexRoute
   '/recommend': typeof RecommendIndexRoute
+  '/course/create': typeof ShellCourseCreateRoute
+  '/my/permissions': typeof ShellMyPermissionsRoute
+  '/my/preferences': typeof ShellMyPreferencesRoute
+  '/my/reviews': typeof ShellMyReviewsRoute
+  '/my/saved-courses': typeof ShellMySavedCoursesRoute
+  '/my/saved-places': typeof ShellMySavedPlacesRoute
+  '/course': typeof ShellCourseIndexRoute
+  '/map': typeof ShellMapIndexRoute
+  '/my': typeof ShellMyIndexRoute
+  '/course/$courseId/edit': typeof ShellCourseCourseIdEditRoute
+  '/course/$courseId': typeof ShellCourseCourseIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/course/': typeof CourseIndexRoute
+  '/_shell': typeof ShellRouteWithChildren
+  '/place/$placeId': typeof PlacePlaceIdRoute
+  '/_shell/': typeof ShellIndexRoute
+  '/login/': typeof LoginIndexRoute
+  '/onboarding/': typeof OnboardingIndexRoute
   '/recommend/': typeof RecommendIndexRoute
+  '/_shell/course/create': typeof ShellCourseCreateRoute
+  '/_shell/my/permissions': typeof ShellMyPermissionsRoute
+  '/_shell/my/preferences': typeof ShellMyPreferencesRoute
+  '/_shell/my/reviews': typeof ShellMyReviewsRoute
+  '/_shell/my/saved-courses': typeof ShellMySavedCoursesRoute
+  '/_shell/my/saved-places': typeof ShellMySavedPlacesRoute
+  '/_shell/course/': typeof ShellCourseIndexRoute
+  '/_shell/map/': typeof ShellMapIndexRoute
+  '/_shell/my/': typeof ShellMyIndexRoute
+  '/_shell/course/$courseId/edit': typeof ShellCourseCourseIdEditRoute
+  '/_shell/course/$courseId/': typeof ShellCourseCourseIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/course/' | '/recommend/'
+  fullPaths:
+    | '/'
+    | '/place/$placeId'
+    | '/login/'
+    | '/onboarding/'
+    | '/recommend/'
+    | '/course/create'
+    | '/my/permissions'
+    | '/my/preferences'
+    | '/my/reviews'
+    | '/my/saved-courses'
+    | '/my/saved-places'
+    | '/course/'
+    | '/map/'
+    | '/my/'
+    | '/course/$courseId/edit'
+    | '/course/$courseId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/course' | '/recommend'
-  id: '__root__' | '/' | '/course/' | '/recommend/'
+  to:
+    | '/place/$placeId'
+    | '/'
+    | '/login'
+    | '/onboarding'
+    | '/recommend'
+    | '/course/create'
+    | '/my/permissions'
+    | '/my/preferences'
+    | '/my/reviews'
+    | '/my/saved-courses'
+    | '/my/saved-places'
+    | '/course'
+    | '/map'
+    | '/my'
+    | '/course/$courseId/edit'
+    | '/course/$courseId'
+  id:
+    | '__root__'
+    | '/_shell'
+    | '/place/$placeId'
+    | '/_shell/'
+    | '/login/'
+    | '/onboarding/'
+    | '/recommend/'
+    | '/_shell/course/create'
+    | '/_shell/my/permissions'
+    | '/_shell/my/preferences'
+    | '/_shell/my/reviews'
+    | '/_shell/my/saved-courses'
+    | '/_shell/my/saved-places'
+    | '/_shell/course/'
+    | '/_shell/map/'
+    | '/_shell/my/'
+    | '/_shell/course/$courseId/edit'
+    | '/_shell/course/$courseId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  CourseIndexRoute: typeof CourseIndexRoute
+  ShellRoute: typeof ShellRouteWithChildren
+  PlacePlaceIdRoute: typeof PlacePlaceIdRoute
+  LoginIndexRoute: typeof LoginIndexRoute
+  OnboardingIndexRoute: typeof OnboardingIndexRoute
   RecommendIndexRoute: typeof RecommendIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
+    '/_shell': {
+      id: '/_shell'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof ShellRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/recommend/': {
@@ -75,19 +251,151 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecommendIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/course/': {
-      id: '/course/'
+    '/onboarding/': {
+      id: '/onboarding/'
+      path: '/onboarding'
+      fullPath: '/onboarding/'
+      preLoaderRoute: typeof OnboardingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login/': {
+      id: '/login/'
+      path: '/login'
+      fullPath: '/login/'
+      preLoaderRoute: typeof LoginIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_shell/': {
+      id: '/_shell/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof ShellIndexRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/place/$placeId': {
+      id: '/place/$placeId'
+      path: '/place/$placeId'
+      fullPath: '/place/$placeId'
+      preLoaderRoute: typeof PlacePlaceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_shell/my/': {
+      id: '/_shell/my/'
+      path: '/my'
+      fullPath: '/my/'
+      preLoaderRoute: typeof ShellMyIndexRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/map/': {
+      id: '/_shell/map/'
+      path: '/map'
+      fullPath: '/map/'
+      preLoaderRoute: typeof ShellMapIndexRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/course/': {
+      id: '/_shell/course/'
       path: '/course'
       fullPath: '/course/'
-      preLoaderRoute: typeof CourseIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof ShellCourseIndexRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/my/saved-places': {
+      id: '/_shell/my/saved-places'
+      path: '/my/saved-places'
+      fullPath: '/my/saved-places'
+      preLoaderRoute: typeof ShellMySavedPlacesRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/my/saved-courses': {
+      id: '/_shell/my/saved-courses'
+      path: '/my/saved-courses'
+      fullPath: '/my/saved-courses'
+      preLoaderRoute: typeof ShellMySavedCoursesRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/my/reviews': {
+      id: '/_shell/my/reviews'
+      path: '/my/reviews'
+      fullPath: '/my/reviews'
+      preLoaderRoute: typeof ShellMyReviewsRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/my/preferences': {
+      id: '/_shell/my/preferences'
+      path: '/my/preferences'
+      fullPath: '/my/preferences'
+      preLoaderRoute: typeof ShellMyPreferencesRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/my/permissions': {
+      id: '/_shell/my/permissions'
+      path: '/my/permissions'
+      fullPath: '/my/permissions'
+      preLoaderRoute: typeof ShellMyPermissionsRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/course/create': {
+      id: '/_shell/course/create'
+      path: '/course/create'
+      fullPath: '/course/create'
+      preLoaderRoute: typeof ShellCourseCreateRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/course/$courseId/': {
+      id: '/_shell/course/$courseId/'
+      path: '/course/$courseId'
+      fullPath: '/course/$courseId/'
+      preLoaderRoute: typeof ShellCourseCourseIdIndexRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/course/$courseId/edit': {
+      id: '/_shell/course/$courseId/edit'
+      path: '/course/$courseId/edit'
+      fullPath: '/course/$courseId/edit'
+      preLoaderRoute: typeof ShellCourseCourseIdEditRouteImport
+      parentRoute: typeof ShellRoute
     }
   }
 }
 
+interface ShellRouteChildren {
+  ShellIndexRoute: typeof ShellIndexRoute
+  ShellCourseCreateRoute: typeof ShellCourseCreateRoute
+  ShellMyPermissionsRoute: typeof ShellMyPermissionsRoute
+  ShellMyPreferencesRoute: typeof ShellMyPreferencesRoute
+  ShellMyReviewsRoute: typeof ShellMyReviewsRoute
+  ShellMySavedCoursesRoute: typeof ShellMySavedCoursesRoute
+  ShellMySavedPlacesRoute: typeof ShellMySavedPlacesRoute
+  ShellCourseIndexRoute: typeof ShellCourseIndexRoute
+  ShellMapIndexRoute: typeof ShellMapIndexRoute
+  ShellMyIndexRoute: typeof ShellMyIndexRoute
+  ShellCourseCourseIdEditRoute: typeof ShellCourseCourseIdEditRoute
+  ShellCourseCourseIdIndexRoute: typeof ShellCourseCourseIdIndexRoute
+}
+
+const ShellRouteChildren: ShellRouteChildren = {
+  ShellIndexRoute: ShellIndexRoute,
+  ShellCourseCreateRoute: ShellCourseCreateRoute,
+  ShellMyPermissionsRoute: ShellMyPermissionsRoute,
+  ShellMyPreferencesRoute: ShellMyPreferencesRoute,
+  ShellMyReviewsRoute: ShellMyReviewsRoute,
+  ShellMySavedCoursesRoute: ShellMySavedCoursesRoute,
+  ShellMySavedPlacesRoute: ShellMySavedPlacesRoute,
+  ShellCourseIndexRoute: ShellCourseIndexRoute,
+  ShellMapIndexRoute: ShellMapIndexRoute,
+  ShellMyIndexRoute: ShellMyIndexRoute,
+  ShellCourseCourseIdEditRoute: ShellCourseCourseIdEditRoute,
+  ShellCourseCourseIdIndexRoute: ShellCourseCourseIdIndexRoute,
+}
+
+const ShellRouteWithChildren = ShellRoute._addFileChildren(ShellRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  CourseIndexRoute: CourseIndexRoute,
+  ShellRoute: ShellRouteWithChildren,
+  PlacePlaceIdRoute: PlacePlaceIdRoute,
+  LoginIndexRoute: LoginIndexRoute,
+  OnboardingIndexRoute: OnboardingIndexRoute,
   RecommendIndexRoute: RecommendIndexRoute,
 }
 export const routeTree = rootRouteImport

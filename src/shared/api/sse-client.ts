@@ -1,7 +1,6 @@
+import { buildHeaders } from './build-headers'
+import { BASE_URL } from './config'
 import { ApiError } from './errors'
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ''
-const API_KEY = import.meta.env.VITE_API_KEY
 
 export interface SSECallbacks<T> {
   onData: (data: T) => void
@@ -21,10 +20,7 @@ export async function fetchSSE<TBody, TData>(
 ): Promise<void> {
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-API-Key': API_KEY,
-    },
+    headers: buildHeaders(),
     body: JSON.stringify(body),
     signal: signal ?? null,
   })
