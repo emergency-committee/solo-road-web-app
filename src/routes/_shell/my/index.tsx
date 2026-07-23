@@ -12,6 +12,7 @@ import {
   ProfileMenuList,
   ProfileStatsGrid,
 } from '@/features/profile'
+import { useLogout } from '@/features/auth'
 
 export const Route = createFileRoute('/_shell/my/')({
   component: MyPage,
@@ -19,6 +20,7 @@ export const Route = createFileRoute('/_shell/my/')({
 
 function MyPage() {
   const navigate = useNavigate()
+  const logout = useLogout()
 
   return (
     <main className="px-margin-mobile pt-lg mx-auto max-w-2xl pb-8">
@@ -70,6 +72,7 @@ function MyPage() {
       <div className="mt-xl flex justify-center">
         <button
           type="button"
+          onClick={() => void logout()}
           className="font-label-md text-label-md hover:bg-error-container/20 border-error-container px-lg py-sm text-error rounded-full border transition-colors"
         >
           Sign Out

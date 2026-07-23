@@ -50,6 +50,10 @@
   --color-on-background: #171c1f;
   --color-surface-variant: #dee3e7;
 
+  /* 카카오 브랜드 고정 색상 (Kakao Developers 가이드) */
+  --color-kakao-yellow: #fee500;
+  --color-kakao-text: #3c1e1e;
+
   /* shadcn/ui semantic 토큰 -> DESIGN.md 토큰 매핑 */
   --color-foreground: var(--color-on-surface);
   --color-card: var(--color-surface-container-lowest);

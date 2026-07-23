@@ -27,9 +27,15 @@ const ADVANCED_SETTINGS = [
   { icon: Bell, label: 'Smart Alerts', value: 'Enabled for safety & routes' },
 ]
 
+export interface PreferenceSettingsSubmitData {
+  mood: string[]
+  soloPriority: boolean
+  food: string[]
+}
+
 interface PreferenceSettingsFormProps {
   mode: 'onboarding' | 'settings'
-  onSubmit: () => void
+  onSubmit: (data: PreferenceSettingsSubmitData) => void
 }
 
 export function PreferenceSettingsForm({ mode, onSubmit }: PreferenceSettingsFormProps) {
@@ -114,7 +120,7 @@ export function PreferenceSettingsForm({ mode, onSubmit }: PreferenceSettingsFor
 
       <button
         type="button"
-        onClick={onSubmit}
+        onClick={() => onSubmit({ mood, soloPriority, food })}
         className="font-label-md bg-primary text-on-primary flex w-full items-center justify-center gap-2 rounded-xl py-4 shadow-lg transition-transform active:scale-[0.98]"
       >
         {mode === 'onboarding' ? '시작하기' : 'Save Preferences'}

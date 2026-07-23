@@ -6,7 +6,10 @@ import {
   OnboardingProfileStep,
   OnboardingWelcomeStep,
   useOnboardingStore,
+  useSubmitOnboarding,
 } from '@/features/onboarding'
+import type { PreferenceSettingsSubmitData } from '@/shared/components/preference-settings-form/PreferenceSettingsForm'
+import { useSessionStore } from '@/shared/auth/session-store'
 
 export const Route = createFileRoute('/onboarding/')({
   component: OnboardingPage,
@@ -14,14 +17,17 @@ export const Route = createFileRoute('/onboarding/')({
 
 function OnboardingPage() {
   const navigate = useNavigate()
-  const { step, goToStep } = useOnboardingStore()
+  const { step, goToStep, gender, foodPreference, interests } = useOnboardingStore()
+  const { mutate: submitOnboarding } = useSubmitOnboarding()
 
   function handleSkip() {
-    navigate({ to: '/' })
+    // 건너뛰기도 온보딩 완료로 취급하고 로그인 화면으로 넘어간다(온보딩 → 로그인 순서).
+    useSessionStore.getState().setOnboarded()
+    navigate({ to: '/login' })
   }
 
-  function handleComplete() {
-    navigate({ to: '/' })
+  function handleComplete(detail: PreferenceSettingsSubmitData) {
+    submitOnboarding({ gender, foodPreference, interests, ...detail })
   }
 
   return (

@@ -1,6 +1,13 @@
-import { PreferenceSettingsForm } from '@/shared/components/preference-settings-form/PreferenceSettingsForm'
+import {
+  PreferenceSettingsForm,
+  type PreferenceSettingsSubmitData,
+} from '@/shared/components/preference-settings-form/PreferenceSettingsForm'
 
-export function OnboardingDetailStep({ onComplete }: { onComplete: () => void }) {
+export function OnboardingDetailStep({
+  onComplete,
+}: {
+  onComplete: (data: PreferenceSettingsSubmitData) => void
+}) {
   return (
     <div>
       <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-xl">

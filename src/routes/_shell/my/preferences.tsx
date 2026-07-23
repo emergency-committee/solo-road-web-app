@@ -13,7 +13,13 @@ function PreferencesPage() {
     <div className="bg-surface min-h-screen pb-24">
       <TopAppBar title="Travel Preferences" showBack />
       <main className="px-margin-mobile pt-lg mx-auto max-w-2xl">
-        <PreferenceSettingsForm mode="settings" onSubmit={() => router.history.back()} />
+        <PreferenceSettingsForm
+          mode="settings"
+          onSubmit={() => {
+            // TODO: 백엔드 설정 저장 엔드포인트 확정 후 실제 저장 API 연결
+            router.history.back()
+          }}
+        />
       </main>
     </div>
   )

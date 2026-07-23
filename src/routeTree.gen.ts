@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ShellRouteImport } from './routes/_shell'
 import { Route as RecommendIndexRouteImport } from './routes/recommend/index'
 import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
+import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as ShellIndexRouteImport } from './routes/_shell/index'
 import { Route as PlacePlaceIdRouteImport } from './routes/place/$placeId'
 import { Route as ShellMyIndexRouteImport } from './routes/_shell/my/index'
@@ -38,6 +39,11 @@ const RecommendIndexRoute = RecommendIndexRouteImport.update({
 const OnboardingIndexRoute = OnboardingIndexRouteImport.update({
   id: '/onboarding/',
   path: '/onboarding/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginIndexRoute = LoginIndexRouteImport.update({
+  id: '/login/',
+  path: '/login/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShellIndexRoute = ShellIndexRouteImport.update({
@@ -110,6 +116,7 @@ const ShellCourseCourseIdEditRoute = ShellCourseCourseIdEditRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof ShellIndexRoute
   '/place/$placeId': typeof PlacePlaceIdRoute
+  '/login/': typeof LoginIndexRoute
   '/onboarding/': typeof OnboardingIndexRoute
   '/recommend/': typeof RecommendIndexRoute
   '/course/create': typeof ShellCourseCreateRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/place/$placeId': typeof PlacePlaceIdRoute
   '/': typeof ShellIndexRoute
+  '/login': typeof LoginIndexRoute
   '/onboarding': typeof OnboardingIndexRoute
   '/recommend': typeof RecommendIndexRoute
   '/course/create': typeof ShellCourseCreateRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/_shell': typeof ShellRouteWithChildren
   '/place/$placeId': typeof PlacePlaceIdRoute
   '/_shell/': typeof ShellIndexRoute
+  '/login/': typeof LoginIndexRoute
   '/onboarding/': typeof OnboardingIndexRoute
   '/recommend/': typeof RecommendIndexRoute
   '/_shell/course/create': typeof ShellCourseCreateRoute
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/place/$placeId'
+    | '/login/'
     | '/onboarding/'
     | '/recommend/'
     | '/course/create'
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
   to:
     | '/place/$placeId'
     | '/'
+    | '/login'
     | '/onboarding'
     | '/recommend'
     | '/course/create'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/_shell'
     | '/place/$placeId'
     | '/_shell/'
+    | '/login/'
     | '/onboarding/'
     | '/recommend/'
     | '/_shell/course/create'
@@ -218,6 +230,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   ShellRoute: typeof ShellRouteWithChildren
   PlacePlaceIdRoute: typeof PlacePlaceIdRoute
+  LoginIndexRoute: typeof LoginIndexRoute
   OnboardingIndexRoute: typeof OnboardingIndexRoute
   RecommendIndexRoute: typeof RecommendIndexRoute
 }
@@ -243,6 +256,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding/'
       preLoaderRoute: typeof OnboardingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login/': {
+      id: '/login/'
+      path: '/login'
+      fullPath: '/login/'
+      preLoaderRoute: typeof LoginIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_shell/': {
@@ -374,6 +394,7 @@ const ShellRouteWithChildren = ShellRoute._addFileChildren(ShellRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   ShellRoute: ShellRouteWithChildren,
   PlacePlaceIdRoute: PlacePlaceIdRoute,
+  LoginIndexRoute: LoginIndexRoute,
   OnboardingIndexRoute: OnboardingIndexRoute,
   RecommendIndexRoute: RecommendIndexRoute,
 }
