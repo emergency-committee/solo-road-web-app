@@ -11,7 +11,7 @@ export function useSubmitOnboarding() {
     mutationFn: (payload: OnboardingSubmitPayload) => submitOnboarding(payload),
     onSuccess: () => {
       useSessionStore.getState().setOnboarded()
-      navigate({ to: '/login' })
+      navigate({ to: '/' })
     },
   })
 }

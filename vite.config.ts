@@ -68,6 +68,13 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
+      // Spring 백엔드(solo_road_server, 기본 포트 8080)의 인증 엔드포인트.
+      // 더 구체적인 규칙을 /api 보다 먼저 두어야 /api/v1/auth/* 가 AI 서버로 새지 않는다.
+      // 인증은 HttpOnly 쿠키라 동일 출처로 프록시해야 로컬에서도 쿠키가 정상적으로 오간다.
+      '/api/v1/auth': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
       '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,
