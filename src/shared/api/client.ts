@@ -7,6 +7,7 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
   const { headers: extraHeaders, ...rest } = options
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     ...rest,
+    credentials: 'include',
     headers: buildHeaders(extraHeaders as HeadersInit | undefined),
   })
 

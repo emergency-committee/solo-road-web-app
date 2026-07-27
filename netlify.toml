@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# TanStack Router는 클라이언트 사이드 라우팅이므로 모든 경로를 index.html로 fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

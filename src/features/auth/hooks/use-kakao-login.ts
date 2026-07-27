@@ -1,17 +1,22 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useSessionStore } from '@/shared/auth/session-store'
+import { kakaoAuthorizeUrl } from '../api/kakao-oauth'
 
 export function useKakaoLogin() {
   const navigate = useNavigate()
 
   function startLogin() {
-    // TODO: 실제 카카오 OAuth 연동(Authorization Code 방식) 및 백엔드 토큰 교환으로 교체.
-    // 지금은 버튼 클릭 시 바로 다음 화면(홈)으로 넘어가는 자리표시자 동작만 수행한다.
-    useSessionStore.getState().setSession({
-      accessToken: 'local-session-token',
-      user: { id: 'local-user', nickname: '솔로더 여행자' },
-    })
-    navigate({ to: '/' })
+    if (import.meta.env.VITE_AUTH_MOCK === 'true') {
+      useSessionStore.getState().setSession({
+        user: { id: 'local-user', nickname: '솔로더 여행자' },
+      })
+      const hasOnboarded = useSessionStore.getState().hasOnboarded
+      navigate({ to: hasOnboarded ? '/' : '/onboarding' })
+      return
+    }
+
+    // 카카오 인가 화면으로 전체 페이지 리다이렉트. 콜백은 /login/kakao/callback 라우트가 처리한다.
+    window.location.href = kakaoAuthorizeUrl()
   }
 
   return { startLogin }

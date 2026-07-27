@@ -1,5 +1,5 @@
-export { useCourseStream } from './hooks/use-course-stream'
-export type { CourseRequest, SSEMessageData } from './types/course.types'
+export { useGenerateCourse } from './hooks/use-generate-course'
+export type { GenerateCourseRequest, GenerateCourseResponse } from './types/course.types'
 
 export { CourseCreateForm } from './components/CourseCreateForm'
 export { CourseDateRangeCalendar } from './components/CourseDateRangeCalendar'

@@ -1,22 +1,20 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
+/**
+ * 인증 토큰은 백엔드가 HttpOnly 쿠키로만 내려주므로(JS에서 읽거나 저장할 수 없음),
+ * 여기서는 로그인 여부 판단용으로 사용자 정보만 들고 있는다.
+ */
 export interface AuthUser {
   id: string
-  nickname: string
+  nickname?: string
   profileImageUrl?: string
 }
 
 interface SessionState {
-  accessToken: string | null
-  refreshToken: string | null
   user: AuthUser | null
   hasOnboarded: boolean
-  setSession: (payload: {
-    accessToken: string
-    refreshToken?: string | null
-    user: AuthUser
-  }) => void
+  setSession: (payload: { user: AuthUser }) => void
   setOnboarded: () => void
   clearSession: () => void
 }
@@ -24,21 +22,16 @@ interface SessionState {
 export const useSessionStore = create<SessionState>()(
   persist(
     (set) => ({
-      accessToken: null,
-      refreshToken: null,
       user: null,
       hasOnboarded: false,
-      setSession: ({ accessToken, refreshToken, user }) =>
-        set({ accessToken, refreshToken: refreshToken ?? null, user }),
+      setSession: ({ user }) => set({ user }),
       setOnboarded: () => set({ hasOnboarded: true }),
-      clearSession: () => set({ accessToken: null, refreshToken: null, user: null }),
+      clearSession: () => set({ user: null }),
     }),
     {
       name: 'solo-road-session',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        accessToken: state.accessToken,
-        refreshToken: state.refreshToken,
         user: state.user,
         hasOnboarded: state.hasOnboarded,
       }),
