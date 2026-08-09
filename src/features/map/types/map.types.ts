@@ -11,3 +11,10 @@ export interface MapMarkerData {
   reviewCount: number
   tags: { label: string; tone: 'primary' | 'secondary' }[]
 }
+
+export const MAP_FILTERS: { value: string; label: string }[] = [
+  { value: 'all', label: '전체' },
+  { value: 'cafe', label: '카페/베이커리' },
+  { value: 'landmark', label: '명소' },
+  { value: 'safe-restaurant', label: '안전 식당' },
+]

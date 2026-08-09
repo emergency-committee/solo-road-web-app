@@ -6,13 +6,11 @@ import {
   ShieldCheck,
   SlidersHorizontal,
 } from 'lucide-react'
-import {
-  mockUserProfile,
-  ProfileHeader,
-  ProfileMenuList,
-  ProfileStatsGrid,
-} from '@/features/profile'
+import { ProfileHeader, ProfileMenuList, ProfileStatsGrid } from '@/features/profile'
 import { useLogout } from '@/features/auth'
+import { useSessionStore } from '@/shared/auth/session-store'
+import { useSavedPlaces } from '@/features/saved'
+import { useMyReviews } from '@/features/review'
 
 export const Route = createFileRoute('/_shell/my/')({
   component: MyPage,
@@ -21,49 +19,57 @@ export const Route = createFileRoute('/_shell/my/')({
 function MyPage() {
   const navigate = useNavigate()
   const logout = useLogout()
+  const user = useSessionStore((state) => state.user)
+  const savedPlacesQuery = useSavedPlaces(0, 1)
+  const myReviewsQuery = useMyReviews(0, 1)
 
   return (
     <main className="px-margin-mobile pt-lg mx-auto max-w-2xl pb-8">
       <h2 className="font-headline-xl text-headline-xl text-on-surface mb-xl mt-lg">마이페이지</h2>
 
       <ProfileHeader
-        name={mockUserProfile.name}
-        avatarUrl={mockUserProfile.avatarUrl}
-        avatarAlt={mockUserProfile.avatarAlt}
+        name={user?.nickname ?? '솔로더 여행자'}
+        avatarUrl={user?.profileImageUrl ?? 'https://picsum.photos/seed/solo-road-profile/160/160'}
+        avatarAlt="프로필 사진"
       />
-      <ProfileStatsGrid stats={mockUserProfile.stats} />
+      <ProfileStatsGrid
+        stats={[
+          { label: '저장한 장소', value: savedPlacesQuery.data?.totalElements ?? 0 },
+          { label: '내 리뷰', value: myReviewsQuery.data?.totalElements ?? 0 },
+        ]}
+      />
 
       <ProfileMenuList
         items={[
           {
             icon: <Bookmark className="size-5" />,
-            label: 'Saved Places',
+            label: '저장한 장소',
             onClick: () => navigate({ to: '/my/saved-places' }),
           },
           {
             icon: <RouteIcon className="size-5" />,
-            label: 'Saved Courses',
+            label: '저장한 코스',
             onClick: () => navigate({ to: '/my/saved-courses' }),
           },
           {
             icon: <MessageSquare className="size-5" />,
-            label: 'My Reviews',
+            label: '내 리뷰',
             onClick: () => navigate({ to: '/my/reviews' }),
           },
         ]}
       />
 
       <ProfileMenuList
-        title="SETTINGS"
+        title="설정"
         items={[
           {
             icon: <SlidersHorizontal className="size-5" />,
-            label: 'Travel Preference Settings',
+            label: '여행 취향 설정',
             onClick: () => navigate({ to: '/my/preferences' }),
           },
           {
             icon: <ShieldCheck className="size-5" />,
-            label: 'Permissions',
+            label: '권한 설정',
             onClick: () => navigate({ to: '/my/permissions' }),
           },
         ]}
@@ -75,7 +81,7 @@ function MyPage() {
           onClick={() => void logout()}
           className="font-label-md text-label-md hover:bg-error-container/20 border-error-container px-lg py-sm text-error rounded-full border transition-colors"
         >
-          Sign Out
+          로그아웃
         </button>
       </div>
     </main>

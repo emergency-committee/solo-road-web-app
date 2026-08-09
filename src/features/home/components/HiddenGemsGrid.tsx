@@ -1,14 +1,18 @@
 import { useNavigate } from '@tanstack/react-router'
 import { PlaceCard } from '@/shared/components/PlaceCard'
 import { SectionHeader } from '@/shared/components/SectionHeader'
-import type { HomePlaceCardData } from '../mocks/home-mocks'
+import type { HomePlaceCardData } from '../types/home.types'
 
 export function HiddenGemsGrid({ places }: { places: HomePlaceCardData[] }) {
   const navigate = useNavigate()
 
   return (
     <section className="space-y-md">
-      <SectionHeader title="여유로운 숨은 명소" actionLabel="더 보기" />
+      <SectionHeader
+        title="여유로운 숨은 명소"
+        actionLabel="더 보기"
+        onAction={() => navigate({ to: '/recommend' })}
+      />
       <div className="gap-md grid grid-cols-2">
         {places.map((place) => (
           <PlaceCard

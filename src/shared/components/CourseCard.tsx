@@ -123,7 +123,7 @@ export function CourseCard(props: CourseCardProps) {
             />
             <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/40 to-transparent p-3">
               <span className="font-label-caps text-label-caps rounded border border-white/30 bg-white/20 px-2 py-1 text-white backdrop-blur-md">
-                MAP PREVIEW
+                지도 미리보기
               </span>
             </div>
           </div>
@@ -149,7 +149,7 @@ export function CourseCard(props: CourseCardProps) {
                 </div>
                 <div className="flex items-center gap-1">
                   <MapPin className="size-4" />
-                  <span>{props.placeCount} Places</span>
+                  <span>장소 {props.placeCount}곳</span>
                 </div>
               </div>
               <button
@@ -160,7 +160,7 @@ export function CourseCard(props: CourseCardProps) {
                 }}
                 className="font-label-md text-primary flex items-center gap-1 hover:underline"
               >
-                View Details
+                자세히 보기
                 <ChevronRight className="size-[18px]" />
               </button>
             </div>
@@ -195,7 +195,7 @@ export function CourseCard(props: CourseCardProps) {
               <Star className="text-primary size-3.5 fill-current" />
               <span className="font-label-md text-label-md text-on-surface-variant">
                 {props.rating.toFixed(1)}
-                {props.reviewCount !== undefined && ` (${props.reviewCount} reviews)`}
+                {props.reviewCount !== undefined && ` (리뷰 ${props.reviewCount}개)`}
               </span>
             </div>
           </div>

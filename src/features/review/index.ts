@@ -1,4 +1,5 @@
 export { ReviewCard } from './components/ReviewCard'
 export { DeleteReviewDialog } from './components/DeleteReviewDialog'
-export { mockReviews } from './mocks/review-mocks'
+export { useMyReviews } from './hooks/use-my-reviews'
+export { useDeleteReview } from './hooks/use-delete-review'
 export type { Review } from './types/review.types'

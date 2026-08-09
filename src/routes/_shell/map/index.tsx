@@ -5,18 +5,46 @@ import {
   MapMarker,
   type MapMarkerData,
   MapSearchBar,
-  mockMapMarkers,
   PlacePreviewSheet,
   SafetyTogglePanel,
 } from '@/features/map'
+import { derivePosition } from '@/features/map/lib/marker-layout'
+import { usePlaces } from '@/features/place'
+import { formatDistanceMeters } from '@/shared/lib/format'
+import type { ApiPlacesParams } from '@/features/place'
 
 export const Route = createFileRoute('/_shell/map/')({
   component: MapPage,
 })
 
+function toPlacesParams(filter: string): ApiPlacesParams {
+  if (filter === 'cafe') return { type: '카페' }
+  if (filter === 'landmark') return { type: '명소' }
+  if (filter === 'safe-restaurant') return { soloFriendlyOnly: true }
+  return {}
+}
+
 function MapPage() {
   const [filterValue, setFilterValue] = useState<string[]>(['all'])
   const [selectedMarker, setSelectedMarker] = useState<MapMarkerData | null>(null)
+
+  const placesQuery = usePlaces(toPlacesParams(filterValue[0] ?? 'all'))
+  const markers: MapMarkerData[] = (placesQuery.data?.content ?? []).map((place) => {
+    const { top, left } = derivePosition(place.placeId)
+    return {
+      id: place.placeId.toString(),
+      name: place.name,
+      icon: place.type.includes('공원') || place.type.includes('park') ? 'park' : 'coffee',
+      top,
+      left,
+      imageUrl: place.thumbnailUrl ?? `https://picsum.photos/seed/place-${place.placeId.toString()}/480/480`,
+      imageAlt: place.name,
+      distanceLabel: formatDistanceMeters(place.distanceM),
+      rating: place.rating ?? 0,
+      reviewCount: 0,
+      tags: place.soloFriendlyBadge ? [{ label: '혼행 친화', tone: 'secondary' as const }] : [],
+    }
+  })
 
   return (
     <div className="bg-surface-container relative h-[calc(100vh-4rem)] w-full overflow-hidden">
@@ -29,7 +57,7 @@ function MapPage() {
         <div className="bg-primary size-3.5 rounded-full border-2 border-white shadow-[0_0_8px_rgba(0,0,0,0.2)]" />
       </div>
 
-      {mockMapMarkers.map((marker) => (
+      {markers.map((marker) => (
         <MapMarker key={marker.id} marker={marker} onSelect={setSelectedMarker} />
       ))}
 

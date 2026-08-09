@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
-import { mockSavedPlaces, SavedPlaceGrid, SAVED_PLACE_FILTERS } from '@/features/saved'
-import { FilterChipGroup } from '@/shared/components/FilterChip'
+import { Bookmark } from 'lucide-react'
+import { SavedPlaceGrid, useSavedPlaces } from '@/features/saved'
+import { EmptyState } from '@/shared/components/EmptyState'
 import { TopAppBar } from '@/shared/components/layout/TopAppBar'
 
 export const Route = createFileRoute('/_shell/my/saved-places')({
@@ -9,19 +9,22 @@ export const Route = createFileRoute('/_shell/my/saved-places')({
 })
 
 function SavedPlacesPage() {
-  const [filter, setFilter] = useState<string[]>(['all'])
+  const { data, isLoading } = useSavedPlaces()
+  const places = data?.content ?? []
 
   return (
     <div className="bg-surface min-h-screen pb-24">
-      <TopAppBar title="Saved Places" showBack />
+      <TopAppBar title="저장한 장소" showBack />
       <main className="px-margin-mobile pt-lg">
-        <FilterChipGroup
-          options={SAVED_PLACE_FILTERS}
-          value={filter}
-          onChange={setFilter}
-          className="mb-lg"
-        />
-        <SavedPlaceGrid places={mockSavedPlaces} />
+        {isLoading ? (
+          <p className="font-body-sm text-body-sm text-on-surface-variant text-center">
+            저장한 장소를 불러오는 중이에요...
+          </p>
+        ) : places.length === 0 ? (
+          <EmptyState icon={<Bookmark className="size-6" />} title="아직 저장한 장소가 없어요" />
+        ) : (
+          <SavedPlaceGrid places={places} />
+        )}
       </main>
     </div>
   )

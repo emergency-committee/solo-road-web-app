@@ -11,7 +11,7 @@ export function KeyHighlightsList({ highlights }: { highlights: PlaceHighlight[]
   return (
     <section className="mb-lg">
       <h3 className="font-label-caps text-label-caps text-outline mb-md uppercase">
-        Key Highlights
+        주요 특징
       </h3>
       <div className="gap-sm flex flex-wrap">
         {highlights.map((highlight) => {

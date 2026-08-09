@@ -5,11 +5,22 @@ import { useState } from 'react'
 interface PlaceDetailHeroProps {
   imageUrl: string
   imageAlt: string
+  liked?: boolean
+  onToggleLike?: () => void
 }
 
-export function PlaceDetailHero({ imageUrl, imageAlt }: PlaceDetailHeroProps) {
+export function PlaceDetailHero({ imageUrl, imageAlt, liked, onToggleLike }: PlaceDetailHeroProps) {
   const router = useRouter()
-  const [saved, setSaved] = useState(false)
+  const [localSaved, setLocalSaved] = useState(false)
+  const saved = liked ?? localSaved
+
+  function handleToggle() {
+    if (onToggleLike) {
+      onToggleLike()
+      return
+    }
+    setLocalSaved((prev) => !prev)
+  }
 
   return (
     <header className="relative h-[397px] w-full overflow-hidden">
@@ -34,7 +45,7 @@ export function PlaceDetailHero({ imageUrl, imageAlt }: PlaceDetailHeroProps) {
           </button>
           <button
             type="button"
-            onClick={() => setSaved((prev) => !prev)}
+            onClick={handleToggle}
             aria-pressed={saved}
             aria-label="찜하기"
             className="glass-effect text-primary flex size-10 items-center justify-center rounded-full shadow-md active:scale-95"

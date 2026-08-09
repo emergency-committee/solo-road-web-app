@@ -23,19 +23,23 @@ export function ReviewCard({ review, onEdit, onDelete }: ReviewCardProps) {
             <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold">
               {review.placeName}
             </h2>
-            <p className="font-label-md text-label-md text-outline">
-              {review.location} • {review.dateLabel}
-            </p>
+            {(review.location ?? review.dateLabel) && (
+              <p className="font-label-md text-label-md text-outline">
+                {[review.location, review.dateLabel].filter(Boolean).join(' • ')}
+              </p>
+            )}
           </div>
           <div className="gap-xs flex">
-            <button
-              type="button"
-              onClick={onEdit}
-              aria-label="리뷰 수정"
-              className="text-outline hover:text-primary p-1 transition-colors"
-            >
-              <Pencil className="size-4" />
-            </button>
+            {onEdit && (
+              <button
+                type="button"
+                onClick={onEdit}
+                aria-label="리뷰 수정"
+                className="text-outline hover:text-primary p-1 transition-colors"
+              >
+                <Pencil className="size-4" />
+              </button>
+            )}
             <button
               type="button"
               onClick={onDelete}
@@ -56,7 +60,7 @@ export function ReviewCard({ review, onEdit, onDelete }: ReviewCardProps) {
               />
             ))}
           </div>
-          <StatBadge label={review.tag.label} tone={review.tag.tone} />
+          {review.tag && <StatBadge label={review.tag.label} tone={review.tag.tone} />}
         </div>
         <p
           className={cn(

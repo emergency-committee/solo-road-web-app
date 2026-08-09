@@ -2,10 +2,10 @@ import { Link } from '@tanstack/react-router'
 import { Home, Map, Route, User } from 'lucide-react'
 
 const NAV_ITEMS = [
-  { to: '/', label: 'Home', icon: Home, exact: true },
-  { to: '/map', label: 'Map', icon: Map, exact: false },
-  { to: '/course', label: 'Course', icon: Route, exact: false },
-  { to: '/my', label: 'My', icon: User, exact: false },
+  { to: '/', label: '홈', icon: Home, exact: true },
+  { to: '/map', label: '지도', icon: Map, exact: false },
+  { to: '/course', label: '코스', icon: Route, exact: false },
+  { to: '/my', label: '마이', icon: User, exact: false },
 ] as const
 
 export function BottomNav() {
