@@ -9,9 +9,9 @@ export const Route = createFileRoute('/_shell')({
 
 function ShellLayout() {
   return (
-    <div className="pb-16">
+    <>
       <Outlet />
       <BottomNav />
-    </div>
+    </>
   )
 }

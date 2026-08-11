@@ -24,7 +24,7 @@ function MyPage() {
   const myReviewsQuery = useMyReviews(0, 1)
 
   return (
-    <main className="px-margin-mobile pt-lg mx-auto max-w-2xl pb-8">
+    <main className="min-h-screen px-margin-mobile pt-lg mx-auto max-w-2xl pb-8">
       <h2 className="font-headline-xl text-headline-xl text-on-surface mb-xl mt-lg">마이페이지</h2>
 
       <ProfileHeader

@@ -10,7 +10,7 @@ const NAV_ITEMS = [
 
 export function BottomNav() {
   return (
-    <nav className="bg-surface border-outline-variant px-gutter-mobile fixed inset-x-0 bottom-0 z-50 flex h-16 items-center justify-around border-t pb-[env(safe-area-inset-bottom)]">
+    <nav className="bg-surface border-outline-variant px-gutter-mobile sticky inset-x-0 bottom-0 z-50 flex h-16 items-center justify-around border-t pb-[env(safe-area-inset-bottom)]">
       {NAV_ITEMS.map(({ to, label, icon: Icon, exact }) => (
         <Link
           key={to}
