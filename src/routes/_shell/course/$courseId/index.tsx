@@ -17,7 +17,7 @@ function CourseDetailPage() {
 
   if (isLoading) {
     return (
-      <main className="p-margin-mobile">
+      <main className="min-h-screen p-margin-mobile">
         <p className="font-body-md text-on-surface-variant text-center">
           코스를 불러오는 중이에요...
         </p>
@@ -27,14 +27,14 @@ function CourseDetailPage() {
 
   if (isError || !course) {
     return (
-      <main className="p-margin-mobile">
+      <main className="min-h-screen p-margin-mobile">
         <EmptyState icon={<MapPin className="size-6" />} title="코스를 찾을 수 없어요" />
       </main>
     )
   }
 
   return (
-    <div className="font-body-md text-body-md pb-32">
+    <div className="font-body-md text-body-md min-h-screen pb-32">
       <header className="bg-surface px-margin-mobile py-base fixed inset-x-0 top-0 z-50 flex items-center justify-between">
         <button
           type="button"

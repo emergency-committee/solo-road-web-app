@@ -18,7 +18,7 @@ function CoursePage() {
   const myCourses = myCoursesQuery.data?.content ?? []
 
   return (
-    <main className="space-y-xl px-margin-mobile pt-lg mx-auto max-w-4xl pb-8">
+    <main className="min-h-screen space-y-xl px-margin-mobile pt-lg mx-auto max-w-4xl pb-8">
       <section className="space-y-sm">
         <h2 className="font-headline-xl text-headline-xl text-on-surface">코스 메인</h2>
         <p className="font-body-md text-body-md text-on-surface-variant">
