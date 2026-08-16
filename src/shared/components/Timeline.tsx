@@ -20,6 +20,7 @@ interface TimelineItemProps {
   imageAlt?: string
   subtitle?: string
   badges?: TimelineBadge[]
+  after?: ReactNode
   editable?: boolean
   onEdit?: () => void
   onRemove?: () => void
@@ -44,6 +45,7 @@ export function TimelineItem({
   imageAlt,
   subtitle,
   badges,
+  after,
   editable = false,
   onEdit,
   onRemove,
@@ -126,6 +128,7 @@ export function TimelineItem({
             </div>
           )}
         </div>
+        {after && <div className="mt-sm">{after}</div>}
       </div>
     </div>
   )

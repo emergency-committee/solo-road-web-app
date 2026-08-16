@@ -3,6 +3,7 @@ export type { GenerateCourseRequest, GenerateCourseResponse } from './types/cour
 
 export { CourseCreateForm } from './components/CourseCreateForm'
 export { CourseDateRangeCalendar } from './components/CourseDateRangeCalendar'
+export { CourseLegButton } from './components/CourseLegButton'
 export type { DateRange } from './components/CourseDateRangeCalendar'
 export { useCourseEditStore } from './store/course-edit-store'
 export {

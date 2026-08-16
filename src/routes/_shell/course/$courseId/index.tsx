@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
 import { ArrowLeft, Heart, MapPin, Navigation, Save, Share2 } from 'lucide-react'
-import { mockCourseDetails } from '@/features/course'
+import { useState } from 'react'
+import { CourseLegButton, mockCourseDetails, type CourseStop } from '@/features/course'
+import { CourseRouteViewer } from '@/features/course-route'
 import { Timeline, TimelineItem } from '@/shared/components/Timeline'
 import { EmptyState } from '@/shared/components/EmptyState'
 
@@ -12,6 +14,10 @@ function CourseDetailPage() {
   const { courseId } = Route.useParams()
   const router = useRouter()
   const course = mockCourseDetails[courseId] ?? Object.values(mockCourseDetails)[0]
+  const [selectedLeg, setSelectedLeg] = useState<{
+    origin: CourseStop
+    destination: CourseStop
+  } | null>(null)
 
   if (!course) {
     return (
@@ -102,6 +108,19 @@ function CourseDetailPage() {
                 imageUrl={stop.imageUrl}
                 imageAlt={stop.imageAlt}
                 {...(stop.badges !== undefined && { badges: stop.badges })}
+                {...(course.stops[i + 1]
+                  ? {
+                      after: (
+                        <CourseLegButton
+                          originName={stop.title}
+                          destinationName={course.stops[i + 1]!.title}
+                          onClick={() =>
+                            setSelectedLeg({ origin: stop, destination: course.stops[i + 1]! })
+                          }
+                        />
+                      ),
+                    }
+                  : {})}
               />
             ))}
           </Timeline>
@@ -125,6 +144,19 @@ function CourseDetailPage() {
           코스 시작하기
         </Link>
       </div>
+
+      {selectedLeg && (
+        <CourseRouteViewer
+          originName={selectedLeg.origin.title}
+          destinationName={selectedLeg.destination.title}
+          origin={{ lat: selectedLeg.origin.latitude, lng: selectedLeg.origin.longitude }}
+          destination={{
+            lat: selectedLeg.destination.latitude,
+            lng: selectedLeg.destination.longitude,
+          }}
+          onClose={() => setSelectedLeg(null)}
+        />
+      )}
     </div>
   )
 }

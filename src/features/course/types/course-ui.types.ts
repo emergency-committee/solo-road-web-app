@@ -4,6 +4,8 @@ export interface CourseStop {
   durationLabel: string
   title: string
   subtitle: string
+  latitude: number
+  longitude: number
   imageUrl: string
   imageAlt: string
   badges?: { label: string; tone: 'primary' | 'success' }[]

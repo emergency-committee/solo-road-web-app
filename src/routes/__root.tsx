@@ -6,7 +6,7 @@ export const Route = createRootRoute({
   component: () => (
     <div className="app-frame" ref={setAppFrameElement}>
       <Outlet />
-      {import.meta.env.DEV && <TanStackRouterDevtools />}
+      {import.meta.env.VITE_ENABLE_DEVTOOLS === 'true' && <TanStackRouterDevtools />}
     </div>
   ),
 })

@@ -55,7 +55,7 @@ function CoursePage() {
             <Link
               key={course.id}
               to="/course/$courseId"
-              params={{ courseId: 'seongsu-art-walk' }}
+              params={{ courseId: course.id }}
               className="group border-outline-variant/20 hover:bg-surface-container-high bg-surface-container flex overflow-hidden rounded-xl border transition-colors"
             >
               <div className="h-full w-24 shrink-0">

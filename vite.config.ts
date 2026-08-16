@@ -75,6 +75,14 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true,
       },
+      '/api/v1/routes': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/api/v1/safety': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
       '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,
