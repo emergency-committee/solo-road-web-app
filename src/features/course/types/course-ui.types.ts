@@ -1,5 +1,18 @@
 export interface CourseStop {
   id: string
+  placeId: number
+  stayDurationMinutes?: number
+  time?: string
+  durationLabel: string
+  title: string
+  subtitle?: string
+  imageUrl: string
+  imageAlt: string
+  badges?: { label: string; tone: 'primary' | 'success' }[]
+}
+
+export interface DemoCourseStop {
+  id: string
   time: string
   durationLabel: string
   title: string
@@ -19,7 +32,7 @@ export interface CourseDetail {
   mapImageUrl: string
   mapImageAlt: string
   badges: string[]
-  stops: CourseStop[]
+  stops: DemoCourseStop[]
 }
 
 export interface RecommendedCourse {

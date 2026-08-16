@@ -2,7 +2,16 @@ import { Building2, MapPinPlus, Moon, Search, Sparkles, Trees, X, Zap } from 'lu
 import { useState } from 'react'
 import { Switch } from '@/shared/components/ui/switch'
 import { FilterChipGroup } from '@/shared/components/FilterChip'
+import { toIsoDateString } from '@/shared/lib/format'
 import { CourseDateRangeCalendar, type DateRange } from './CourseDateRangeCalendar'
+
+export interface CourseCreateFormData {
+  region: string
+  startDate: string
+  endDate: string
+  preferredMood: string
+  safetyPriority: boolean
+}
 
 const QUICK_REGIONS = ['서울', '부산', '제주', '강릉']
 
@@ -30,22 +39,33 @@ const INITIAL_INTEREST_PLACES: InterestPlace[] = [
 ]
 
 interface CourseCreateFormProps {
-  onSubmit: () => void
+  onSubmit: (data: CourseCreateFormData) => void
+  submitting?: boolean
 }
 
-export function CourseCreateForm({ onSubmit }: CourseCreateFormProps) {
+export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateFormProps) {
   const [region, setRegion] = useState('')
   const [dateRange, setDateRange] = useState<DateRange>({ start: null, end: null })
   const [interestPlaces, setInterestPlaces] = useState(INITIAL_INTEREST_PLACES)
   const [vibe, setVibe] = useState<string[]>(['nature'])
   const [safetyPriority, setSafetyPriority] = useState(true)
 
+  const isValid = region.trim().length > 0 && dateRange.start !== null && dateRange.end !== null
+
   return (
     <form
       className="space-y-xl"
       onSubmit={(e) => {
         e.preventDefault()
-        onSubmit()
+        if (!isValid || dateRange.start === null || dateRange.end === null) return
+
+        onSubmit({
+          region,
+          startDate: toIsoDateString(dateRange.start),
+          endDate: toIsoDateString(dateRange.end),
+          preferredMood: vibe[0] ?? 'nature',
+          safetyPriority,
+        })
       }}
     >
       <section className="space-y-md">
@@ -83,6 +103,8 @@ export function CourseCreateForm({ onSubmit }: CourseCreateFormProps) {
         <CourseDateRangeCalendar range={dateRange} onRangeChange={setDateRange} />
       </section>
 
+      {/* TODO: POST /api/v1/courses/generate는 아직 관심 장소(placeIds)를 받지 않아 AI가 전체 코스를 자동 구성한다.
+          장소 검색/추가 UI는 백엔드가 필드를 지원하면 연결한다. */}
       <section className="space-y-md">
         <div className="mb-xs flex items-center justify-between">
           <label className="font-label-md text-label-md text-on-surface-variant tracking-wider uppercase">
@@ -160,9 +182,10 @@ export function CourseCreateForm({ onSubmit }: CourseCreateFormProps) {
 
       <button
         type="submit"
-        className="font-headline-lg-mobile text-headline-lg-mobile gap-xs bg-primary-container py-lg text-on-primary flex w-full items-center justify-center rounded-xl font-bold shadow-lg transition-transform active:scale-[0.98]"
+        disabled={!isValid || submitting}
+        className="font-headline-lg-mobile text-headline-lg-mobile gap-xs bg-primary-container py-lg text-on-primary flex w-full items-center justify-center rounded-xl font-bold shadow-lg transition-transform active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
       >
-        코스 생성하기
+        {submitting ? 'AI가 코스를 만들고 있어요...' : '코스 생성하기'}
         <Sparkles className="size-5" />
       </button>
     </form>

@@ -1,7 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
-import { mockSavedCourses, SAVED_COURSE_FILTERS, SavedCourseGrid } from '@/features/saved'
-import { FilterChipGroup } from '@/shared/components/FilterChip'
+import { Route as RouteIcon } from 'lucide-react'
+import { useMyCourses } from '@/features/course'
+import { SavedCourseGrid } from '@/features/saved'
+import { EmptyState } from '@/shared/components/EmptyState'
 import { TopAppBar } from '@/shared/components/layout/TopAppBar'
 
 export const Route = createFileRoute('/_shell/my/saved-courses')({
@@ -9,22 +10,25 @@ export const Route = createFileRoute('/_shell/my/saved-courses')({
 })
 
 function SavedCoursesPage() {
-  const [filter, setFilter] = useState<string[]>(['all'])
+  const { data, isLoading } = useMyCourses()
+  const courses = data?.content ?? []
 
   return (
     <div className="bg-surface min-h-screen pb-24">
-      <TopAppBar title="Saved Courses" showBack />
+      <TopAppBar title="저장한 코스" showBack />
       <main className="px-margin-mobile pt-4">
         <p className="font-body-sm text-body-sm text-on-surface-variant mb-lg">
-          Explore your curated collection of walking routes and solo-travel journeys.
+          나만의 도보 코스와 혼행 여정 모음을 둘러보세요.
         </p>
-        <FilterChipGroup
-          options={SAVED_COURSE_FILTERS}
-          value={filter}
-          onChange={setFilter}
-          className="mb-lg"
-        />
-        <SavedCourseGrid courses={mockSavedCourses} />
+        {isLoading ? (
+          <p className="font-body-sm text-body-sm text-on-surface-variant text-center">
+            코스를 불러오는 중이에요...
+          </p>
+        ) : courses.length === 0 ? (
+          <EmptyState icon={<RouteIcon className="size-6" />} title="아직 만든 코스가 없어요" />
+        ) : (
+          <SavedCourseGrid courses={courses} />
+        )}
       </main>
     </div>
   )

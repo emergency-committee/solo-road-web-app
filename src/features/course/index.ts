@@ -1,19 +1,23 @@
 export { useGenerateCourse } from './hooks/use-generate-course'
-export type { GenerateCourseRequest, GenerateCourseResponse } from './types/course.types'
+export { useCourseRecommendations } from './hooks/use-course-recommendations'
+export { useMyCourses } from './hooks/use-my-courses'
+export { useCourseDetail } from './hooks/use-course-detail'
+export { useUpdateCourse } from './hooks/use-update-course'
+export { useDeleteCourse } from './hooks/use-delete-course'
+export type {
+  CourseDetailResponse,
+  CourseDetailStop,
+  CourseRecommendationItem,
+  GenerateCourseRequest,
+  GenerateCourseResponse,
+  MyCourseItem,
+} from './types/course.types'
 
 export { CourseCreateForm } from './components/CourseCreateForm'
+export type { CourseCreateFormData } from './components/CourseCreateForm'
 export { CourseDateRangeCalendar } from './components/CourseDateRangeCalendar'
 export { CourseLegButton } from './components/CourseLegButton'
+export { mockCourseDetails, mockSavedCourseRows } from './mocks/course-mocks'
 export type { DateRange } from './components/CourseDateRangeCalendar'
 export { useCourseEditStore } from './store/course-edit-store'
-export {
-  mockCourseDetails,
-  mockRecommendedCourses,
-  mockSavedCourseRows,
-} from './mocks/course-mocks'
-export type {
-  CourseDetail,
-  CourseStop,
-  RecommendedCourse,
-  SavedCourseRow,
-} from './types/course-ui.types'
+export type { CourseDetail, CourseStop, DemoCourseStop } from './types/course-ui.types'

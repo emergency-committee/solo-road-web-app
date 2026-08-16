@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { kakaoLoginRequest } from '@/features/auth/api/auth-api'
-import { exchangeKakaoCodeForToken } from '@/features/auth/api/kakao-oauth'
+import { exchangeKakaoCodeForToken, fetchKakaoUserProfile } from '@/features/auth/api/kakao-oauth'
 import { useSessionStore } from '@/shared/auth/session-store'
 
 interface KakaoCallbackSearch {
@@ -39,9 +39,22 @@ function KakaoCallbackPage() {
     async function login(authorizationCode: string) {
       try {
         const kakaoAccessToken = await exchangeKakaoCodeForToken(authorizationCode)
-        const result = await kakaoLoginRequest(kakaoAccessToken)
+        const [result, profile] = await Promise.all([
+          kakaoLoginRequest(kakaoAccessToken),
+          // 프로필 조회는 화면 표시용 부가 정보이므로 실패해도 로그인 자체는 계속 진행한다.
+          fetchKakaoUserProfile(kakaoAccessToken).catch(() => ({
+            nickname: undefined,
+            profileImageUrl: undefined,
+          })),
+        ])
         useSessionStore.getState().setSession({
-          user: { id: String(result.user.userId) },
+          user: {
+            id: String(result.user.userId),
+            ...(profile.nickname !== undefined && { nickname: profile.nickname }),
+            ...(profile.profileImageUrl !== undefined && {
+              profileImageUrl: profile.profileImageUrl,
+            }),
+          },
         })
         const needsOnboarding = result.isNewUser || !useSessionStore.getState().hasOnboarded
         await navigate({ to: needsOnboarding ? '/onboarding' : '/' })

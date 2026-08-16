@@ -101,12 +101,6 @@ interface KakaoMapsApi {
   }
 }
 
-declare global {
-  interface Window {
-    kakao?: { maps: KakaoMapsApi }
-  }
-}
-
 let kakaoMapsPromise: Promise<KakaoMapsApi> | null = null
 
 export function CourseRouteMap({
@@ -331,8 +325,9 @@ function MapButton({
 }
 
 function loadKakaoMaps(appKey: string): Promise<KakaoMapsApi> {
-  if (window.kakao?.maps) {
-    return new Promise((resolve) => window.kakao?.maps.load(() => resolve(window.kakao!.maps)))
+  const loadedMaps = getKakaoMapsApi()
+  if (loadedMaps) {
+    return new Promise((resolve) => loadedMaps.load(() => resolve(loadedMaps)))
   }
   if (kakaoMapsPromise) return kakaoMapsPromise
 
@@ -341,16 +336,21 @@ function loadKakaoMaps(appKey: string): Promise<KakaoMapsApi> {
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(appKey)}&autoload=false`
     script.async = true
     script.onload = () => {
-      if (!window.kakao?.maps) {
+      const maps = getKakaoMapsApi()
+      if (!maps) {
         reject(new Error('Kakao Maps SDK did not initialize.'))
         return
       }
-      window.kakao.maps.load(() => resolve(window.kakao!.maps))
+      maps.load(() => resolve(maps))
     }
     script.onerror = () => reject(new Error('Failed to load Kakao Maps SDK.'))
     document.head.appendChild(script)
   })
   return kakaoMapsPromise
+}
+
+function getKakaoMapsApi(): KakaoMapsApi | undefined {
+  return (window as unknown as { kakao?: { maps?: KakaoMapsApi } }).kakao?.maps
 }
 
 function toKakaoPath(maps: KakaoMapsApi, path: Coordinate[]) {

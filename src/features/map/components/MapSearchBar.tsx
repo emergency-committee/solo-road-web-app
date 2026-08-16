@@ -1,6 +1,6 @@
 import { MapPin, Search } from 'lucide-react'
 import { FilterChipGroup } from '@/shared/components/FilterChip'
-import { mockMapFilters } from '../mocks/map-mocks'
+import { MAP_FILTERS } from '../types/map.types'
 
 interface MapSearchBarProps {
   filterValue: string[]
@@ -21,7 +21,7 @@ export function MapSearchBar({ filterValue, onFilterChange }: MapSearchBarProps)
         <MapPin className="text-outline size-5" />
       </div>
       <FilterChipGroup
-        options={mockMapFilters}
+        options={MAP_FILTERS}
         value={filterValue}
         onChange={onFilterChange}
         className="pb-base mt-sm"

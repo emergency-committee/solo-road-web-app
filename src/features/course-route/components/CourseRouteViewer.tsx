@@ -1,6 +1,7 @@
 import { ArrowLeft, MapPin } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import { useState } from 'react'
+import { KAKAO_JS_KEY } from '@/shared/api/config'
 import { ApiError } from '@/shared/api/errors'
 import { useCourseLegRoute } from '../hooks/use-course-leg-route'
 import { useCourseRouteInfrastructure } from '../hooks/use-course-route-infrastructure'
@@ -32,7 +33,7 @@ export function CourseRouteViewer({
   const [showCrimeRisk, setShowCrimeRisk] = useState(true)
   const routeQuery = useCourseLegRoute(origin, destination)
   const infrastructure = useCourseRouteInfrastructure(bounds, { showLights, showCctv, showPolice })
-  const kakaoJavaScriptKey = import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY?.trim()
+  const kakaoJavaScriptKey = KAKAO_JS_KEY?.trim()
 
   return createPortal(
     <section className="bg-surface fixed inset-y-0 left-1/2 z-[80] w-full max-w-[430px] -translate-x-1/2 overflow-hidden shadow-2xl">

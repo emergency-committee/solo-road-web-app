@@ -1,5 +1,4 @@
 export { MiniMapPreviewCard } from './components/MiniMapPreviewCard'
 export { SoloFriendlySection } from './components/SoloFriendlySection'
 export { HiddenGemsGrid } from './components/HiddenGemsGrid'
-export { mockSoloDiningPlaces, mockHiddenGems } from './mocks/home-mocks'
-export type { HomePlaceCardData } from './mocks/home-mocks'
+export type { HomePlaceCardData } from './types/home.types'

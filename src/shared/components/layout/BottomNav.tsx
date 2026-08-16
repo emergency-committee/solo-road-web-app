@@ -2,15 +2,15 @@ import { Link } from '@tanstack/react-router'
 import { Home, Map, Route, User } from 'lucide-react'
 
 const NAV_ITEMS = [
-  { to: '/', label: 'Home', icon: Home, exact: true },
-  { to: '/map', label: 'Map', icon: Map, exact: false },
-  { to: '/course', label: 'Course', icon: Route, exact: false },
-  { to: '/my', label: 'My', icon: User, exact: false },
+  { to: '/', label: '홈', icon: Home, exact: true },
+  { to: '/map', label: '지도', icon: Map, exact: false },
+  { to: '/course', label: '코스', icon: Route, exact: false },
+  { to: '/my', label: '마이', icon: User, exact: false },
 ] as const
 
 export function BottomNav() {
   return (
-    <nav className="bg-surface border-outline-variant px-gutter-mobile fixed inset-x-0 bottom-0 z-50 flex h-16 items-center justify-around border-t pb-[env(safe-area-inset-bottom)]">
+    <nav className="bg-surface border-outline-variant px-gutter-mobile sticky inset-x-0 bottom-0 z-50 flex h-16 items-center justify-around border-t pb-[env(safe-area-inset-bottom)]">
       {NAV_ITEMS.map(({ to, label, icon: Icon, exact }) => (
         <Link
           key={to}

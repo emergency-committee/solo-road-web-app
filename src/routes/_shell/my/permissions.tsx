@@ -13,7 +13,7 @@ function PermissionsPage() {
 
   return (
     <div className="bg-surface flex min-h-screen flex-col">
-      <TopAppBar title="Permissions" showBack />
+      <TopAppBar title="권한 설정" showBack />
       <main className="px-margin-mobile mx-auto w-full max-w-2xl flex-1 pb-24">
         <section className="py-xl">
           <div className="mb-lg">
@@ -21,12 +21,12 @@ function PermissionsPage() {
               <ShieldCheck className="text-on-primary-container size-8" fill="currentColor" />
             </div>
             <h2 className="font-headline-lg text-headline-lg mb-sm text-primary">
-              Your Safety, Your Choice
+              당신의 안전, 당신의 선택
             </h2>
             <p className="font-body-md text-on-surface-variant leading-relaxed">
-              Solo-road uses real-time data to provide silent, reliable protection. By enabling
-              these permissions, you allow our system to monitor safe routes, detect unusual stops,
-              and alert your trusted contacts if you need assistance.
+              솔로더는 실시간 데이터로 조용하고 신뢰할 수 있는 보호를 제공합니다. 이 권한을 허용하면
+              안전한 경로를 모니터링하고, 이상 상황을 감지하며, 도움이 필요할 때 지정한 연락처에
+              알릴 수 있습니다.
             </p>
           </div>
         </section>
@@ -50,10 +50,10 @@ function PermissionsPage() {
             type="button"
             className="font-label-caps bg-primary text-on-primary flex h-14 w-full items-center justify-center gap-2 rounded-full tracking-widest uppercase shadow-lg transition-all hover:opacity-90 active:scale-[0.98]"
           >
-            Save Preferences
+            설정 저장
           </button>
           <p className="font-label-md text-on-surface-variant text-center">
-            You can change these anytime in settings.
+            설정에서 언제든지 변경할 수 있습니다.
           </p>
         </div>
       </main>
