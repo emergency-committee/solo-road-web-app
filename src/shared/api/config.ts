@@ -4,5 +4,4 @@ export const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ''
 export const API_PREFIX = '/api/v1'
 export const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY
 /** 카카오 디벨로퍼스 > 내 애플리케이션 > 앱 키 > JavaScript 키 (REST API 키와 다름, 카카오맵 SDK 전용). */
-export const KAKAO_JS_KEY =
-  import.meta.env.VITE_KAKAO_JS_KEY ?? import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY
+export const KAKAO_JS_KEY = import.meta.env.VITE_KAKAO_JS_KEY
