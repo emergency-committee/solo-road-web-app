@@ -18,7 +18,7 @@ export function CourseLegButton({ originName, destinationName, onClick }: Course
       </span>
       <span className="min-w-0 flex-1">
         <span className="text-on-surface-variant block text-[10px] font-semibold">
-          이동 코스 보기
+          안심 도보 경로
         </span>
         <span className="text-on-surface block truncate text-xs font-bold">
           {originName} → {destinationName}

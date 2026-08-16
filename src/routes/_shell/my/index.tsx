@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
   Bookmark,
+  Database,
   MessageSquare,
   Route as RouteIcon,
   ShieldCheck,
@@ -24,7 +25,7 @@ function MyPage() {
   const myReviewsQuery = useMyReviews(0, 1)
 
   return (
-    <main className="min-h-screen px-margin-mobile pt-lg mx-auto max-w-2xl pb-8">
+    <main className="px-margin-mobile pt-lg mx-auto min-h-screen max-w-2xl pb-8">
       <h2 className="font-headline-xl text-headline-xl text-on-surface mb-xl mt-lg">마이페이지</h2>
 
       <ProfileHeader
@@ -71,6 +72,17 @@ function MyPage() {
             icon: <ShieldCheck className="size-5" />,
             label: '권한 설정',
             onClick: () => navigate({ to: '/my/permissions' }),
+          },
+        ]}
+      />
+
+      <ProfileMenuList
+        title="서비스 정보"
+        items={[
+          {
+            icon: <Database className="size-5" />,
+            label: '데이터 출처 및 이용 기준',
+            onClick: () => navigate({ to: '/my/data-sources' }),
           },
         ]}
       />

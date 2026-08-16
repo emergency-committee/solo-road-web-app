@@ -1,6 +1,6 @@
 import { useSessionStore } from '@/shared/auth/session-store'
 import { buildHeaders } from './build-headers'
-import { BASE_URL } from './config'
+import { AUTH_MOCK_ENABLED, BASE_URL } from './config'
 import { ApiError, type ApiErrorBody } from './errors'
 
 export async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -13,7 +13,7 @@ export async function apiRequest<T>(endpoint: string, options: RequestInit = {})
 
   if (!response.ok) {
     const body = await response.text()
-    if (response.status === 401) {
+    if (response.status === 401 && !AUTH_MOCK_ENABLED) {
       useSessionStore.getState().clearSession()
     }
 

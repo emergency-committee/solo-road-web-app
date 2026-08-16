@@ -1,4 +1,5 @@
 import { useNavigate } from '@tanstack/react-router'
+import { AUTH_MOCK_ENABLED } from '@/shared/api/config'
 import { useSessionStore } from '@/shared/auth/session-store'
 import { kakaoAuthorizeUrl } from '../api/kakao-oauth'
 
@@ -6,7 +7,7 @@ export function useKakaoLogin() {
   const navigate = useNavigate()
 
   function startLogin() {
-    if (import.meta.env.VITE_AUTH_MOCK === 'true') {
+    if (AUTH_MOCK_ENABLED) {
       useSessionStore.getState().setSession({
         user: { id: 'local-user', nickname: '솔로더 여행자' },
       })

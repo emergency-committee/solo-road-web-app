@@ -12,7 +12,7 @@ function ShellLayout() {
   const hideBottomNav = pathname.startsWith('/course/')
 
   return (
-    <div className="pb-16">
+    <div className={hideBottomNav ? undefined : 'pb-16'}>
       <Outlet />
       {!hideBottomNav && <BottomNav />}
     </div>

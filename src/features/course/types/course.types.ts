@@ -52,6 +52,8 @@ export interface CourseDetailStop {
   placeId: number
   name: string
   thumbnailUrl?: string
+  latitude: number
+  longitude: number
   stayDurationMinutes?: number
 }
 

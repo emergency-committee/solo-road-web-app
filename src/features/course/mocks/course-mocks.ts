@@ -83,27 +83,6 @@ export const mockSavedCourseRows: SavedCourseRow[] = [
     imageUrl: 'https://picsum.photos/seed/busan-safe-loop-check/240/240',
     imageAlt: '광안리해수욕장에서 민락수변공원까지 이어지는 해변 코스',
   },
-  {
-    id: 'safety-limited-evidence-demo',
-    title: '제주 안전근거 제한 검증',
-    location: '제주국제컨벤션센터 → 주상절리대 • 0.8km',
-    imageUrl: 'https://picsum.photos/seed/jeju-limited-safety-data/240/240',
-    imageAlt: '제주국제컨벤션센터에서 대포주상절리대까지 이어지는 검증 코스',
-  },
-  {
-    id: 'ikseondong-alley-tour',
-    title: '익선동 골목 탐방',
-    location: '서울 종로구 • 1.2km',
-    imageUrl: 'https://picsum.photos/seed/ikseondong-alley/240/240',
-    imageAlt: '역사적인 골목길 탐방 지도',
-  },
-  {
-    id: 'seokchon-lake-night',
-    title: '석촌호수 야경 산책',
-    location: '서울 송파구 • 2.5km',
-    imageUrl: 'https://picsum.photos/seed/seokchon-lake/240/240',
-    imageAlt: '호숫가 야경 산책로',
-  },
 ]
 
 export const mockCourseDetails: Record<string, CourseDetail> = {
@@ -359,7 +338,7 @@ export const mockCourseDetails: Record<string, CourseDetail> = {
     totalDistanceLabel: '총 1.7km',
     mapImageUrl: 'https://picsum.photos/seed/busan-safe-loop-check-map/800/500',
     mapImageAlt: '광안리해수욕장에서 민락수변공원까지의 우회 기각 검증 지도',
-    badges: ['왕복형 우회 방지', '큰길 경로 유지 확인'],
+    badges: ['왕복형 우회 방지', '불필요 경유 기각 확인'],
     stops: [
       {
         id: 'gwangalli-beach',
@@ -384,41 +363,6 @@ export const mockCourseDetails: Record<string, CourseDetail> = {
         imageUrl: 'https://picsum.photos/seed/millak-waterfront-night/240/240',
         imageAlt: '민락수변공원의 저녁 산책로',
         badges: [{ label: '산책', tone: 'success' }],
-      },
-    ],
-  },
-  'safety-limited-evidence-demo': {
-    id: 'safety-limited-evidence-demo',
-    title: '중문 관광지 안전근거 제한 검증',
-    dateLabel: '2026년 8월 11일 (화)',
-    totalDistanceLabel: '총 0.8km',
-    mapImageUrl: 'https://picsum.photos/seed/jeju-limited-safety-data-map/800/500',
-    mapImageAlt: '제주국제컨벤션센터에서 대포주상절리대까지의 안전근거 검증 지도',
-    badges: ['근거 제한적 표시 확인', '안전 과장 방지'],
-    stops: [
-      {
-        id: 'jeju-icc',
-        time: '05:30 PM',
-        durationLabel: '40분 체류 예정',
-        title: '제주국제컨벤션센터',
-        subtitle: '제주특별자치도 서귀포시 중문관광로 224',
-        latitude: 33.2414128817356,
-        longitude: 126.424441448133,
-        imageUrl: 'https://picsum.photos/seed/jeju-icc-evening/240/240',
-        imageAlt: '제주국제컨벤션센터',
-        badges: [{ label: '출발', tone: 'primary' }],
-      },
-      {
-        id: 'daepo-jusangjeolli',
-        time: '06:20 PM',
-        durationLabel: '50분 체류 예정',
-        title: '중문대포주상절리대',
-        subtitle: '제주특별자치도 서귀포시 이어도로 36-30',
-        latitude: 33.23798494731946,
-        longitude: 126.42601106402861,
-        imageUrl: 'https://picsum.photos/seed/daepo-jusangjeolli-evening/240/240',
-        imageAlt: '중문대포주상절리대 해안',
-        badges: [{ label: '관광', tone: 'success' }],
       },
     ],
   },

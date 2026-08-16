@@ -1,16 +1,19 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
-import { ArrowLeft, Heart, MapPin, Navigation, Save, Share2 } from 'lucide-react'
-import { useState } from 'react'
+import { ArrowLeft, Heart, MapPin, Navigation, Share2 } from 'lucide-react'
+import { useLayoutEffect, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import {
   CourseLegButton,
   mockCourseDetails,
   useCourseDetail,
+  useCourseEditStore,
   type CourseDetail,
   type DemoCourseStop,
 } from '@/features/course'
 import { CourseRouteViewer } from '@/features/course-route'
 import { EmptyState } from '@/shared/components/EmptyState'
 import { Timeline, TimelineItem } from '@/shared/components/Timeline'
+import { getAppFrameElement } from '@/shared/lib/app-frame'
 import { formatDistanceMeters, formatDurationMinutes } from '@/shared/lib/format'
 
 export const Route = createFileRoute('/_shell/course/$courseId/')({
@@ -24,13 +27,18 @@ function CourseDetailPage() {
   const courseIdNumber = Number(courseId)
   const { data: course, isLoading, isError } = useCourseDetail(courseIdNumber)
 
+  useLayoutEffect(() => {
+    getAppFrameElement()?.scrollTo(0, 0)
+    window.scrollTo(0, 0)
+  }, [courseId])
+
   if (demoCourse) {
     return <DemoCourseDetailPage course={demoCourse} onBack={() => router.history.back()} />
   }
 
   if (isLoading) {
     return (
-      <main className="min-h-screen p-margin-mobile">
+      <main className="p-margin-mobile min-h-screen">
         <p className="font-body-md text-on-surface-variant text-center">
           코스를 불러오는 중이에요...
         </p>
@@ -40,7 +48,7 @@ function CourseDetailPage() {
 
   if (isError || !course) {
     return (
-      <main className="min-h-screen p-margin-mobile">
+      <main className="p-margin-mobile min-h-screen">
         <EmptyState icon={<MapPin className="size-6" />} title="코스를 찾을 수 없어요" />
       </main>
     )
@@ -105,7 +113,7 @@ function CourseDetailPage() {
         </section>
       </main>
 
-      <div className="gap-md border-outline-variant bg-surface/80 px-margin-mobile py-md fixed inset-x-0 bottom-0 z-40 flex border-t backdrop-blur-md">
+      <CourseBottomActionBar>
         <Link
           to="/course/$courseId/edit"
           params={{ courseId }}
@@ -114,18 +122,40 @@ function CourseDetailPage() {
           편집하기
         </Link>
         <Link
-          to="/map"
+          to="/course/$courseId/map"
+          params={{ courseId }}
           className="font-headline-lg-mobile text-headline-lg-mobile gap-xs bg-primary text-on-primary flex h-12 flex-[1.5] items-center justify-center rounded-xl shadow-lg transition-all hover:brightness-110 active:scale-95"
         >
           <Navigation className="size-5" />
-          지도에서 보기
+          코스 한눈에 보기
         </Link>
-      </div>
+      </CourseBottomActionBar>
     </div>
   )
 }
 
 function DemoCourseDetailPage({ course, onBack }: { course: CourseDetail; onBack: () => void }) {
+  const editedStops = useCourseEditStore((state) => state.demoStopsByCourseId[course.id])
+  const stops: DemoCourseStop[] = editedStops
+    ? editedStops.flatMap((stop) =>
+        stop.latitude !== undefined && stop.longitude !== undefined
+          ? [
+              {
+                id: stop.id,
+                time: stop.time ?? '시간 미정',
+                durationLabel: stop.durationLabel,
+                title: stop.title,
+                subtitle: stop.subtitle ?? '',
+                latitude: stop.latitude,
+                longitude: stop.longitude,
+                imageUrl: stop.imageUrl,
+                imageAlt: stop.imageAlt,
+                ...(stop.badges !== undefined && { badges: stop.badges }),
+              },
+            ]
+          : [],
+      )
+    : course.stops
   const [selectedLeg, setSelectedLeg] = useState<{
     origin: DemoCourseStop
     destination: DemoCourseStop
@@ -175,13 +205,13 @@ function DemoCourseDetailPage({ course, onBack }: { course: CourseDetail; onBack
             일정 타임라인
           </h3>
           <Timeline>
-            {course.stops.map((stop, index) => {
-              const nextStop = course.stops[index + 1]
+            {stops.map((stop, index) => {
+              const nextStop = stops[index + 1]
               return (
                 <TimelineItem
                   key={stop.id}
                   index={index + 1}
-                  isLast={index === course.stops.length - 1}
+                  isLast={index === stops.length - 1}
                   time={stop.time}
                   durationLabel={stop.durationLabel}
                   title={stop.title}
@@ -195,9 +225,7 @@ function DemoCourseDetailPage({ course, onBack }: { course: CourseDetail; onBack
                           <CourseLegButton
                             originName={stop.title}
                             destinationName={nextStop.title}
-                            onClick={() =>
-                              setSelectedLeg({ origin: stop, destination: nextStop })
-                            }
+                            onClick={() => setSelectedLeg({ origin: stop, destination: nextStop })}
                           />
                         ),
                       }
@@ -209,29 +237,23 @@ function DemoCourseDetailPage({ course, onBack }: { course: CourseDetail; onBack
         </section>
       </main>
 
-      <div className="gap-md border-outline-variant bg-surface/80 px-margin-mobile py-md fixed inset-x-0 bottom-0 z-40 flex border-t backdrop-blur-md">
-        <button
-          type="button"
+      <CourseBottomActionBar>
+        <Link
+          to="/course/$courseId/edit"
+          params={{ courseId: course.id }}
           className="font-headline-lg-mobile text-headline-lg-mobile hover:bg-primary-fixed gap-xs border-primary bg-surface text-primary flex h-12 flex-1 items-center justify-center rounded-xl border transition-colors active:scale-95"
         >
-          <Save className="size-5" />
-          저장하기
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            const firstStop = course.stops[0]
-            const secondStop = course.stops[1]
-            if (firstStop && secondStop) {
-              setSelectedLeg({ origin: firstStop, destination: secondStop })
-            }
-          }}
+          편집하기
+        </Link>
+        <Link
+          to="/course/$courseId/map"
+          params={{ courseId: course.id }}
           className="font-headline-lg-mobile text-headline-lg-mobile gap-xs bg-primary text-on-primary flex h-12 flex-[1.5] items-center justify-center rounded-xl shadow-lg transition-all hover:brightness-110 active:scale-95"
         >
           <Navigation className="size-5" />
-          코스 시작하기
-        </button>
-      </div>
+          코스 한눈에 보기
+        </Link>
+      </CourseBottomActionBar>
 
       {selectedLeg && (
         <CourseRouteViewer
@@ -246,6 +268,15 @@ function DemoCourseDetailPage({ course, onBack }: { course: CourseDetail; onBack
         />
       )}
     </div>
+  )
+}
+
+function CourseBottomActionBar({ children }: { children: ReactNode }) {
+  return createPortal(
+    <div className="gap-md border-outline-variant bg-surface/90 px-margin-mobile py-md fixed bottom-0 left-1/2 z-40 flex w-full max-w-[430px] -translate-x-1/2 border-t backdrop-blur-md">
+      {children}
+    </div>,
+    document.body,
   )
 }
 

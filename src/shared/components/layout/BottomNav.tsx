@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { Home, Map, Route, User } from 'lucide-react'
+import { createPortal } from 'react-dom'
 
 const NAV_ITEMS = [
   { to: '/', label: '홈', icon: Home, exact: true },
@@ -9,8 +10,8 @@ const NAV_ITEMS = [
 ] as const
 
 export function BottomNav() {
-  return (
-    <nav className="bg-surface border-outline-variant px-gutter-mobile sticky inset-x-0 bottom-0 z-50 flex h-16 items-center justify-around border-t pb-[env(safe-area-inset-bottom)]">
+  return createPortal(
+    <nav className="bg-surface border-outline-variant px-gutter-mobile fixed bottom-0 left-1/2 z-50 flex h-16 w-full max-w-[430px] -translate-x-1/2 items-center justify-around border-t pb-[env(safe-area-inset-bottom)]">
       {NAV_ITEMS.map(({ to, label, icon: Icon, exact }) => (
         <Link
           key={to}
@@ -23,6 +24,7 @@ export function BottomNav() {
           <span className="font-label-md text-label-md">{label}</span>
         </Link>
       ))}
-    </nav>
+    </nav>,
+    document.body,
   )
 }

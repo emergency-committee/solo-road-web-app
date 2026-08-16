@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import { ChevronDown, ChevronUp, Clock3, Route, ShieldCheck, TriangleAlert } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import type {
@@ -138,6 +139,13 @@ export function CourseRouteResultPanel({
               </p>
             </div>
           )}
+
+          <Link
+            to="/my/data-sources"
+            className="text-primary border-outline-variant/60 mt-3 flex h-9 items-center justify-center border-t pt-2 text-[10px] font-bold"
+          >
+            데이터 출처 및 점수 이용 기준
+          </Link>
         </div>
       )}
     </section>

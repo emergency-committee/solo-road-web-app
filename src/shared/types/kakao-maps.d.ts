@@ -24,7 +24,34 @@ declare global {
       getCenter(): LatLng
       setLevel(level: number): void
       panTo(latlng: LatLng): void
+      setBounds(
+        bounds: LatLngBounds,
+        paddingTop?: number,
+        paddingRight?: number,
+        paddingBottom?: number,
+        paddingLeft?: number,
+      ): void
       relayout(): void
+    }
+
+    class LatLngBounds {
+      constructor()
+      extend(latlng: LatLng): void
+    }
+
+    interface PolylineOptions {
+      map?: Map
+      path: LatLng[]
+      strokeWeight?: number
+      strokeColor?: string
+      strokeOpacity?: number
+      strokeStyle?: string
+      zIndex?: number
+    }
+
+    class Polyline {
+      constructor(options: PolylineOptions)
+      setMap(map: Map | null): void
     }
 
     interface CustomOverlayOptions {

@@ -19,6 +19,7 @@ import { Route as ShellCourseIndexRouteImport } from './routes/_shell/course/ind
 import { Route as ShellCourseCreateRouteImport } from './routes/_shell/course/create'
 import { Route as ShellMapIndexRouteImport } from './routes/_shell/map/index'
 import { Route as ShellMyIndexRouteImport } from './routes/_shell/my/index'
+import { Route as ShellMyDataSourcesRouteImport } from './routes/_shell/my/data-sources'
 import { Route as ShellMyPermissionsRouteImport } from './routes/_shell/my/permissions'
 import { Route as ShellMyPreferencesRouteImport } from './routes/_shell/my/preferences'
 import { Route as ShellMyReviewsRouteImport } from './routes/_shell/my/reviews'
@@ -27,6 +28,7 @@ import { Route as ShellMySavedPlacesRouteImport } from './routes/_shell/my/saved
 import { Route as LoginKakaoCallbackRouteImport } from './routes/login/kakao/callback'
 import { Route as ShellCourseCourseIdIndexRouteImport } from './routes/_shell/course/$courseId/index'
 import { Route as ShellCourseCourseIdEditRouteImport } from './routes/_shell/course/$courseId/edit'
+import { Route as ShellCourseCourseIdMapRouteImport } from './routes/_shell/course/$courseId/map'
 
 const ShellRoute = ShellRouteImport.update({
   id: '/_shell',
@@ -77,6 +79,11 @@ const ShellMyIndexRoute = ShellMyIndexRouteImport.update({
   path: '/my/',
   getParentRoute: () => ShellRoute,
 } as any)
+const ShellMyDataSourcesRoute = ShellMyDataSourcesRouteImport.update({
+  id: '/my/data-sources',
+  path: '/my/data-sources',
+  getParentRoute: () => ShellRoute,
+} as any)
 const ShellMyPermissionsRoute = ShellMyPermissionsRouteImport.update({
   id: '/my/permissions',
   path: '/my/permissions',
@@ -118,6 +125,11 @@ const ShellCourseCourseIdEditRoute = ShellCourseCourseIdEditRouteImport.update({
   path: '/course/$courseId/edit',
   getParentRoute: () => ShellRoute,
 } as any)
+const ShellCourseCourseIdMapRoute = ShellCourseCourseIdMapRouteImport.update({
+  id: '/course/$courseId/map',
+  path: '/course/$courseId/map',
+  getParentRoute: () => ShellRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof ShellIndexRoute
@@ -126,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/onboarding/': typeof OnboardingIndexRoute
   '/recommend/': typeof RecommendIndexRoute
   '/course/create': typeof ShellCourseCreateRoute
+  '/my/data-sources': typeof ShellMyDataSourcesRoute
   '/my/permissions': typeof ShellMyPermissionsRoute
   '/my/preferences': typeof ShellMyPreferencesRoute
   '/my/reviews': typeof ShellMyReviewsRoute
@@ -136,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/map/': typeof ShellMapIndexRoute
   '/my/': typeof ShellMyIndexRoute
   '/course/$courseId/edit': typeof ShellCourseCourseIdEditRoute
+  '/course/$courseId/map': typeof ShellCourseCourseIdMapRoute
   '/course/$courseId/': typeof ShellCourseCourseIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -145,6 +159,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingIndexRoute
   '/recommend': typeof RecommendIndexRoute
   '/course/create': typeof ShellCourseCreateRoute
+  '/my/data-sources': typeof ShellMyDataSourcesRoute
   '/my/permissions': typeof ShellMyPermissionsRoute
   '/my/preferences': typeof ShellMyPreferencesRoute
   '/my/reviews': typeof ShellMyReviewsRoute
@@ -155,6 +170,7 @@ export interface FileRoutesByTo {
   '/map': typeof ShellMapIndexRoute
   '/my': typeof ShellMyIndexRoute
   '/course/$courseId/edit': typeof ShellCourseCourseIdEditRoute
+  '/course/$courseId/map': typeof ShellCourseCourseIdMapRoute
   '/course/$courseId': typeof ShellCourseCourseIdIndexRoute
 }
 export interface FileRoutesById {
@@ -166,6 +182,7 @@ export interface FileRoutesById {
   '/onboarding/': typeof OnboardingIndexRoute
   '/recommend/': typeof RecommendIndexRoute
   '/_shell/course/create': typeof ShellCourseCreateRoute
+  '/_shell/my/data-sources': typeof ShellMyDataSourcesRoute
   '/_shell/my/permissions': typeof ShellMyPermissionsRoute
   '/_shell/my/preferences': typeof ShellMyPreferencesRoute
   '/_shell/my/reviews': typeof ShellMyReviewsRoute
@@ -176,6 +193,7 @@ export interface FileRoutesById {
   '/_shell/map/': typeof ShellMapIndexRoute
   '/_shell/my/': typeof ShellMyIndexRoute
   '/_shell/course/$courseId/edit': typeof ShellCourseCourseIdEditRoute
+  '/_shell/course/$courseId/map': typeof ShellCourseCourseIdMapRoute
   '/_shell/course/$courseId/': typeof ShellCourseCourseIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -187,6 +205,7 @@ export interface FileRouteTypes {
     | '/onboarding/'
     | '/recommend/'
     | '/course/create'
+    | '/my/data-sources'
     | '/my/permissions'
     | '/my/preferences'
     | '/my/reviews'
@@ -197,6 +216,7 @@ export interface FileRouteTypes {
     | '/map/'
     | '/my/'
     | '/course/$courseId/edit'
+    | '/course/$courseId/map'
     | '/course/$courseId/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -206,6 +226,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/recommend'
     | '/course/create'
+    | '/my/data-sources'
     | '/my/permissions'
     | '/my/preferences'
     | '/my/reviews'
@@ -216,6 +237,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/my'
     | '/course/$courseId/edit'
+    | '/course/$courseId/map'
     | '/course/$courseId'
   id:
     | '__root__'
@@ -226,6 +248,7 @@ export interface FileRouteTypes {
     | '/onboarding/'
     | '/recommend/'
     | '/_shell/course/create'
+    | '/_shell/my/data-sources'
     | '/_shell/my/permissions'
     | '/_shell/my/preferences'
     | '/_shell/my/reviews'
@@ -236,6 +259,7 @@ export interface FileRouteTypes {
     | '/_shell/map/'
     | '/_shell/my/'
     | '/_shell/course/$courseId/edit'
+    | '/_shell/course/$courseId/map'
     | '/_shell/course/$courseId/'
   fileRoutesById: FileRoutesById
 }
@@ -320,6 +344,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellMyIndexRouteImport
       parentRoute: typeof ShellRoute
     }
+    '/_shell/my/data-sources': {
+      id: '/_shell/my/data-sources'
+      path: '/my/data-sources'
+      fullPath: '/my/data-sources'
+      preLoaderRoute: typeof ShellMyDataSourcesRouteImport
+      parentRoute: typeof ShellRoute
+    }
     '/_shell/my/permissions': {
       id: '/_shell/my/permissions'
       path: '/my/permissions'
@@ -376,12 +407,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellCourseCourseIdEditRouteImport
       parentRoute: typeof ShellRoute
     }
+    '/_shell/course/$courseId/map': {
+      id: '/_shell/course/$courseId/map'
+      path: '/course/$courseId/map'
+      fullPath: '/course/$courseId/map'
+      preLoaderRoute: typeof ShellCourseCourseIdMapRouteImport
+      parentRoute: typeof ShellRoute
+    }
   }
 }
 
 interface ShellRouteChildren {
   ShellIndexRoute: typeof ShellIndexRoute
   ShellCourseCreateRoute: typeof ShellCourseCreateRoute
+  ShellMyDataSourcesRoute: typeof ShellMyDataSourcesRoute
   ShellMyPermissionsRoute: typeof ShellMyPermissionsRoute
   ShellMyPreferencesRoute: typeof ShellMyPreferencesRoute
   ShellMyReviewsRoute: typeof ShellMyReviewsRoute
@@ -391,12 +430,14 @@ interface ShellRouteChildren {
   ShellMapIndexRoute: typeof ShellMapIndexRoute
   ShellMyIndexRoute: typeof ShellMyIndexRoute
   ShellCourseCourseIdEditRoute: typeof ShellCourseCourseIdEditRoute
+  ShellCourseCourseIdMapRoute: typeof ShellCourseCourseIdMapRoute
   ShellCourseCourseIdIndexRoute: typeof ShellCourseCourseIdIndexRoute
 }
 
 const ShellRouteChildren: ShellRouteChildren = {
   ShellIndexRoute: ShellIndexRoute,
   ShellCourseCreateRoute: ShellCourseCreateRoute,
+  ShellMyDataSourcesRoute: ShellMyDataSourcesRoute,
   ShellMyPermissionsRoute: ShellMyPermissionsRoute,
   ShellMyPreferencesRoute: ShellMyPreferencesRoute,
   ShellMyReviewsRoute: ShellMyReviewsRoute,
@@ -406,6 +447,7 @@ const ShellRouteChildren: ShellRouteChildren = {
   ShellMapIndexRoute: ShellMapIndexRoute,
   ShellMyIndexRoute: ShellMyIndexRoute,
   ShellCourseCourseIdEditRoute: ShellCourseCourseIdEditRoute,
+  ShellCourseCourseIdMapRoute: ShellCourseCourseIdMapRoute,
   ShellCourseCourseIdIndexRoute: ShellCourseCourseIdIndexRoute,
 }
 

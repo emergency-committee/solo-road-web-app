@@ -1,10 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { ChevronRight, PlusCircle, Route as RouteIcon } from 'lucide-react'
-import {
-  mockSavedCourseRows,
-  useCourseRecommendations,
-  useMyCourses,
-} from '@/features/course'
+import { mockSavedCourseRows, useCourseRecommendations, useMyCourses } from '@/features/course'
 import { EmptyState } from '@/shared/components/EmptyState'
 import { PlaceCard } from '@/shared/components/PlaceCard'
 import { SectionHeader } from '@/shared/components/SectionHeader'
@@ -22,7 +18,7 @@ function CoursePage() {
   const myCourses = myCoursesQuery.data?.content ?? []
 
   return (
-    <main className="min-h-screen space-y-xl px-margin-mobile pt-lg mx-auto max-w-4xl pb-8">
+    <main className="space-y-xl px-margin-mobile pt-lg mx-auto min-h-screen max-w-4xl pb-8">
       <section className="space-y-sm">
         <h2 className="font-headline-xl text-headline-xl text-on-surface">코스 메인</h2>
         <p className="font-body-md text-body-md text-on-surface-variant">
@@ -78,37 +74,35 @@ function CoursePage() {
             description="새 코스를 만들어 나만의 여정을 시작해보세요."
           />
         ) : (
-          <div className="gap-md grid grid-cols-1 md:grid-cols-2">
+          <div className="gap-md grid grid-cols-1">
             {myCourses.map((course) => (
               <Link
                 key={course.courseId}
                 to="/course/$courseId"
                 params={{ courseId: course.courseId.toString() }}
-                className="group border-outline-variant/20 hover:bg-surface-container-high bg-surface-container flex overflow-hidden rounded-xl border transition-colors"
+                className="group border-outline-variant/20 hover:bg-surface-container-high bg-surface-container flex min-h-28 overflow-hidden rounded-xl border transition-colors"
               >
-                <div className="h-full w-24 shrink-0">
+                <div className="w-28 shrink-0">
                   <img
                     src={`https://picsum.photos/seed/course-${course.courseId.toString()}/240/240`}
                     alt={course.title}
                     className="size-full object-cover"
                   />
                 </div>
-                <div className="p-md flex flex-1 flex-col justify-between">
+                <div className="p-md min-w-0 flex-1">
                   <div>
                     <h6 className="font-label-md text-label-md mb-xs text-primary tracking-widest uppercase">
                       내 일정
                     </h6>
-                    <h5 className="font-body-md text-body-md text-on-surface font-bold">
+                    <h5 className="font-body-md text-body-md text-on-surface font-bold break-keep">
                       {course.title}
                     </h5>
-                    <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 break-keep">
                       {course.region ?? '지역 정보 없음'}
                     </p>
                   </div>
-                  <div className="flex justify-end">
-                    <ChevronRight className="text-on-surface-variant group-hover:text-primary size-5 transition-colors" />
-                  </div>
                 </div>
+                <ChevronRight className="text-on-surface-variant group-hover:text-primary mr-md size-5 shrink-0 self-center transition-colors" />
               </Link>
             ))}
           </div>
@@ -117,15 +111,15 @@ function CoursePage() {
 
       <section className="space-y-md">
         <SectionHeader title="안심경로 검증 코스" />
-        <div className="gap-md grid grid-cols-1 md:grid-cols-2">
+        <div className="gap-md grid grid-cols-1">
           {mockSavedCourseRows.map((course) => (
             <Link
               key={course.id}
               to="/course/$courseId"
               params={{ courseId: course.id }}
-              className="group border-outline-variant/20 hover:bg-surface-container-high bg-surface-container flex overflow-hidden rounded-xl border transition-colors"
+              className="group border-outline-variant/20 hover:bg-surface-container-high bg-surface-container flex min-h-28 overflow-hidden rounded-xl border transition-colors"
             >
-              <div className="h-full w-24 shrink-0">
+              <div className="w-28 shrink-0">
                 <img
                   src={course.imageUrl}
                   alt={course.imageAlt}
@@ -136,14 +130,14 @@ function CoursePage() {
                 <h6 className="font-label-md text-label-md mb-xs text-primary tracking-widest uppercase">
                   Safety Demo
                 </h6>
-                <h5 className="font-body-md text-body-md text-on-surface font-bold">
+                <h5 className="font-body-md text-body-md text-on-surface font-bold break-keep">
                   {course.title}
                 </h5>
-                <p className="font-body-sm text-body-sm text-on-surface-variant">
+                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 break-keep">
                   {course.location}
                 </p>
               </div>
-              <ChevronRight className="text-on-surface-variant group-hover:text-primary mr-md size-5 self-center transition-colors" />
+              <ChevronRight className="text-on-surface-variant group-hover:text-primary mr-md size-5 shrink-0 self-center transition-colors" />
             </Link>
           ))}
         </div>

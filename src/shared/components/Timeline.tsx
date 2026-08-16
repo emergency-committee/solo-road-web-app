@@ -24,6 +24,7 @@ interface TimelineItemProps {
   editable?: boolean
   onEdit?: () => void
   onRemove?: () => void
+  dragHandle?: ReactNode
   className?: string
 }
 
@@ -49,6 +50,7 @@ export function TimelineItem({
   editable = false,
   onEdit,
   onRemove,
+  dragHandle,
   className,
 }: TimelineItemProps) {
   return (
@@ -85,28 +87,33 @@ export function TimelineItem({
                 <img src={imageUrl} alt={imageAlt ?? title} className="size-full object-cover" />
               </div>
             )}
-            <div className="p-md flex flex-1 flex-col justify-between">
-              <div>
-                <h4 className="font-headline-lg-mobile text-on-surface text-[16px] leading-tight font-semibold">
-                  {title}
-                </h4>
-                {subtitle && <p className="text-body-sm text-on-surface-variant">{subtitle}</p>}
-              </div>
-              {badges && badges.length > 0 && (
-                <div className="gap-xs flex">
-                  {badges.map((badge) => (
-                    <span
-                      key={badge.label}
-                      className={cn(
-                        'rounded px-1 text-[10px] font-bold',
-                        BADGE_TONE_CLASSES[badge.tone ?? 'neutral'],
-                      )}
-                    >
-                      {badge.label}
-                    </span>
-                  ))}
+            <div className="p-md flex min-w-0 flex-1 justify-between gap-2">
+              <div className="flex min-w-0 flex-1 flex-col justify-between">
+                <div className="min-w-0">
+                  <h4 className="font-headline-lg-mobile text-on-surface truncate text-[16px] leading-tight font-semibold">
+                    {title}
+                  </h4>
+                  {subtitle && (
+                    <p className="text-body-sm text-on-surface-variant truncate">{subtitle}</p>
+                  )}
                 </div>
-              )}
+                {badges && badges.length > 0 && (
+                  <div className="gap-xs flex">
+                    {badges.map((badge) => (
+                      <span
+                        key={badge.label}
+                        className={cn(
+                          'rounded px-1 text-[10px] font-bold',
+                          BADGE_TONE_CLASSES[badge.tone ?? 'neutral'],
+                        )}
+                      >
+                        {badge.label}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {dragHandle}
             </div>
           </div>
           {editable && (

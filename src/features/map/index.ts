@@ -1,5 +1,4 @@
 export { MapSearchBar } from './components/MapSearchBar'
-export { SafetyTogglePanel } from './components/SafetyTogglePanel'
 export { MapMarker } from './components/MapMarker'
 export { PlacePreviewSheet } from './components/PlacePreviewSheet'
 export { KakaoMap } from './components/KakaoMap'

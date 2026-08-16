@@ -7,7 +7,6 @@ import {
   type MapMarkerData,
   MapSearchBar,
   PlacePreviewSheet,
-  SafetyTogglePanel,
 } from '@/features/map'
 import { usePlaces } from '@/features/place'
 import { formatDistanceMeters } from '@/shared/lib/format'
@@ -54,7 +53,8 @@ function MapPage() {
         lat: place.latitude,
         lng: place.longitude,
         imageUrl:
-          place.thumbnailUrl ?? `https://picsum.photos/seed/place-${place.placeId.toString()}/480/480`,
+          place.thumbnailUrl ??
+          `https://picsum.photos/seed/place-${place.placeId.toString()}/480/480`,
         imageAlt: place.name,
         distanceLabel: formatDistanceMeters(place.distanceM),
         rating: place.rating ?? 0,
@@ -83,13 +83,11 @@ function MapPage() {
         className="absolute inset-0 z-0"
       />
 
-      <SafetyTogglePanel />
-
       <button
         type="button"
         aria-label="현재 위치로 이동"
         onClick={handleRecenter}
-        className="right-margin-mobile text-primary absolute bottom-[240px] z-30 flex size-12 items-center justify-center rounded-full bg-white shadow-md transition-transform active:scale-90"
+        className="right-margin-mobile text-primary absolute top-1/2 z-30 flex size-12 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-md transition-transform active:scale-90"
       >
         <LocateFixed className="size-5" />
       </button>
