@@ -9,22 +9,6 @@ export interface RouteOption {
   safetyScore: number
   facilityScore: number
   path: Coordinate[]
-  crimeRisk: CrimeRiskDetails
-}
-
-export interface CrimeRiskDetails {
-  dataCoveragePercent: number
-  averageGrade: number
-  highCautionCoveragePercent: number
-  cautionIndex: number
-  scorePenalty: number
-  segments: CrimeRiskSegment[]
-  sourceNotice: string
-}
-
-export interface CrimeRiskSegment {
-  path: Coordinate[]
-  grade: number
 }
 
 export interface RouteSafetyDetails {
@@ -50,7 +34,6 @@ export interface RouteSafetyDetails {
   extraDurationMinutes: number
   evidenceLevel: 'STRONG' | 'MODERATE' | 'LIMITED'
   evidenceAxisCount: number
-  crimeRisk: CrimeRiskDetails
   safetyWaypoints: SafetyWaypoint[]
   dataNotice: string
 }
@@ -58,11 +41,7 @@ export interface RouteSafetyDetails {
 export interface SafetyWaypoint {
   name: string
   type:
-    | 'POLICE_STATION'
-    | 'PATROL_DIVISION'
-    | 'POLICE_BOX'
-    | 'COAST_GUARD_STATION'
-    | 'SAFETY_EVIDENCE'
+    'POLICE_STATION' | 'PATROL_DIVISION' | 'POLICE_BOX' | 'COAST_GUARD_STATION' | 'SAFETY_EVIDENCE'
   coordinate: Coordinate
   reason: string
   evidenceScore: number

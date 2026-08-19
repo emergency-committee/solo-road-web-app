@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import {
+  Copyright,
   Database,
   ExternalLink,
   LampDesk,
   Lightbulb,
   MapPinned,
-  ShieldAlert,
   ShieldCheck,
   Video,
 } from 'lucide-react'
@@ -23,7 +23,6 @@ interface SourceItem {
   referenceDate: string
   usage: string
   url: string
-  license?: string
 }
 
 const SECURITY_LIGHT_SOURCES: SourceItem[] = [
@@ -91,34 +90,20 @@ const POLICE_SOURCES: SourceItem[] = [
     referenceDate: '2025-12-31',
     usage: '원본 주소를 카카오 로컬 API로 좌표 변환해 경찰시설 접근 근거로 사용합니다.',
     url: 'https://www.data.go.kr/data/15077036/fileData.do',
-    license: '공공데이터포털 이용허락범위 제한 없음',
-  },
-]
-
-const CRIME_RISK_SOURCES: SourceItem[] = [
-  {
-    name: '범죄주의구간(전체)',
-    provider: '경찰청 · 생활안전지도',
-    coverage: '현재 제주 경로 평가에 반영',
-    referenceDate: '수집 2025년 · 수정 2025-12-29',
-    usage:
-      '행정구역별 과거 범죄 밀도 WMS를 약 60m 간격으로 표본화해 경로의 주의도 감점에 사용합니다.',
-    url: 'https://www.safemap.go.kr/opna/data/dataViewRenew.do?objtId=205',
-    license: '공공누리 제4유형 · 출처표시 · 상업적 이용 금지 · 변경 금지',
   },
 ]
 
 function DataSourcesPage() {
   return (
     <div className="bg-background min-h-screen pb-24">
-      <TopAppBar title="데이터 출처 및 이용 기준" showBack />
+      <TopAppBar title="데이터 출처" showBack />
       <main className="px-margin-mobile pt-md mx-auto max-w-2xl">
         <div className="mb-xl">
           <Database className="text-primary mb-sm size-8" />
-          <h2 className="text-headline-lg-mobile font-bold">안심경로에 사용한 원본 데이터</h2>
+          <h2 className="text-headline-lg-mobile font-bold">안심경로 데이터 안내</h2>
           <p className="text-body-sm text-on-surface-variant mt-xs leading-5">
-            시설 종류마다 제공기관과 기준일이 다릅니다. 원본의 좌표와 기준일을 보존하고, 경로
-            주변에서 확인되는 위치 근거만 점수에 반영합니다.
+            안심점수에 사용한 데이터의 제공기관과 기준일을 공개합니다. 각 카드에서 원본 페이지도
+            확인할 수 있어요.
           </p>
         </div>
 
@@ -148,13 +133,6 @@ function DataSourcesPage() {
           sources={POLICE_SOURCES}
         />
         <SourceSection
-          icon={<ShieldAlert className="size-5" />}
-          title="과거 범죄 밀도"
-          description="개별 범죄 발생 위치나 실시간 위험 정보가 아닌 공간 밀도 분석 자료입니다."
-          sources={CRIME_RISK_SOURCES}
-          warning="원본이 변경 금지 조건인 공공누리 제4유형이므로, WMS 표본화와 점수 활용은 제공기관의 별도 허용 여부를 확인한 뒤 운영 범위를 확정해야 합니다."
-        />
-        <SourceSection
           icon={<MapPinned className="size-5" />}
           title="지도와 도보 경로"
           description="지도 표시와 큰길 우선 도보 경로 조회에는 카카오맵 API를 사용합니다."
@@ -170,6 +148,21 @@ function DataSourcesPage() {
             },
           ]}
         />
+
+        <section className="border-outline-variant/50 mb-xl pt-md border-t">
+          <div className="mb-sm flex items-start gap-3">
+            <span className="bg-primary-fixed text-primary grid size-9 shrink-0 place-items-center rounded-[8px]">
+              <Copyright className="size-5" />
+            </span>
+            <div>
+              <h3 className="text-base font-bold">출처 표기 원칙</h3>
+              <p className="text-body-sm text-on-surface-variant mt-0.5 leading-5">
+                데이터명, 제공기관, 기준일, 원본 링크를 함께 표시합니다. 원본 데이터는 다운로드나
+                조회 API로 재제공하지 않습니다.
+              </p>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   )
@@ -241,18 +234,12 @@ function SourceCard({ source }: { source: SourceItem }) {
         </a>
       </div>
       <dl className="mt-sm grid grid-cols-[76px_1fr] gap-x-2 gap-y-1.5 text-xs leading-5">
-        <dt className="text-outline">적용 지역</dt>
+        <dt className="text-outline">데이터 범위</dt>
         <dd>{source.coverage}</dd>
         <dt className="text-outline">기준일</dt>
         <dd>{source.referenceDate}</dd>
         <dt className="text-outline">활용 방식</dt>
         <dd>{source.usage}</dd>
-        {source.license && (
-          <>
-            <dt className="text-outline">이용 조건</dt>
-            <dd>{source.license}</dd>
-          </>
-        )}
       </dl>
     </article>
   )

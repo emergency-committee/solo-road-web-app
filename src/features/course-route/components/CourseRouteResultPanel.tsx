@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { ChevronDown, ChevronUp, Clock3, Route, ShieldCheck, TriangleAlert } from 'lucide-react'
+import { ChevronDown, ChevronUp, Clock3, Route, ShieldCheck } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import type {
   NavigateRouteResponse,
@@ -21,12 +21,7 @@ export function CourseRouteResultPanel({
 }: CourseRouteResultPanelProps) {
   const [detailsOpen, setDetailsOpen] = useState(false)
   const active = activeRoute === 'safe' ? route : route.fastestRoute
-  const scoreGain = route.safetyScore - route.fastestRoute.safetyScore
-  const extraMinutes = Math.max(0, route.durationMinutes - route.fastestRoute.durationMinutes)
   const primaryWaypoint = route.safety.safetyWaypoints[0]
-  const activeCrimeRisk =
-    activeRoute === 'safe' ? route.safety.crimeRisk : route.fastestRoute.crimeRisk
-  const activeFacilityScore = active.facilityScore
 
   return (
     <section className="absolute inset-x-3 bottom-3 z-20 max-h-[calc(100dvh-112px)] overflow-y-auto rounded-[8px] border border-white/70 bg-white/97 p-3 shadow-xl backdrop-blur-sm">
@@ -88,42 +83,15 @@ export function CourseRouteResultPanel({
               <ShieldCheck className="text-primary size-4 shrink-0" />
               <div className="min-w-0 flex-1">
                 <strong className="text-on-surface block text-[11px]">
-                  {route.safety.safetyDetourApplied ? '안심 경유지 적용' : '안심 경유지 미적용'}
+                  {route.safety.safetyDetourApplied
+                    ? '안전시설이 확인되는 구간을 더 지나요'
+                    : '현재 경로가 가장 균형이 좋아요'}
                 </strong>
-                <p className="mt-0.5 text-[10px] leading-4">
-                  {routeDecisionDetail(route, extraMinutes, scoreGain)}
-                </p>
+                <p className="mt-0.5 text-[10px] leading-4">{routeDecisionDetail(route)}</p>
                 {primaryWaypoint && <WaypointEvidence route={route} />}
               </div>
             </div>
           )}
-
-          <div className="border-outline-variant/60 mt-3 flex items-start gap-2 border-t pt-2.5 text-[10px] leading-4">
-            <TriangleAlert className="mt-0.5 size-3.5 shrink-0 text-[#d84a2f]" />
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-2">
-                <strong className="text-on-surface">
-                  과거 범죄 밀도 주의도 {activeCrimeRisk.cautionIndex}
-                </strong>
-                <span className="font-bold text-[#b52d20]">
-                  {activeCrimeRisk.scorePenalty > 0
-                    ? `주의도 감점 -${activeCrimeRisk.scorePenalty}점`
-                    : '주의도 감점 없음'}
-                </span>
-              </div>
-              <p className="text-on-surface-variant">
-                시설 근거 {activeFacilityScore}점 - 주의도 감점 {activeCrimeRisk.scorePenalty}점 =
-                최종 안심점수 {active.safetyScore}점
-              </p>
-              <p className="text-on-surface-variant">
-                주의정보 표시 구간 {activeCrimeRisk.dataCoveragePercent}% · 7등급 이상{' '}
-                {activeCrimeRisk.highCautionCoveragePercent}%
-              </p>
-              <p className="text-on-surface-variant/80">
-                경찰청·생활안전지도 2025년 자료 · 현재 위험을 뜻하지 않음
-              </p>
-            </div>
-          </div>
 
           {activeRoute === 'safe' && (
             <div className="mt-3">
@@ -137,6 +105,17 @@ export function CourseRouteResultPanel({
                 {route.safety.securityLightCoveragePercent}% · 독립 근거축{' '}
                 {route.safety.evidenceAxisCount}개
               </p>
+              <div className="border-outline-variant/60 mt-2 border-t pt-2 text-[9px] leading-4">
+                <strong className="text-on-surface block">안심점수 계산 기준</strong>
+                <p className="text-on-surface-variant">
+                  시설 개수가 아니라 경로를 30m 간격으로 나눠 안전시설이 확인되는 구간의 비율을
+                  계산해요.
+                </p>
+                <p className="text-on-surface mt-0.5 font-semibold">
+                  안심점수 = 조명 확인 비율 × 50% + 방범 CCTV 확인 비율 × 35% + 경찰시설 확인 비율 ×
+                  15%
+                </p>
+              </div>
             </div>
           )}
 
@@ -144,7 +123,7 @@ export function CourseRouteResultPanel({
             to="/my/data-sources"
             className="text-primary border-outline-variant/60 mt-3 flex h-9 items-center justify-center border-t pt-2 text-[10px] font-bold"
           >
-            데이터 출처 및 점수 이용 기준
+            데이터 출처 보기
           </Link>
         </div>
       )}
@@ -159,31 +138,23 @@ function WaypointEvidence({ route }: { route: NavigateRouteResponse }) {
 
   return (
     <div className="bg-surface-container mt-2 rounded-[6px] px-2.5 py-2 text-[10px] leading-4">
-      <strong className="text-on-surface block">경유지 근거점수 {waypoint.evidenceScore}점</strong>
-      <p className="text-primary font-semibold">
-        실제 큰길 {route.safety.baseSafetyScore}점 → 안심경로 {route.safetyScore}점 (+
-        {actualScoreGain}점)
-      </p>
-      <p className="font-semibold">
-        기본 큰길 대비 실제 거리 +{route.safety.extraDistanceM}m · 시간 +
-        {route.safety.extraDurationMinutes}분
+      <strong className="text-on-surface block">왜 이 길을 골랐나요?</strong>
+      <p className="text-primary mt-0.5 font-semibold">
+        {waypoint.name}을 반영한 뒤, 경유 전 큰길보다 안심점수가 {route.safety.baseSafetyScore}
+        점에서 {route.safetyScore}점으로 {actualScoreGain}점 높아졌어요.
       </p>
       <p className="text-on-surface-variant">
-        후보 단계 예상 +{waypoint.predictedScoreGain}점 · 약 {waypoint.predictedExtraDistanceM}m
+        {formatFastestTimeDifference(route)} · {formatFastestDistanceDifference(route)}
       </p>
-      <p>
+      <p className="mt-1 font-semibold">이 길 주변에서 확인한 시설</p>
+      <p className="text-on-surface-variant">
         가로등 {waypoint.streetLightLocationCount}곳 · 보안등 {waypoint.securityLightLocationCount}
         곳 · 방범 CCTV {waypoint.cctvLocationCount}곳(
         {waypoint.cctvCameraCount}대)
       </p>
-      <p>
-        기본 큰길 대비 조명 {route.safety.baseLightingCoveragePercent}% →{' '}
-        {route.safety.lightingCoveragePercent}% · CCTV {route.safety.baseCctvCoveragePercent}% →{' '}
-        {route.safety.cctvCoveragePercent}%
-      </p>
-      <p>
-        경찰시설 {waypoint.policeFacilityCount}곳 · 기존 경로에서 {waypoint.offRouteDistanceM}m
-      </p>
+      {waypoint.policeFacilityCount > 0 && (
+        <p className="text-on-surface-variant">경찰시설 {waypoint.policeFacilityCount}곳</p>
+      )}
     </div>
   )
 }
@@ -241,20 +212,37 @@ function routeTitle(route: NavigateRouteResponse, activeRoute: RouteView): strin
   return '큰길 경로를 유지했어요'
 }
 
-function routeDecisionDetail(
-  route: NavigateRouteResponse,
-  extraMinutes: number,
-  scoreGain: number,
-): string {
-  const scoreLabel = `안심점수 ${scoreGain >= 0 ? '+' : ''}${scoreGain}`
+function routeDecisionDetail(route: NavigateRouteResponse): string {
   if (route.safety.safetyDetourApplied) {
     const waypointNames = route.safety.safetyWaypoints.map((waypoint) => waypoint.name).join(', ')
-    return `빠른 경로 대비 ${extraMinutes}분 추가 · ${scoreLabel} · ${waypointNames} 경유`
+    const scoreGain = route.safetyScore - route.safety.baseSafetyScore
+    return `${formatFastestTimeLead(route)} 안전 경유지(${waypointNames})를 반영해 경유 전 큰길보다 안심점수가 ${scoreGain}점 높아졌어요.`
   }
   if (route.safety.routeStrategy === 'SHORTEST_ALREADY_SAFEST') {
-    return `빠른 경로가 더 안전해 우회하지 않음 · ${scoreLabel}`
+    return '빠른 경로가 안전시설 점수도 높아 별도의 우회가 필요하지 않아요.'
   }
-  return `점수·추가 시간·동선 형태를 비교해 큰길 유지 · 빠른 경로 대비 ${scoreLabel}`
+  return '안전시설과 이동시간을 함께 비교했을 때 현재 큰길이 가장 적절해요.'
+}
+
+function formatFastestTimeLead(route: NavigateRouteResponse): string {
+  const difference = route.durationMinutes - route.fastestRoute.durationMinutes
+  if (difference === 0) return '빠른 경로와 예상 시간은 같고,'
+  if (difference < 0) return `빠른 경로보다 ${Math.abs(difference)}분 빠르고,`
+  return `빠른 경로보다 ${difference}분 더 걸리지만,`
+}
+
+function formatFastestTimeDifference(route: NavigateRouteResponse): string {
+  const difference = route.durationMinutes - route.fastestRoute.durationMinutes
+  if (difference === 0) return '빠른 경로와 예상 시간은 같아요'
+  if (difference < 0) return `빠른 경로보다 ${Math.abs(difference)}분 빨라요`
+  return `빠른 경로보다 ${difference}분 더 걸려요`
+}
+
+function formatFastestDistanceDifference(route: NavigateRouteResponse): string {
+  const difference = route.distanceM - route.fastestRoute.distanceM
+  if (difference === 0) return '거리 차이 없음'
+  if (difference < 0) return `${Math.abs(difference)}m 덜 걸어요`
+  return `${difference}m 더 걸어요`
 }
 
 function formatDistance(distanceM: number): string {

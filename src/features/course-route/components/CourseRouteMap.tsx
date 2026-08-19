@@ -20,7 +20,6 @@ interface CourseRouteMapProps {
   lights: LightItem[]
   cctv: CctvItem[]
   police: PoliceItem[]
-  showCrimeRisk: boolean
   onBoundsChange: (bounds: MapBounds | null) => void
 }
 
@@ -112,7 +111,6 @@ export function CourseRouteMap({
   lights,
   cctv,
   police,
-  showCrimeRisk,
   onBoundsChange,
 }: CourseRouteMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -210,24 +208,6 @@ export function CourseRouteMap({
       )
     }
 
-    const crimeRisk = safeActive ? route?.safety.crimeRisk : route?.fastestRoute.crimeRisk
-    if (showCrimeRisk) {
-      crimeRisk?.segments
-        .filter((segment) => segment.grade >= 4)
-        .forEach((segment) => {
-          overlays.push(
-            new maps.Polyline({
-              map,
-              path: toKakaoPath(maps, segment.path),
-              strokeWeight: 7,
-              strokeColor: crimeRiskColor(segment.grade),
-              strokeOpacity: 0.92,
-              zIndex: 5,
-            }),
-          )
-        })
-    }
-
     route?.safety.safetyWaypoints.forEach((waypoint) => {
       overlays.push(createSafetyWaypointOverlay(maps, map, waypoint))
     })
@@ -235,7 +215,7 @@ export function CourseRouteMap({
     if (destination) overlays.push(createPointOverlay(maps, map, destination, 'destination'))
 
     return () => clearOverlays(overlays)
-  }, [activeRoute, destination, maps, origin, route, showCrimeRisk])
+  }, [activeRoute, destination, maps, origin, route])
 
   useEffect(() => {
     const map = mapRef.current
@@ -450,10 +430,4 @@ function createSafetyWaypointOverlay(
 
 function clearOverlays(overlays: KakaoOverlay[]) {
   overlays.forEach((overlay) => overlay.setMap(null))
-}
-
-function crimeRiskColor(grade: number): string {
-  if (grade >= 9) return '#9f1239'
-  if (grade >= 7) return '#c93438'
-  return '#d4513c'
 }

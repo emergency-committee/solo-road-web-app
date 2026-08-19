@@ -30,7 +30,6 @@ export function CourseRouteViewer({
   const [showLights, setShowLights] = useState(true)
   const [showCctv, setShowCctv] = useState(true)
   const [showPolice, setShowPolice] = useState(true)
-  const [showCrimeRisk, setShowCrimeRisk] = useState(true)
   const routeQuery = useCourseLegRoute(origin, destination)
   const infrastructure = useCourseRouteInfrastructure(bounds, { showLights, showCctv, showPolice })
   const kakaoJavaScriptKey = KAKAO_JS_KEY?.trim()
@@ -47,7 +46,6 @@ export function CourseRouteViewer({
           lights={showLights ? infrastructure.lights : []}
           cctv={showCctv ? infrastructure.cctv : []}
           police={showPolice ? infrastructure.police : []}
-          showCrimeRisk={showCrimeRisk}
           onBoundsChange={setBounds}
         />
       ) : (
@@ -80,9 +78,6 @@ export function CourseRouteViewer({
         <LegendDot color="#315eaf" label="CCTV" />
         <LegendDot color="#2e7d5b" label="경찰" />
         <span className="flex items-center gap-1">
-          <span className="h-1 w-3 rounded-full bg-[#d84a2f]" /> 주의
-        </span>
-        <span className="flex items-center gap-1">
           <span className="h-0.5 w-4 rounded-full bg-[#006b7d]" /> 안심경로
         </span>
       </div>
@@ -90,13 +85,11 @@ export function CourseRouteViewer({
       <CourseSafetyControls
         showLights={showLights}
         showCctv={showCctv}
-        showCrimeRisk={showCrimeRisk}
         lightCount={infrastructure.lights.length}
         cctvCount={infrastructure.cctv.length}
         policeCount={infrastructure.police.length}
         onLightsChange={setShowLights}
         onCctvChange={setShowCctv}
-        onCrimeRiskChange={setShowCrimeRisk}
         showPolice={showPolice}
         onPoliceChange={setShowPolice}
       />

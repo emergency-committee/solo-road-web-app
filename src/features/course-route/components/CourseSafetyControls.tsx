@@ -1,16 +1,14 @@
-import { Lightbulb, Shield, TriangleAlert, Video } from 'lucide-react'
+import { Lightbulb, Shield, Video } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 
 interface CourseSafetyControlsProps {
   showLights: boolean
   showCctv: boolean
-  showCrimeRisk: boolean
   lightCount: number
   cctvCount: number
   policeCount: number
   onLightsChange: (show: boolean) => void
   onCctvChange: (show: boolean) => void
-  onCrimeRiskChange: (show: boolean) => void
   showPolice: boolean
   onPoliceChange: (show: boolean) => void
 }
@@ -18,27 +16,16 @@ interface CourseSafetyControlsProps {
 export function CourseSafetyControls({
   showLights,
   showCctv,
-  showCrimeRisk,
   lightCount,
   cctvCount,
   policeCount,
   onLightsChange,
   onCctvChange,
-  onCrimeRiskChange,
   showPolice,
   onPoliceChange,
 }: CourseSafetyControlsProps) {
   return (
     <div className="absolute top-[104px] right-3 z-30 flex flex-col gap-2">
-      <SafetyButton
-        label={`범죄주의 구간 ${showCrimeRisk ? '숨기기' : '표시'}`}
-        active={showCrimeRisk}
-        count={0}
-        activeClass="bg-[#d84a2f] text-white"
-        onClick={() => onCrimeRiskChange(!showCrimeRisk)}
-      >
-        <TriangleAlert className="size-5" />
-      </SafetyButton>
       <SafetyButton
         label={`CCTV ${showCctv ? '숨기기' : '표시'}`}
         active={showCctv}
