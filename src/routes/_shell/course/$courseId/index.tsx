@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
 import { ArrowLeft, Heart, MapPin, Navigation, Share2 } from 'lucide-react'
-import { useLayoutEffect, useState, type ReactNode } from 'react'
+import { useLayoutEffect, useMemo, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import {
   CourseLegButton,
@@ -8,13 +8,31 @@ import {
   useCourseDetail,
   useCourseEditStore,
   type CourseDetail,
+  type CourseDetailStop,
   type DemoCourseStop,
 } from '@/features/course'
 import { CourseRouteViewer } from '@/features/course-route'
+import { DEFAULT_MAP_CENTER, KakaoMap, type MapMarkerData } from '@/features/map'
 import { EmptyState } from '@/shared/components/EmptyState'
 import { Timeline, TimelineItem } from '@/shared/components/Timeline'
 import { getAppFrameElement } from '@/shared/lib/app-frame'
 import { formatDistanceMeters, formatDurationMinutes } from '@/shared/lib/format'
+
+function stopToMarker(stop: CourseDetailStop): MapMarkerData {
+  return {
+    id: stop.courseStopId.toString(),
+    name: `${(stop.stopOrder + 1).toString()}. ${stop.name}`,
+    icon: 'coffee',
+    lat: stop.latitude,
+    lng: stop.longitude,
+    imageUrl: stop.thumbnailUrl ?? `https://picsum.photos/seed/place-${stop.placeId.toString()}/240/240`,
+    imageAlt: stop.name,
+    distanceLabel: '',
+    rating: 0,
+    reviewCount: 0,
+    tags: [],
+  }
+}
 
 export const Route = createFileRoute('/_shell/course/$courseId/')({
   component: CourseDetailPage,
@@ -26,6 +44,9 @@ function CourseDetailPage() {
   const demoCourse = mockCourseDetails[courseId]
   const courseIdNumber = Number(courseId)
   const { data: course, isLoading, isError } = useCourseDetail(courseIdNumber)
+
+  const stopMarkers = useMemo(() => (course?.stops ?? []).map(stopToMarker), [course?.stops])
+  const mapCenter = stopMarkers[0] ?? DEFAULT_MAP_CENTER
 
   useLayoutEffect(() => {
     getAppFrameElement()?.scrollTo(0, 0)
@@ -87,6 +108,17 @@ function CourseDetailPage() {
             )}
           </div>
         </div>
+
+        {stopMarkers.length > 0 && (
+          <section className="mt-lg px-margin-mobile">
+            <h3 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-md">
+              경유지 지도
+            </h3>
+            <div className="h-[220px] w-full overflow-hidden rounded-xl">
+              <KakaoMap center={mapCenter} markers={stopMarkers} level={6} />
+            </div>
+          </section>
+        )}
 
         <section className="mt-lg px-margin-mobile">
           <h3 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-md">
