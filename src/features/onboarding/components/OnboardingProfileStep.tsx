@@ -25,11 +25,55 @@ const INTEREST_OPTIONS = [
 ]
 
 export function OnboardingProfileStep() {
-  const { gender, setGender, foodPreference, setFoodPreference, interests, toggleInterest } =
-    useOnboardingStore()
+  const {
+    nickname,
+    setNickname,
+    gender,
+    setGender,
+    foodPreference,
+    setFoodPreference,
+    interests,
+    toggleInterest,
+  } = useOnboardingStore()
+  const nicknameLength = nickname.trim().length
 
   return (
     <div className="space-y-xl">
+      <section className="space-y-sm">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h3 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold">
+              사용할 닉네임
+            </h3>
+            <p className="font-label-md text-label-md text-outline mt-1">
+              공개 코스와 여행자 랭킹에 표시돼요.
+            </p>
+          </div>
+          <span
+            className={`shrink-0 text-xs ${
+              nicknameLength >= 2 ? 'text-on-surface-variant' : 'text-error'
+            }`}
+            aria-live="polite"
+          >
+            {nickname.length}/12
+          </span>
+        </div>
+        <input
+          type="text"
+          value={nickname}
+          onChange={(event) => setNickname(event.target.value.slice(0, 12))}
+          maxLength={12}
+          autoComplete="nickname"
+          placeholder="2~12자로 입력해주세요"
+          aria-label="사용할 닉네임"
+          aria-invalid={nicknameLength < 2}
+          className="border-outline-variant bg-white text-on-surface placeholder:text-outline focus:border-primary focus:ring-primary/20 h-12 w-full rounded-xl border px-4 text-base outline-none transition focus:ring-2"
+        />
+        {nicknameLength > 0 && nicknameLength < 2 && (
+          <p className="text-error text-xs">닉네임은 2자 이상 입력해주세요.</p>
+        )}
+      </section>
+
       <section className="space-y-sm">
         <div className="flex items-end justify-between">
           <h3 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold">

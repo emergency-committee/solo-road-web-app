@@ -4,6 +4,7 @@ import { loadKakaoMapsSdk } from '@/features/map/lib/load-kakao-maps'
 export interface CourseOverviewStop {
   id: string
   order: number
+  dayNumber?: number
   name: string
   latitude: number
   longitude: number
@@ -41,7 +42,7 @@ export function CourseOverviewMap({ stops }: { stops: CourseOverviewStop[] }) {
 
           const bounds = new sdk.maps.LatLngBounds()
           points.forEach((point) => bounds.extend(point))
-          map.setBounds(bounds, 96, 56, 190, 56)
+          map.setBounds(bounds, 36, 36, 36, 36)
         }
 
         stops.forEach((stop, index) => {
@@ -49,7 +50,7 @@ export function CourseOverviewMap({ stops }: { stops: CourseOverviewStop[] }) {
           marker.className =
             'grid size-9 place-items-center rounded-full border-[3px] border-white bg-primary text-sm font-bold text-white shadow-lg'
           marker.textContent = (index + 1).toString()
-          marker.title = `${(index + 1).toString()}. ${stop.name}`
+          marker.title = `${stop.dayNumber ? `${stop.dayNumber.toString()}일차 · ` : ''}${(index + 1).toString()}. ${stop.name}`
 
           const overlay = new sdk.maps.CustomOverlay({
             map,

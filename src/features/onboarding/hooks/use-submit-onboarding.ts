@@ -9,8 +9,12 @@ export function useSubmitOnboarding() {
 
   return useMutation({
     mutationFn: (payload: OnboardingSubmitPayload) => submitOnboarding(payload),
-    onSuccess: () => {
-      useSessionStore.getState().setOnboarded()
+    onSuccess: (response) => {
+      const session = useSessionStore.getState()
+      if (session.user) {
+        session.setSession({ user: { ...session.user, nickname: response.nickname } })
+      }
+      session.setOnboarded()
       navigate({ to: '/' })
     },
   })

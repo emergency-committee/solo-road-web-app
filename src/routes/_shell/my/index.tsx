@@ -12,6 +12,7 @@ import { useLogout } from '@/features/auth'
 import { useSessionStore } from '@/shared/auth/session-store'
 import { useSavedPlaces } from '@/features/saved'
 import { useMyReviews } from '@/features/review'
+import { GamificationSummary } from '@/features/course'
 
 export const Route = createFileRoute('/_shell/my/')({
   component: MyPage,
@@ -39,6 +40,8 @@ function MyPage() {
           { label: '내 리뷰', value: myReviewsQuery.data?.totalElements ?? 0 },
         ]}
       />
+
+      <GamificationSummary />
 
       <ProfileMenuList
         items={[

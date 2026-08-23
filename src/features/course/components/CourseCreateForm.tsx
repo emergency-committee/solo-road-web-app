@@ -4,6 +4,8 @@ import { Switch } from '@/shared/components/ui/switch'
 import { FilterChipGroup } from '@/shared/components/FilterChip'
 import { toIsoDateString } from '@/shared/lib/format'
 import { CourseDateRangeCalendar, type DateRange } from './CourseDateRangeCalendar'
+import { isSafetyRouteRegion } from '../lib/course-region'
+import { calculateTripDays, formatTripLength } from '../lib/course-schedule'
 
 export interface CourseCreateFormData {
   region: string
@@ -13,7 +15,7 @@ export interface CourseCreateFormData {
   safetyPriority: boolean
 }
 
-const QUICK_REGIONS = ['서울', '부산', '제주', '강릉']
+const QUICK_REGIONS = ['서울', '부산', '제주']
 
 const VIBE_OPTIONS = [
   { value: 'quiet', label: '조용한', icon: Moon },
@@ -49,8 +51,22 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
   const [interestPlaces, setInterestPlaces] = useState(INITIAL_INTEREST_PLACES)
   const [vibe, setVibe] = useState<string[]>(['nature'])
   const [safetyPriority, setSafetyPriority] = useState(true)
+  const [safetyPreferenceTouched, setSafetyPreferenceTouched] = useState(false)
 
   const isValid = region.trim().length > 0 && dateRange.start !== null && dateRange.end !== null
+  const safetyRouteSupported = isSafetyRouteRegion(region)
+  const selectedStartDate = dateRange.start ? toIsoDateString(dateRange.start) : undefined
+  const selectedEndDate = dateRange.end ? toIsoDateString(dateRange.end) : undefined
+  const selectedTripDays = calculateTripDays(selectedStartDate, selectedEndDate)
+
+  function changeRegion(nextRegion: string) {
+    setRegion(nextRegion)
+    if (!isSafetyRouteRegion(nextRegion)) {
+      setSafetyPriority(false)
+    } else if (!safetyPreferenceTouched) {
+      setSafetyPriority(true)
+    }
+  }
 
   return (
     <form
@@ -64,7 +80,7 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
           startDate: toIsoDateString(dateRange.start),
           endDate: toIsoDateString(dateRange.end),
           preferredMood: vibe[0] ?? 'nature',
-          safetyPriority,
+          safetyPriority: safetyRouteSupported && safetyPriority,
         })
       }}
     >
@@ -76,7 +92,7 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
           <Search className="left-md text-outline absolute top-1/2 size-5 -translate-y-1/2" />
           <input
             value={region}
-            onChange={(e) => setRegion(e.target.value)}
+            onChange={(e) => changeRegion(e.target.value)}
             className="border-outline-variant text-body-md focus:ring-primary bg-surface-container-low py-md pr-md placeholder:text-outline/60 w-full rounded-xl border pl-11 focus:border-transparent focus:ring-2 focus:outline-none"
             placeholder="어디로 떠나시나요?"
             type="text"
@@ -87,13 +103,16 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
             <button
               key={option}
               type="button"
-              onClick={() => setRegion(option)}
-              className="border-outline-variant text-body-sm hover:border-primary px-md py-xs shrink-0 rounded-full border bg-white font-medium transition-colors"
+              onClick={() => changeRegion(option)}
+              className={`text-body-sm hover:border-primary px-md py-xs shrink-0 rounded-full border font-medium transition-colors ${region === option ? 'border-primary bg-primary text-white' : 'border-outline-variant bg-white'}`}
             >
               {option}
             </button>
           ))}
         </div>
+        <p className="font-label-md text-label-md text-on-surface-variant">
+          다른 지역은 입력창에 지역명을 직접 적어주세요.
+        </p>
       </section>
 
       <section className="space-y-md">
@@ -101,6 +120,12 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
           02. 여행 기간
         </label>
         <CourseDateRangeCalendar range={dateRange} onRangeChange={setDateRange} />
+        {dateRange.start && dateRange.end && (
+          <div className="bg-primary/5 text-primary flex items-center justify-between rounded-lg px-4 py-3">
+            <span className="text-sm font-semibold">선택한 여행 기간</span>
+            <strong>{formatTripLength(selectedStartDate, selectedEndDate, selectedTripDays)}</strong>
+          </div>
+        )}
       </section>
 
       {/* TODO: POST /api/v1/courses/generate는 아직 관심 장소(placeIds)를 받지 않아 AI가 전체 코스를 자동 구성한다.
@@ -161,22 +186,37 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
         />
       </section>
 
-      <section className="border-primary-container/20 bg-primary/5 p-md rounded-2xl border">
+      <section
+        className={`p-md rounded-xl border ${safetyRouteSupported ? 'border-primary/20 bg-primary/5' : 'border-outline-variant/40 bg-surface-container-low'}`}
+      >
         <div className="flex items-center justify-between">
           <div className="gap-md flex items-center">
-            <div className="bg-primary-container/10 p-sm text-primary rounded-full">
+            <div
+              className={`p-sm rounded-full ${safetyRouteSupported ? 'bg-primary-container/10 text-primary' : 'bg-surface-container-high text-outline'}`}
+            >
               <Sparkles className="size-5" />
             </div>
             <div>
               <p className="font-body-md text-body-md text-on-primary-fixed-variant font-bold">
-                안전 우선 옵션
+                안심경로 함께 보기
               </p>
               <p className="font-label-md text-label-md text-on-surface-variant">
-                가로등이 많은 큰 길 위주로 안내합니다.
+                {!region.trim()
+                  ? '서울·부산·제주에서 이용할 수 있어요.'
+                  : safetyRouteSupported
+                    ? '안전시설을 반영한 도보 경로를 함께 안내해요.'
+                    : `${region.trim()}은 일반 코스로 만들어요. 안심경로는 준비 중이에요.`}
               </p>
             </div>
           </div>
-          <Switch checked={safetyPriority} onCheckedChange={setSafetyPriority} />
+          <Switch
+            checked={safetyRouteSupported && safetyPriority}
+            disabled={!safetyRouteSupported}
+            onCheckedChange={(checked) => {
+              setSafetyPreferenceTouched(true)
+              setSafetyPriority(checked)
+            }}
+          />
         </div>
       </section>
 

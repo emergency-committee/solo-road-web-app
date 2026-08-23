@@ -50,6 +50,7 @@ function CourseMapPage() {
               {
                 id: stop.id,
                 order: index + 1,
+                dayNumber: 1,
                 name: stop.title,
                 latitude: stop.latitude,
                 longitude: stop.longitude,
@@ -60,6 +61,7 @@ function CourseMapPage() {
     : (course?.stops ?? []).map((stop, index) => ({
         id: stop.courseStopId.toString(),
         order: index + 1,
+        dayNumber: stop.dayNumber,
         name: stop.name,
         latitude: stop.latitude,
         longitude: stop.longitude,
@@ -101,7 +103,10 @@ function CourseMapPage() {
               <span className="bg-primary text-on-primary grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold">
                 {stop.order}
               </span>
-              <span className="text-body-sm min-w-0 truncate font-semibold">{stop.name}</span>
+              <span className="text-body-sm min-w-0 truncate font-semibold">
+                {stop.dayNumber ? `${stop.dayNumber.toString()}일차 · ` : ''}
+                {stop.name}
+              </span>
             </li>
           ))}
         </ol>

@@ -1,11 +1,13 @@
 export interface CourseStop {
   id: string
   placeId: number
+  dayNumber: number
   stayDurationMinutes?: number
   time?: string
   durationLabel: string
   title: string
   subtitle?: string
+  memo?: string
   latitude?: number
   longitude?: number
   imageUrl: string

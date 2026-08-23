@@ -81,7 +81,7 @@ export function TimelineItem({
           </div>
         )}
         <div className="border-outline-variant hover:border-primary overflow-hidden rounded-xl border bg-white shadow-sm transition-colors">
-          <div className="flex h-24">
+          <div className="flex min-h-24">
             {imageUrl && (
               <div className="w-1/3 shrink-0">
                 <img src={imageUrl} alt={imageAlt ?? title} className="size-full object-cover" />
@@ -94,7 +94,9 @@ export function TimelineItem({
                     {title}
                   </h4>
                   {subtitle && (
-                    <p className="text-body-sm text-on-surface-variant truncate">{subtitle}</p>
+                    <p className="text-body-sm text-on-surface-variant line-clamp-2 leading-snug">
+                      {subtitle}
+                    </p>
                   )}
                 </div>
                 {badges && badges.length > 0 && (
@@ -123,7 +125,7 @@ export function TimelineItem({
                 onClick={onEdit}
                 className="font-label-md text-on-surface-variant hover:bg-surface-variant/40 flex-1 rounded-lg py-2 transition-colors"
               >
-                수정
+                메모
               </button>
               <button
                 type="button"

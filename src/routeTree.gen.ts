@@ -17,14 +17,18 @@ import { Route as PlacePlaceIdRouteImport } from './routes/place/$placeId'
 import { Route as RecommendIndexRouteImport } from './routes/recommend/index'
 import { Route as ShellCourseIndexRouteImport } from './routes/_shell/course/index'
 import { Route as ShellCourseCreateRouteImport } from './routes/_shell/course/create'
+import { Route as ShellCourseDiscoverRouteImport } from './routes/_shell/course/discover'
 import { Route as ShellMapIndexRouteImport } from './routes/_shell/map/index'
 import { Route as ShellMyIndexRouteImport } from './routes/_shell/my/index'
 import { Route as ShellMyDataSourcesRouteImport } from './routes/_shell/my/data-sources'
 import { Route as ShellMyPermissionsRouteImport } from './routes/_shell/my/permissions'
 import { Route as ShellMyPreferencesRouteImport } from './routes/_shell/my/preferences'
+import { Route as ShellMyRankingRouteImport } from './routes/_shell/my/ranking'
 import { Route as ShellMyReviewsRouteImport } from './routes/_shell/my/reviews'
 import { Route as ShellMySavedCoursesRouteImport } from './routes/_shell/my/saved-courses'
 import { Route as ShellMySavedPlacesRouteImport } from './routes/_shell/my/saved-places'
+import { Route as ShellMyTitlesRouteImport } from './routes/_shell/my/titles'
+import { Route as ShellTravelersTravelerIdRouteImport } from './routes/_shell/travelers/$travelerId'
 import { Route as LoginKakaoCallbackRouteImport } from './routes/login/kakao/callback'
 import { Route as ShellCourseCourseIdIndexRouteImport } from './routes/_shell/course/$courseId/index'
 import { Route as ShellCourseCourseIdEditRouteImport } from './routes/_shell/course/$courseId/edit'
@@ -69,6 +73,11 @@ const ShellCourseCreateRoute = ShellCourseCreateRouteImport.update({
   path: '/course/create',
   getParentRoute: () => ShellRoute,
 } as any)
+const ShellCourseDiscoverRoute = ShellCourseDiscoverRouteImport.update({
+  id: '/course/discover',
+  path: '/course/discover',
+  getParentRoute: () => ShellRoute,
+} as any)
 const ShellMapIndexRoute = ShellMapIndexRouteImport.update({
   id: '/map/',
   path: '/map/',
@@ -94,6 +103,11 @@ const ShellMyPreferencesRoute = ShellMyPreferencesRouteImport.update({
   path: '/my/preferences',
   getParentRoute: () => ShellRoute,
 } as any)
+const ShellMyRankingRoute = ShellMyRankingRouteImport.update({
+  id: '/my/ranking',
+  path: '/my/ranking',
+  getParentRoute: () => ShellRoute,
+} as any)
 const ShellMyReviewsRoute = ShellMyReviewsRouteImport.update({
   id: '/my/reviews',
   path: '/my/reviews',
@@ -109,6 +123,17 @@ const ShellMySavedPlacesRoute = ShellMySavedPlacesRouteImport.update({
   path: '/my/saved-places',
   getParentRoute: () => ShellRoute,
 } as any)
+const ShellMyTitlesRoute = ShellMyTitlesRouteImport.update({
+  id: '/my/titles',
+  path: '/my/titles',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellTravelersTravelerIdRoute =
+  ShellTravelersTravelerIdRouteImport.update({
+    id: '/travelers/$travelerId',
+    path: '/travelers/$travelerId',
+    getParentRoute: () => ShellRoute,
+  } as any)
 const LoginKakaoCallbackRoute = LoginKakaoCallbackRouteImport.update({
   id: '/login/kakao/callback',
   path: '/login/kakao/callback',
@@ -138,12 +163,16 @@ export interface FileRoutesByFullPath {
   '/onboarding/': typeof OnboardingIndexRoute
   '/recommend/': typeof RecommendIndexRoute
   '/course/create': typeof ShellCourseCreateRoute
+  '/course/discover': typeof ShellCourseDiscoverRoute
   '/my/data-sources': typeof ShellMyDataSourcesRoute
   '/my/permissions': typeof ShellMyPermissionsRoute
   '/my/preferences': typeof ShellMyPreferencesRoute
+  '/my/ranking': typeof ShellMyRankingRoute
   '/my/reviews': typeof ShellMyReviewsRoute
   '/my/saved-courses': typeof ShellMySavedCoursesRoute
   '/my/saved-places': typeof ShellMySavedPlacesRoute
+  '/my/titles': typeof ShellMyTitlesRoute
+  '/travelers/$travelerId': typeof ShellTravelersTravelerIdRoute
   '/login/kakao/callback': typeof LoginKakaoCallbackRoute
   '/course/': typeof ShellCourseIndexRoute
   '/map/': typeof ShellMapIndexRoute
@@ -159,12 +188,16 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingIndexRoute
   '/recommend': typeof RecommendIndexRoute
   '/course/create': typeof ShellCourseCreateRoute
+  '/course/discover': typeof ShellCourseDiscoverRoute
   '/my/data-sources': typeof ShellMyDataSourcesRoute
   '/my/permissions': typeof ShellMyPermissionsRoute
   '/my/preferences': typeof ShellMyPreferencesRoute
+  '/my/ranking': typeof ShellMyRankingRoute
   '/my/reviews': typeof ShellMyReviewsRoute
   '/my/saved-courses': typeof ShellMySavedCoursesRoute
   '/my/saved-places': typeof ShellMySavedPlacesRoute
+  '/my/titles': typeof ShellMyTitlesRoute
+  '/travelers/$travelerId': typeof ShellTravelersTravelerIdRoute
   '/login/kakao/callback': typeof LoginKakaoCallbackRoute
   '/course': typeof ShellCourseIndexRoute
   '/map': typeof ShellMapIndexRoute
@@ -182,12 +215,16 @@ export interface FileRoutesById {
   '/onboarding/': typeof OnboardingIndexRoute
   '/recommend/': typeof RecommendIndexRoute
   '/_shell/course/create': typeof ShellCourseCreateRoute
+  '/_shell/course/discover': typeof ShellCourseDiscoverRoute
   '/_shell/my/data-sources': typeof ShellMyDataSourcesRoute
   '/_shell/my/permissions': typeof ShellMyPermissionsRoute
   '/_shell/my/preferences': typeof ShellMyPreferencesRoute
+  '/_shell/my/ranking': typeof ShellMyRankingRoute
   '/_shell/my/reviews': typeof ShellMyReviewsRoute
   '/_shell/my/saved-courses': typeof ShellMySavedCoursesRoute
   '/_shell/my/saved-places': typeof ShellMySavedPlacesRoute
+  '/_shell/my/titles': typeof ShellMyTitlesRoute
+  '/_shell/travelers/$travelerId': typeof ShellTravelersTravelerIdRoute
   '/login/kakao/callback': typeof LoginKakaoCallbackRoute
   '/_shell/course/': typeof ShellCourseIndexRoute
   '/_shell/map/': typeof ShellMapIndexRoute
@@ -205,12 +242,16 @@ export interface FileRouteTypes {
     | '/onboarding/'
     | '/recommend/'
     | '/course/create'
+    | '/course/discover'
     | '/my/data-sources'
     | '/my/permissions'
     | '/my/preferences'
+    | '/my/ranking'
     | '/my/reviews'
     | '/my/saved-courses'
     | '/my/saved-places'
+    | '/my/titles'
+    | '/travelers/$travelerId'
     | '/login/kakao/callback'
     | '/course/'
     | '/map/'
@@ -226,12 +267,16 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/recommend'
     | '/course/create'
+    | '/course/discover'
     | '/my/data-sources'
     | '/my/permissions'
     | '/my/preferences'
+    | '/my/ranking'
     | '/my/reviews'
     | '/my/saved-courses'
     | '/my/saved-places'
+    | '/my/titles'
+    | '/travelers/$travelerId'
     | '/login/kakao/callback'
     | '/course'
     | '/map'
@@ -248,12 +293,16 @@ export interface FileRouteTypes {
     | '/onboarding/'
     | '/recommend/'
     | '/_shell/course/create'
+    | '/_shell/course/discover'
     | '/_shell/my/data-sources'
     | '/_shell/my/permissions'
     | '/_shell/my/preferences'
+    | '/_shell/my/ranking'
     | '/_shell/my/reviews'
     | '/_shell/my/saved-courses'
     | '/_shell/my/saved-places'
+    | '/_shell/my/titles'
+    | '/_shell/travelers/$travelerId'
     | '/login/kakao/callback'
     | '/_shell/course/'
     | '/_shell/map/'
@@ -330,6 +379,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellCourseCreateRouteImport
       parentRoute: typeof ShellRoute
     }
+    '/_shell/course/discover': {
+      id: '/_shell/course/discover'
+      path: '/course/discover'
+      fullPath: '/course/discover'
+      preLoaderRoute: typeof ShellCourseDiscoverRouteImport
+      parentRoute: typeof ShellRoute
+    }
     '/_shell/map/': {
       id: '/_shell/map/'
       path: '/map'
@@ -365,6 +421,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellMyPreferencesRouteImport
       parentRoute: typeof ShellRoute
     }
+    '/_shell/my/ranking': {
+      id: '/_shell/my/ranking'
+      path: '/my/ranking'
+      fullPath: '/my/ranking'
+      preLoaderRoute: typeof ShellMyRankingRouteImport
+      parentRoute: typeof ShellRoute
+    }
     '/_shell/my/reviews': {
       id: '/_shell/my/reviews'
       path: '/my/reviews'
@@ -384,6 +447,20 @@ declare module '@tanstack/react-router' {
       path: '/my/saved-places'
       fullPath: '/my/saved-places'
       preLoaderRoute: typeof ShellMySavedPlacesRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/my/titles': {
+      id: '/_shell/my/titles'
+      path: '/my/titles'
+      fullPath: '/my/titles'
+      preLoaderRoute: typeof ShellMyTitlesRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/travelers/$travelerId': {
+      id: '/_shell/travelers/$travelerId'
+      path: '/travelers/$travelerId'
+      fullPath: '/travelers/$travelerId'
+      preLoaderRoute: typeof ShellTravelersTravelerIdRouteImport
       parentRoute: typeof ShellRoute
     }
     '/login/kakao/callback': {
@@ -420,12 +497,16 @@ declare module '@tanstack/react-router' {
 interface ShellRouteChildren {
   ShellIndexRoute: typeof ShellIndexRoute
   ShellCourseCreateRoute: typeof ShellCourseCreateRoute
+  ShellCourseDiscoverRoute: typeof ShellCourseDiscoverRoute
   ShellMyDataSourcesRoute: typeof ShellMyDataSourcesRoute
   ShellMyPermissionsRoute: typeof ShellMyPermissionsRoute
   ShellMyPreferencesRoute: typeof ShellMyPreferencesRoute
+  ShellMyRankingRoute: typeof ShellMyRankingRoute
   ShellMyReviewsRoute: typeof ShellMyReviewsRoute
   ShellMySavedCoursesRoute: typeof ShellMySavedCoursesRoute
   ShellMySavedPlacesRoute: typeof ShellMySavedPlacesRoute
+  ShellMyTitlesRoute: typeof ShellMyTitlesRoute
+  ShellTravelersTravelerIdRoute: typeof ShellTravelersTravelerIdRoute
   ShellCourseIndexRoute: typeof ShellCourseIndexRoute
   ShellMapIndexRoute: typeof ShellMapIndexRoute
   ShellMyIndexRoute: typeof ShellMyIndexRoute
@@ -437,12 +518,16 @@ interface ShellRouteChildren {
 const ShellRouteChildren: ShellRouteChildren = {
   ShellIndexRoute: ShellIndexRoute,
   ShellCourseCreateRoute: ShellCourseCreateRoute,
+  ShellCourseDiscoverRoute: ShellCourseDiscoverRoute,
   ShellMyDataSourcesRoute: ShellMyDataSourcesRoute,
   ShellMyPermissionsRoute: ShellMyPermissionsRoute,
   ShellMyPreferencesRoute: ShellMyPreferencesRoute,
+  ShellMyRankingRoute: ShellMyRankingRoute,
   ShellMyReviewsRoute: ShellMyReviewsRoute,
   ShellMySavedCoursesRoute: ShellMySavedCoursesRoute,
   ShellMySavedPlacesRoute: ShellMySavedPlacesRoute,
+  ShellMyTitlesRoute: ShellMyTitlesRoute,
+  ShellTravelersTravelerIdRoute: ShellTravelersTravelerIdRoute,
   ShellCourseIndexRoute: ShellCourseIndexRoute,
   ShellMapIndexRoute: ShellMapIndexRoute,
   ShellMyIndexRoute: ShellMyIndexRoute,

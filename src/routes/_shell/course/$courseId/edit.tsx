@@ -15,10 +15,11 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Check, GripVertical, MapPinPlus, Plus, Search, X } from 'lucide-react'
+import { CalendarDays, Check, GripVertical, MapPinPlus, Plus, Search, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   mockCourseDetails,
+  formatTripLength,
   useCourseDetail,
   useCourseEditStore,
   useUpdateCourse,
@@ -33,6 +34,8 @@ export const Route = createFileRoute('/_shell/course/$courseId/edit')({
   component: CourseEditPage,
 })
 
+const MAX_COURSE_TITLE_LENGTH = 40
+
 function CourseEditPage() {
   const { courseId } = Route.useParams()
   const courseIdNumber = Number(courseId)
@@ -44,9 +47,12 @@ function CourseEditPage() {
     stops,
     demoStopsByCourseId,
     initialize,
+    updateTitle,
     addStop,
     removeStop,
     moveStop,
+    updateStopMemo,
+    updateStopDay,
     saveDemoStops,
   } = useCourseEditStore()
   const updateCourse = useUpdateCourse(courseIdNumber)
@@ -64,6 +70,7 @@ function CourseEditPage() {
           demoCourse.stops.map((stop, index) => ({
             id: stop.id,
             placeId: -(index + 1),
+            dayNumber: 1,
             time: stop.time,
             durationLabel: stop.durationLabel,
             title: stop.title,
@@ -84,11 +91,13 @@ function CourseEditPage() {
       course.stops.map((stop) => ({
         id: stop.courseStopId.toString(),
         placeId: stop.placeId,
+        dayNumber: stop.dayNumber,
         durationLabel:
           stop.stayDurationMinutes !== undefined
             ? `${formatDurationMinutes(stop.stayDurationMinutes)} 체류 예정`
             : '체류 시간 미정',
         title: stop.name,
+        ...(stop.memo !== undefined && { memo: stop.memo }),
         latitude: stop.latitude,
         longitude: stop.longitude,
         imageUrl:
@@ -102,6 +111,11 @@ function CourseEditPage() {
     )
   }, [course, courseId, demoCourse, demoStopsByCourseId, initialize])
 
+  const tripDays = demoCourse ? 1 : (course?.tripDays ?? 1)
+  const trimmedTitle = title.trim()
+  const isTitleInvalid =
+    trimmedTitle.length === 0 || title.length > MAX_COURSE_TITLE_LENGTH
+
   function handleSave() {
     if (demoCourse) {
       saveDemoStops(courseId)
@@ -109,15 +123,22 @@ function CourseEditPage() {
       return
     }
 
+    const orderedStops = stops
+      .map((stop, originalIndex) => ({ stop, originalIndex }))
+      .sort((a, b) => a.stop.dayNumber - b.stop.dayNumber || a.originalIndex - b.originalIndex)
+      .map(({ stop }) => stop)
+
     updateCourse.mutate(
       {
-        title,
-        stops: stops.map((stop, i) => ({
+        title: trimmedTitle,
+        stops: orderedStops.map((stop, i) => ({
           placeId: stop.placeId,
-          stopOrder: i + 1,
+          stopOrder: i,
+          dayNumber: stop.dayNumber,
           ...(stop.stayDurationMinutes !== undefined && {
             stayDurationMinutes: stop.stayDurationMinutes,
           }),
+          ...(stop.memo?.trim() && { memo: stop.memo.trim() }),
         })),
       },
       {
@@ -143,7 +164,7 @@ function CourseEditPage() {
           <button
             type="button"
             onClick={handleSave}
-            disabled={!demoCourse && updateCourse.isPending}
+            disabled={isTitleInvalid || (!demoCourse && updateCourse.isPending)}
             className="font-label-md text-label-md bg-primary-container text-on-primary rounded-xl px-6 py-2 transition-opacity hover:opacity-90 active:scale-95 disabled:opacity-50"
           >
             {!demoCourse && updateCourse.isPending ? '저장 중...' : '저장'}
@@ -156,12 +177,47 @@ function CourseEditPage() {
             저장하지 못했어요. 잠시 후 다시 시도해주세요.
           </p>
         )}
+        {!demoCourse && (
+          <section className="mb-lg">
+            <div className="mb-2 flex items-center justify-between gap-4">
+              <label htmlFor="course-title" className="font-label-md text-on-surface">
+                코스 이름
+              </label>
+              <span
+                className={`text-xs ${
+                  isTitleInvalid ? 'text-error' : 'text-on-surface-variant'
+                }`}
+                aria-live="polite"
+              >
+                {title.length}/{MAX_COURSE_TITLE_LENGTH}
+              </span>
+            </div>
+            <input
+              id="course-title"
+              type="text"
+              value={title}
+              onChange={(event) =>
+                updateTitle(event.target.value.slice(0, MAX_COURSE_TITLE_LENGTH))
+              }
+              maxLength={MAX_COURSE_TITLE_LENGTH}
+              placeholder="코스 이름을 입력해주세요"
+              aria-invalid={isTitleInvalid}
+              className="border-outline-variant bg-surface text-on-surface placeholder:text-outline focus:border-primary focus:ring-primary/20 h-12 w-full rounded-xl border px-4 text-base outline-none transition focus:ring-2"
+            />
+            {trimmedTitle.length === 0 && (
+              <p className="text-error mt-2 text-xs">코스 이름을 입력해주세요.</p>
+            )}
+          </section>
+        )}
         <section className="border-outline-variant/30 mb-lg bg-surface-container-low p-md flex items-center justify-between rounded-xl border shadow-sm">
           <div>
             <p className="font-label-caps text-outline tracking-wider uppercase">전체 경로</p>
             <div className="flex items-baseline gap-2">
               <span className="font-headline-lg-mobile text-headline-lg-mobile text-primary">
                 {stops.length}개 장소
+              </span>
+              <span className="text-on-surface-variant text-sm">
+                · {formatTripLength(course?.startDate, course?.endDate, tripDays)}
               </span>
             </div>
           </div>
@@ -182,7 +238,10 @@ function CourseEditPage() {
                   stop={stop}
                   index={i}
                   total={stops.length}
+                  tripDays={tripDays}
                   onRemove={() => removeStop(stop.id)}
+                  onMemoChange={(memo) => updateStopMemo(stop.id, memo)}
+                  onDayChange={(dayNumber) => updateStopDay(stop.id, dayNumber)}
                 />
               ))}
             </Timeline>
@@ -199,13 +258,21 @@ function SortableCourseStop({
   stop,
   index,
   total,
+  tripDays,
   onRemove,
+  onMemoChange,
+  onDayChange,
 }: {
   stop: CourseStop
   index: number
   total: number
+  tripDays: number
   onRemove: () => void
+  onMemoChange: (memo: string) => void
+  onDayChange: (dayNumber: number) => void
 }) {
+  const [editingMemo, setEditingMemo] = useState(false)
+  const [memoDraft, setMemoDraft] = useState(stop.memo ?? '')
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: stop.id,
   })
@@ -224,6 +291,7 @@ function SortableCourseStop({
         imageUrl={stop.imageUrl}
         imageAlt={stop.imageAlt}
         editable
+        onEdit={() => setEditingMemo((open) => !open)}
         onRemove={onRemove}
         dragHandle={
           <button
@@ -237,6 +305,60 @@ function SortableCourseStop({
           </button>
         }
       />
+      {tripDays > 1 && (
+        <div className="border-outline-variant/30 bg-surface mb-3 -mt-4 ml-10 flex items-center gap-3 rounded-lg border px-3 py-2">
+          <span className="text-on-surface-variant flex shrink-0 items-center gap-1.5 text-xs font-semibold">
+            <CalendarDays className="size-4" /> 방문일
+          </span>
+          <div className="no-scrollbar flex min-w-0 gap-1 overflow-x-auto">
+            {Array.from({ length: tripDays }, (_, index) => index + 1).map((dayNumber) => (
+              <button
+                key={dayNumber}
+                type="button"
+                onClick={() => onDayChange(dayNumber)}
+                className={`h-8 shrink-0 rounded-md px-3 text-xs font-semibold ${stop.dayNumber === dayNumber ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant'}`}
+              >
+                {dayNumber}일차
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {editingMemo && (
+        <div className="border-outline-variant/30 bg-surface mb-lg -mt-4 ml-10 rounded-lg border p-3 shadow-sm">
+          <label className="mb-2 block text-xs font-semibold">이 장소에서 기억할 메모</label>
+          <textarea
+            value={memoDraft}
+            onChange={(event) => setMemoDraft(event.target.value)}
+            maxLength={500}
+            rows={2}
+            placeholder="예약 시간, 주문할 메뉴처럼 나에게 필요한 내용을 적어보세요."
+            className="border-outline-variant focus:border-primary w-full resize-none rounded-lg border p-2 text-sm outline-none"
+          />
+          <div className="mt-2 flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setMemoDraft(stop.memo ?? '')
+                setEditingMemo(false)
+              }}
+              className="text-on-surface-variant h-9 px-3 text-sm"
+            >
+              취소
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                onMemoChange(memoDraft.trim())
+                setEditingMemo(false)
+              }}
+              className="bg-primary text-on-primary h-9 rounded-lg px-4 text-sm font-semibold"
+            >
+              메모 저장
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -398,6 +520,7 @@ function toCourseStop(place: ApiPlaceSummary): CourseStop {
   return {
     id: `place-${place.placeId.toString()}`,
     placeId: place.placeId,
+    dayNumber: 1,
     durationLabel: '체류 시간 미정',
     title: place.name,
     subtitle: place.type,

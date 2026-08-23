@@ -1,10 +1,10 @@
 import { Link } from '@tanstack/react-router'
-import { Home, Map, Route, User } from 'lucide-react'
+import { Home, Route, User, Utensils } from 'lucide-react'
 import { createPortal } from 'react-dom'
 
 const NAV_ITEMS = [
   { to: '/', label: '홈', icon: Home, exact: true },
-  { to: '/map', label: '지도', icon: Map, exact: false },
+  { to: '/map', label: '혼밥지도', icon: Utensils, exact: false },
   { to: '/course', label: '코스', icon: Route, exact: false },
   { to: '/my', label: '마이', icon: User, exact: false },
 ] as const
