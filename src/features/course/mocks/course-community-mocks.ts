@@ -173,9 +173,9 @@ export const mockCommunityCourseDetails: Record<number, CourseDetailResponse> = 
   910001: detail(
     mockCommunityPublicCourses[0]!,
     [
-      { courseStopId: 920001, stopOrder: 0, placeId: 930001, name: '제주동문시장', latitude: 33.512836, longitude: 126.52843, stayDurationMinutes: 80, memo: '야시장 운영 시간 확인하기', thumbnailUrl: 'https://picsum.photos/seed/community-dongmun-market/240/240' },
-      { courseStopId: 920002, stopOrder: 1, placeId: 930002, name: '관덕정', latitude: 33.51345, longitude: 126.52149, stayDurationMinutes: 35, memo: '해 질 무렵 쉬어가기', thumbnailUrl: 'https://picsum.photos/seed/community-gwandeokjeong/240/240' },
-      { courseStopId: 920003, stopOrder: 2, dayNumber: 2, placeId: 930003, name: '용두암', latitude: 33.51611, longitude: 126.511958, stayDurationMinutes: 50, memo: '아침에는 바람이 강할 수 있어 겉옷 챙기기', thumbnailUrl: 'https://picsum.photos/seed/community-yongduam/240/240' },
+      { courseStopId: 920001, stopOrder: 0, placeId: 930001, name: '제주동문시장', address: '제주특별자치도 제주시 관덕로14길 20', latitude: 33.512836, longitude: 126.52843, stayDurationMinutes: 80, memo: '야시장 운영 시간 확인하기', thumbnailUrl: 'https://picsum.photos/seed/community-dongmun-market/240/240' },
+      { courseStopId: 920002, stopOrder: 1, placeId: 930002, name: '관덕정', address: '제주특별자치도 제주시 관덕로 19', latitude: 33.51345, longitude: 126.52149, stayDurationMinutes: 35, memo: '해 질 무렵 쉬어가기', thumbnailUrl: 'https://picsum.photos/seed/community-gwandeokjeong/240/240' },
+      { courseStopId: 920003, stopOrder: 2, dayNumber: 2, placeId: 930003, name: '용두암', address: '제주특별자치도 제주시 용두암길 15', latitude: 33.51611, longitude: 126.511958, stayDurationMinutes: 50, memo: '아침에는 바람이 강할 수 있어 겉옷 챙기기', thumbnailUrl: 'https://picsum.photos/seed/community-yongduam/240/240' },
     ],
     true,
     '시장에서는 한 곳에서 많이 먹기보다 조금씩 골라 먹는 게 좋았어요.',
@@ -184,9 +184,9 @@ export const mockCommunityCourseDetails: Record<number, CourseDetailResponse> = 
   910002: detail(
     mockCommunityPublicCourses[1]!,
     [
-      { courseStopId: 920011, stopOrder: 0, placeId: 930011, name: '성수연방', latitude: 37.54158, longitude: 127.05665, stayDurationMinutes: 50, thumbnailUrl: 'https://picsum.photos/seed/community-seongsu-start/240/240' },
-      { courseStopId: 920012, stopOrder: 1, placeId: 930012, name: '성수동 카페거리', latitude: 37.54362, longitude: 127.0549, stayDurationMinutes: 70, memo: '바 좌석이 있는 카페 고르기', thumbnailUrl: 'https://picsum.photos/seed/community-seongsu-cafe/240/240' },
-      { courseStopId: 920013, stopOrder: 2, placeId: 930013, name: '서울숲', latitude: 37.54439, longitude: 127.03745, stayDurationMinutes: 60, thumbnailUrl: 'https://picsum.photos/seed/community-seoul-forest/240/240' },
+      { courseStopId: 920011, stopOrder: 0, placeId: 930011, name: '성수연방', address: '서울특별시 성동구 성수이로14길 14', latitude: 37.54158, longitude: 127.05665, stayDurationMinutes: 50, thumbnailUrl: 'https://picsum.photos/seed/community-seongsu-start/240/240' },
+      { courseStopId: 920012, stopOrder: 1, placeId: 930012, name: '성수동 카페거리', address: '서울특별시 성동구 성수이로 일대', latitude: 37.54362, longitude: 127.0549, stayDurationMinutes: 70, memo: '바 좌석이 있는 카페 고르기', thumbnailUrl: 'https://picsum.photos/seed/community-seongsu-cafe/240/240' },
+      { courseStopId: 920013, stopOrder: 2, placeId: 930013, name: '서울숲', address: '서울특별시 성동구 뚝섬로 273', latitude: 37.54439, longitude: 127.03745, stayDurationMinutes: 60, thumbnailUrl: 'https://picsum.photos/seed/community-seoul-forest/240/240' },
     ],
     true,
     '주말 오후에는 카페 대기가 길어서 오전 출발을 추천해요.',
@@ -195,9 +195,9 @@ export const mockCommunityCourseDetails: Record<number, CourseDetailResponse> = 
   910003: detail(
     mockCommunityPublicCourses[2]!,
     [
-      { courseStopId: 920021, stopOrder: 0, placeId: 930021, name: '흰여울문화마을', latitude: 35.07878, longitude: 129.04428, stayDurationMinutes: 90, thumbnailUrl: 'https://picsum.photos/seed/community-huinnyeoul/240/240' },
-      { courseStopId: 920022, stopOrder: 1, placeId: 930022, name: '절영해안산책로', latitude: 35.07591, longitude: 129.05085, stayDurationMinutes: 70, memo: '편한 신발 필수', thumbnailUrl: 'https://picsum.photos/seed/community-jeoryeong/240/240' },
-      { courseStopId: 920023, stopOrder: 2, placeId: 930023, name: '영도 카페거리', latitude: 35.08234, longitude: 129.05212, stayDurationMinutes: 60, thumbnailUrl: 'https://picsum.photos/seed/community-yeongdo-cafe/240/240' },
+      { courseStopId: 920021, stopOrder: 0, placeId: 930021, name: '흰여울문화마을', address: '부산광역시 영도구 영선동4가 605-3', latitude: 35.07878, longitude: 129.04428, stayDurationMinutes: 90, thumbnailUrl: 'https://picsum.photos/seed/community-huinnyeoul/240/240' },
+      { courseStopId: 920022, stopOrder: 1, placeId: 930022, name: '절영해안산책로', address: '부산광역시 영도구 해안산책길 52', latitude: 35.07591, longitude: 129.05085, stayDurationMinutes: 70, memo: '편한 신발 필수', thumbnailUrl: 'https://picsum.photos/seed/community-jeoryeong/240/240' },
+      { courseStopId: 920023, stopOrder: 2, placeId: 930023, name: '영도 카페거리', address: '부산광역시 영도구 절영로 일대', latitude: 35.08234, longitude: 129.05212, stayDurationMinutes: 60, thumbnailUrl: 'https://picsum.photos/seed/community-yeongdo-cafe/240/240' },
     ],
     true,
     '해안 산책로는 낮에 걷고, 해가 지기 전 카페 쪽으로 이동했어요.',
@@ -206,8 +206,8 @@ export const mockCommunityCourseDetails: Record<number, CourseDetailResponse> = 
   910004: detail(
     mockCommunityPublicCourses[3]!,
     [
-      { courseStopId: 920031, stopOrder: 0, placeId: 930031, name: '속초관광수산시장', latitude: 38.20417, longitude: 128.59072, stayDurationMinutes: 80, memo: '먹거리 포장은 조금씩', thumbnailUrl: 'https://picsum.photos/seed/community-sokcho-market/240/240' },
-      { courseStopId: 920032, stopOrder: 1, placeId: 930032, name: '영랑호', latitude: 38.22215, longitude: 128.58418, stayDurationMinutes: 90, memo: '호수 한 바퀴보다 전망 좋은 구간만 걷기', thumbnailUrl: 'https://picsum.photos/seed/community-yeongnangho/240/240' },
+      { courseStopId: 920031, stopOrder: 0, placeId: 930031, name: '속초관광수산시장', address: '강원특별자치도 속초시 중앙로147번길 12', latitude: 38.20417, longitude: 128.59072, stayDurationMinutes: 80, memo: '먹거리 포장은 조금씩', thumbnailUrl: 'https://picsum.photos/seed/community-sokcho-market/240/240' },
+      { courseStopId: 920032, stopOrder: 1, placeId: 930032, name: '영랑호', address: '강원특별자치도 속초시 영랑호반길 140', latitude: 38.22215, longitude: 128.58418, stayDurationMinutes: 90, memo: '호수 한 바퀴보다 전망 좋은 구간만 걷기', thumbnailUrl: 'https://picsum.photos/seed/community-yeongnangho/240/240' },
     ],
     false,
     '속초는 안심경로 지원 지역은 아니지만 낮 시간에 혼자 걷기 편한 동선으로 골랐어요.',

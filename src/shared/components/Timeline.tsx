@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { MessageSquareText } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 
 export function Timeline({ children, className }: { children: ReactNode; className?: string }) {
@@ -19,6 +20,7 @@ interface TimelineItemProps {
   imageUrl?: string
   imageAlt?: string
   subtitle?: string
+  note?: string
   badges?: TimelineBadge[]
   after?: ReactNode
   editable?: boolean
@@ -45,6 +47,7 @@ export function TimelineItem({
   imageUrl,
   imageAlt,
   subtitle,
+  note,
   badges,
   after,
   editable = false,
@@ -97,6 +100,14 @@ export function TimelineItem({
                     <p className="text-body-sm text-on-surface-variant line-clamp-2 leading-snug">
                       {subtitle}
                     </p>
+                  )}
+                  {note && (
+                    <div className="bg-primary/6 mt-2 flex items-start gap-1.5 rounded-md px-2.5 py-2">
+                      <MessageSquareText className="text-primary mt-px size-3.5 shrink-0" />
+                      <p className="text-on-surface-variant line-clamp-2 text-xs leading-snug break-keep">
+                        {note}
+                      </p>
+                    </div>
                   )}
                 </div>
                 {badges && badges.length > 0 && (

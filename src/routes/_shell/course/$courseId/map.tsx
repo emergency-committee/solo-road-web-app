@@ -3,6 +3,7 @@ import { ArrowLeft, MapPin } from 'lucide-react'
 import { useLayoutEffect } from 'react'
 import {
   CourseOverviewMap,
+  getCourseDayColor,
   mockCourseDetails,
   useCourseDetail,
   useCourseEditStore,
@@ -77,7 +78,7 @@ function CourseMapPage() {
 
   return (
     <main className="bg-surface-container relative h-[100dvh] w-full overflow-hidden">
-      <CourseOverviewMap stops={stops} />
+      <CourseOverviewMap stops={stops} legendClassName="top-20 right-3" />
 
       <header className="px-margin-mobile py-md absolute inset-x-0 top-0 z-20">
         <div className="bg-surface/95 gap-md flex items-center rounded-xl px-3 py-2 shadow-lg backdrop-blur-md">
@@ -100,7 +101,10 @@ function CourseMapPage() {
         <ol className="space-y-sm">
           {stops.map((stop) => (
             <li key={stop.id} className="gap-sm flex items-center">
-              <span className="bg-primary text-on-primary grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold">
+              <span
+                className="text-on-primary grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold"
+                style={{ backgroundColor: getCourseDayColor(stop.dayNumber) }}
+              >
                 {stop.order}
               </span>
               <span className="text-body-sm min-w-0 truncate font-semibold">

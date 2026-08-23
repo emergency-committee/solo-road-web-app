@@ -304,7 +304,8 @@ function CourseDetailPage() {
                         `https://picsum.photos/seed/place-${stop.placeId.toString()}/240/240`
                       }
                       imageAlt={stop.name}
-                      {...(stop.memo && { subtitle: `장소 메모 · ${stop.memo}` })}
+                      {...(stop.address && { subtitle: stop.address })}
+                      {...(stop.memo && { note: stop.memo })}
                       {...(stop.stayDurationMinutes !== undefined && {
                         durationLabel: `${formatDurationMinutes(stop.stayDurationMinutes)} 체류 예정`,
                       })}

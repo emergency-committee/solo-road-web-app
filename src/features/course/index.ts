@@ -59,6 +59,8 @@ export {
   formatTripLength,
 } from './lib/course-schedule'
 export { mockCourseDetails, mockSavedCourseRows } from './mocks/course-mocks'
+export { resolveFeaturedCourses } from './lib/featured-course-fallback'
+export { getCourseDayColor } from './lib/course-map-days'
 export type { DateRange } from './components/CourseDateRangeCalendar'
 export { useCourseEditStore } from './store/course-edit-store'
 export type { CourseDetail, CourseStop, DemoCourseStop } from './types/course-ui.types'

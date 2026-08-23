@@ -39,6 +39,14 @@ function isCommunityMockEnabled() {
   return import.meta.env.VITE_AUTH_MOCK === 'true'
 }
 
+function isCommunityDemoCourse(courseId: number) {
+  const course = mockCommunityCourseDetails[courseId]
+  return (
+    course !== undefined &&
+    ((courseId >= 910000 && courseId < 920000) || course.copiedFromCourseId !== undefined)
+  )
+}
+
 export function generateCourse(req: GenerateCourseRequest) {
   return apiRequest<GenerateCourseResponse>(`${API_PREFIX}/courses/generate`, {
     method: 'POST',
@@ -68,13 +76,15 @@ export function getMyCourses() {
 
 export function getCourseDetail(courseId: number) {
   const mockCourse = mockCommunityCourseDetails[courseId]
-  if (isCommunityMockEnabled() && mockCourse) return Promise.resolve(mockCourse)
+  if ((isCommunityMockEnabled() || isCommunityDemoCourse(courseId)) && mockCourse) {
+    return Promise.resolve(mockCourse)
+  }
   return apiRequest<CourseDetailResponse>(`${API_PREFIX}/courses/${courseId.toString()}`)
 }
 
 export function updateCourse(courseId: number, req: UpdateCourseRequest) {
   const mockCourse = mockCommunityCourseDetails[courseId]
-  if (isCommunityMockEnabled() && mockCourse) {
+  if ((isCommunityMockEnabled() || isCommunityDemoCourse(courseId)) && mockCourse) {
     mockCourse.title = req.title
     mockCourse.stops = req.stops.map((input, index) => {
       const existing = mockCourse.stops.find((stop) => stop.placeId === input.placeId)
@@ -84,6 +94,7 @@ export function updateCourse(courseId: number, req: UpdateCourseRequest) {
         dayNumber: input.dayNumber,
         placeId: input.placeId,
         name: existing?.name ?? `추가한 장소 ${index + 1}`,
+        ...(existing?.address !== undefined && { address: existing.address }),
         latitude: existing?.latitude ?? 37.5665,
         longitude: existing?.longitude ?? 126.978,
         ...(existing?.thumbnailUrl !== undefined && { thumbnailUrl: existing.thumbnailUrl }),
@@ -116,7 +127,7 @@ export function updateCourse(courseId: number, req: UpdateCourseRequest) {
 }
 
 export function deleteCourse(courseId: number) {
-  if (isCommunityMockEnabled() && mockCommunityCourseDetails[courseId]) {
+  if (isCommunityMockEnabled() || isCommunityDemoCourse(courseId)) {
     delete mockCommunityCourseDetails[courseId]
     const copiedIndex = mockCopiedCourses.findIndex((course) => course.courseId === courseId)
     if (copiedIndex >= 0) mockCopiedCourses.splice(copiedIndex, 1)
@@ -153,7 +164,7 @@ export function getPublicCourses(params: DiscoverCoursesParams = {}) {
 }
 
 export function getTravelerPublicCourses(travelerId: number, page = 0, size = 20) {
-  if (isCommunityMockEnabled()) {
+  if (isCommunityMockEnabled() || mockTravelerProfiles[travelerId] !== undefined) {
     const filtered = mockCommunityPublicCourses.filter((course) => course.authorId === travelerId)
     return Promise.resolve({
       content: filtered.slice(page * size, page * size + size),
@@ -176,7 +187,7 @@ export function getCourseTags() {
 
 export function publishCourse(courseId: number, req: PublishCourseRequest) {
   const mockCourse = mockCommunityCourseDetails[courseId]
-  if (isCommunityMockEnabled() && mockCourse) {
+  if ((isCommunityMockEnabled() || isCommunityDemoCourse(courseId)) && mockCourse) {
     mockCourse.visibility = 'PUBLIC'
     if (req.description !== undefined) mockCourse.description = req.description
     else delete mockCourse.description
@@ -198,7 +209,7 @@ export function publishCourse(courseId: number, req: PublishCourseRequest) {
 
 export function unpublishCourse(courseId: number) {
   const mockCourse = mockCommunityCourseDetails[courseId]
-  if (isCommunityMockEnabled() && mockCourse) {
+  if ((isCommunityMockEnabled() || isCommunityDemoCourse(courseId)) && mockCourse) {
     mockCourse.visibility = 'PRIVATE'
     return Promise.resolve()
   }
@@ -209,7 +220,7 @@ export function unpublishCourse(courseId: number) {
 
 export function setCourseLike(courseId: number, liked: boolean) {
   const mockCourse = mockCommunityCourseDetails[courseId]
-  if (isCommunityMockEnabled() && mockCourse) {
+  if ((isCommunityMockEnabled() || isCommunityDemoCourse(courseId)) && mockCourse) {
     if (mockCourse.liked !== liked) mockCourse.likeCount += liked ? 1 : -1
     mockCourse.liked = liked
     const listCourse = mockCommunityPublicCourses.find((course) => course.courseId === courseId)
@@ -223,7 +234,7 @@ export function setCourseLike(courseId: number, liked: boolean) {
 
 export function copyCourse(courseId: number) {
   const source = mockCommunityCourseDetails[courseId]
-  if (isCommunityMockEnabled() && source) {
+  if ((isCommunityMockEnabled() || isCommunityDemoCourse(courseId)) && source) {
     const copiedCourseId = courseId + 100000
     mockCommunityCourseDetails[copiedCourseId] = {
       ...source,
@@ -258,7 +269,7 @@ export function copyCourse(courseId: number) {
 }
 
 export function getCourseReviews(courseId: number, page = 0, size = 20) {
-  if (isCommunityMockEnabled() && mockCommunityCourseDetails[courseId]) {
+  if (isCommunityMockEnabled() || isCommunityDemoCourse(courseId)) {
     const reviews = mockCommunityReviews[courseId] ?? []
     return Promise.resolve({
       content: reviews.slice(page * size, page * size + size),
@@ -275,7 +286,7 @@ export function getCourseReviews(courseId: number, page = 0, size = 20) {
 }
 
 export function createCourseReview(courseId: number, req: CreateCourseReviewRequest) {
-  if (isCommunityMockEnabled() && mockCommunityCourseDetails[courseId]) {
+  if (isCommunityMockEnabled() || isCommunityDemoCourse(courseId)) {
     const review: CourseReview = {
       reviewId: Date.now(),
       userId: 999,
@@ -315,7 +326,7 @@ export function getTravelerRanking(page = 0, size = 30) {
 }
 
 export function getTravelerProfile(travelerId: number) {
-  if (isCommunityMockEnabled()) {
+  if (isCommunityMockEnabled() || mockTravelerProfiles[travelerId] !== undefined) {
     const profile = mockTravelerProfiles[travelerId]
     if (profile) return Promise.resolve(profile)
   }

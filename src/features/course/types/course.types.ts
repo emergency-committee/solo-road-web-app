@@ -94,6 +94,7 @@ export interface CourseDetailStop {
   dayNumber: number
   placeId: number
   name: string
+  address?: string
   thumbnailUrl?: string
   /** 경유지(Place)의 위도. Place.latitude 가 DB 상 NOT NULL 이라 항상 내려온다. */
   latitude: number

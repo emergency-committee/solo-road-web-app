@@ -4,6 +4,7 @@ import {
   PublicCourseCard,
   formatCourseDateRange,
   mockSavedCourseRows,
+  resolveFeaturedCourses,
   useCourseRecommendations,
   useMyCourses,
   usePublicCourses,
@@ -23,7 +24,8 @@ function CoursePage() {
 
   const recommendations = recommendationsQuery.data?.content ?? []
   const myCourses = myCoursesQuery.data?.content ?? []
-  const hotCourses = hotCoursesQuery.data?.content ?? []
+  const liveHotCourses = hotCoursesQuery.data?.content ?? []
+  const hotCourses = resolveFeaturedCourses(liveHotCourses)
 
   return (
     <main className="space-y-xl px-margin-mobile pt-lg mx-auto min-h-screen max-w-4xl pb-8">
@@ -50,34 +52,23 @@ function CoursePage() {
           <div className="flex items-center gap-2">
             <Flame className="size-5 text-[#d94b35]" />
             <h3 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">
-              지금 많이 담는 코스
+              지금 주목받는 코스
             </h3>
           </div>
           <Link to="/course/discover" className="font-label-md text-label-md text-primary">
             다른 코스 보기
           </Link>
         </div>
-        {hotCourses.length > 0 ? (
-          <div className="space-y-2">
-            {hotCourses.map((course, index) => (
-              <PublicCourseCard
-                key={course.courseId}
-                course={course}
-                rank={index + 1}
-                variant="compact"
-              />
-            ))}
-          </div>
-        ) : (
-          <Link
-            to="/course/discover"
-            className="border-outline-variant/40 bg-surface-container-low text-on-surface-variant flex min-h-24 items-center justify-center rounded-lg border border-dashed px-5 text-center text-sm break-keep"
-          >
-            {hotCoursesQuery.isLoading
-              ? '여행자들의 코스를 모아보고 있어요...'
-              : '공개된 코스를 둘러보거나 내 코스를 먼저 공유해 보세요.'}
-          </Link>
-        )}
+        <div className="space-y-2">
+          {hotCourses.map((course, index) => (
+            <PublicCourseCard
+              key={course.courseId}
+              course={course}
+              rank={index + 1}
+              variant="compact"
+            />
+          ))}
+        </div>
       </section>
 
       <section className="space-y-md">
