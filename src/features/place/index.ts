@@ -2,10 +2,12 @@ export { PlaceDetailHero } from './components/PlaceDetailHero'
 export { SoloAnalysisCard } from './components/SoloAnalysisCard'
 export { KeyHighlightsList } from './components/KeyHighlightsList'
 export { ReviewSummaryBanner } from './components/ReviewSummaryBanner'
+export { PlaceReviewForm } from './components/PlaceReviewForm'
 export { usePlaceRecommendations } from './hooks/use-place-recommendations'
 export { usePlaces } from './hooks/use-places'
 export { usePlaceDetail } from './hooks/use-place-detail'
 export { usePlaceReviews } from './hooks/use-place-reviews'
+export { useCreatePlaceReview, useReviewTags } from './hooks/use-create-place-review'
 export { useTogglePlaceLike } from './hooks/use-toggle-place-like'
 export type {
   ApiHiddenGemItem,
@@ -14,5 +16,6 @@ export type {
   ApiPlaceSummary,
   ApiSoloDiningItem,
   ApiSoloInfoSummary,
+  ApiSoloTagSummary,
   PlaceHighlight,
 } from './types/place.types'

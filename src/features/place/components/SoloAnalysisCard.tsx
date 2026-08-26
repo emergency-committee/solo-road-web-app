@@ -1,46 +1,56 @@
-import { ShieldCheck } from 'lucide-react'
+import { Utensils } from 'lucide-react'
+import type { ApiSoloTagSummary } from '../types/place.types'
+import { hasDisplayableSoloRating, soloRatingMessage } from '../lib/solo-rating'
 
 interface SoloAnalysisCardProps {
-  /** solo_road_server의 SoloScoresGrade와 동일한 값(HIGH/MEDIUM/LOW). */
-  soloFriendliness: 'HIGH' | 'MEDIUM' | 'LOW'
-  hashtags: string[]
+  soloRating: number | null | undefined
+  reviewCount: number
+  tags: ApiSoloTagSummary[]
 }
 
-const LEVEL_LABEL: Record<SoloAnalysisCardProps['soloFriendliness'], string> = {
-  HIGH: '매우 높음',
-  MEDIUM: '보통',
-  LOW: '낮음',
-}
-
-export function SoloAnalysisCard({ soloFriendliness, hashtags }: SoloAnalysisCardProps) {
+export function SoloAnalysisCard({ soloRating, reviewCount, tags }: SoloAnalysisCardProps) {
   return (
     <section className="mb-lg">
-      <h2 className="font-label-caps text-label-caps text-outline mb-md uppercase">
-        솔로더 분석
-      </h2>
-      <div className="bg-primary-container/10 border-primary/5 p-md flex items-center justify-between rounded-xl border">
-        <div className="gap-md flex items-center">
-          <div className="bg-primary flex size-12 items-center justify-center rounded-full text-white">
-            <ShieldCheck className="size-7" />
+      <h2 className="font-headline-lg-mobile text-headline-lg-mobile mb-3">혼밥 평점</h2>
+      <div className="bg-primary/6 border-primary/10 p-md rounded-lg border">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="bg-primary flex size-12 items-center justify-center rounded-full text-white">
+              <Utensils className="size-6" />
+            </div>
+            <div>
+              <p className="text-on-surface text-base font-bold">
+                {soloRatingMessage(soloRating, reviewCount)}
+              </p>
+              <p className="text-on-surface-variant mt-0.5 text-xs">
+                {reviewCount > 0
+                  ? `혼자 방문한 ${reviewCount}명의 경험을 반영했어요`
+                  : '첫 혼밥 후기를 기다리고 있어요'}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-body-sm text-on-surface-variant">혼행 친화도</p>
-            <p className="font-headline-lg-mobile text-headline-lg-mobile text-primary">
-              {LEVEL_LABEL[soloFriendliness]}
-            </p>
-          </div>
+          {hasDisplayableSoloRating(soloRating, reviewCount) && (
+            <div className="text-right">
+              <p className="text-primary text-3xl font-bold tabular-nums">
+                {soloRating!.toFixed(1)}
+              </p>
+              <p className="text-outline text-xs">5점 만점</p>
+            </div>
+          )}
         </div>
       </div>
-      <div className="mt-xs gap-xs flex flex-wrap">
-        {hashtags.map((tag) => (
-          <span
-            key={tag}
-            className="border-outline-variant/20 text-label-md text-on-surface-variant bg-surface-container-high px-md rounded-full border py-1"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
+      {tags.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <span
+              key={tag.tagId}
+              className="border-outline-variant/30 text-on-surface-variant rounded-full border bg-white px-3 py-1.5 text-xs"
+            >
+              {tag.name} <strong className="text-primary ml-0.5">{tag.positiveCount}</strong>
+            </span>
+          ))}
+        </div>
+      )}
     </section>
   )
 }

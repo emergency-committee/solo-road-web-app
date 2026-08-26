@@ -29,6 +29,8 @@ export interface ApiPlaceSummary {
   name: string
   type: string
   rating?: number
+  soloRating?: number | null
+  soloReviewCount: number
   summary?: string
   latitude: number
   longitude: number
@@ -54,6 +56,7 @@ export interface ApiPlacesParams {
 export interface ApiSoloScoreSummary {
   soloScore?: number
   grade: 'HIGH' | 'MEDIUM' | 'LOW'
+  soloRating?: number | null
   seatScore?: number
   safetyScore?: number
   soloReviewCount: number
@@ -67,6 +70,13 @@ export interface ApiSoloInfoSummary {
   soloSeatStatus?: string
 }
 
+export interface ApiSoloTagSummary {
+  tagId: number
+  name: string
+  positiveCount: number
+  negativeCount: number
+}
+
 export interface ApiPlaceDetail {
   placeId: number
   name: string
@@ -78,6 +88,7 @@ export interface ApiPlaceDetail {
   soloFriendlyBadge: boolean
   soloScore?: ApiSoloScoreSummary
   soloInfo?: ApiSoloInfoSummary
+  soloTagSummaries: ApiSoloTagSummary[]
   analysisTags: string[]
   isLiked: boolean
 }
@@ -91,7 +102,34 @@ export interface ApiReview {
   reviewId: number
   userId: number
   rating: number
+  visitedAlone: boolean | null
+  soloRating: number | null
   contents: string
   tags: string[]
+  createdAt: string
+}
+
+export interface ApiReviewTag {
+  reviewTagId: number
+  tagName: string
+  tagType: string
+  description?: string | null
+}
+
+export interface CreatePlaceReviewRequest {
+  rating: number
+  contents: string
+  visitedAlone?: boolean
+  soloRating?: number
+  tagIds: number[]
+}
+
+export interface CreatePlaceReviewResponse {
+  reviewId: number
+  placeId: number
+  rating: number
+  visitedAlone: boolean | null
+  soloRating: number | null
+  contents: string
   createdAt: string
 }

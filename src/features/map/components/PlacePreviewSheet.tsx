@@ -1,6 +1,8 @@
-import { Footprints, Heart, Share2, Star } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { Footprints, Heart, Share2, Star, Utensils } from 'lucide-react'
 import { Sheet, SheetContent, SheetTitle } from '@/shared/components/ui/sheet'
 import { StatBadge } from '@/shared/components/StatBadge'
+import { hasDisplayableSoloRating } from '@/features/place/lib/solo-rating'
 import type { MapMarkerData } from '../types/map.types'
 
 interface PlacePreviewSheetProps {
@@ -11,7 +13,10 @@ interface PlacePreviewSheetProps {
 export function PlacePreviewSheet({ marker, onOpenChange }: PlacePreviewSheetProps) {
   return (
     <Sheet open={marker !== null} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="px-margin-mobile pt-base pb-lg rounded-t-[24px]">
+      <SheetContent
+        side="bottom"
+        className="px-margin-mobile pt-base pb-lg bottom-16 max-h-[calc(100dvh-4rem)] overflow-y-auto rounded-t-[24px]"
+      >
         {marker && (
           <>
             <SheetTitle className="sr-only">{marker.name}</SheetTitle>
@@ -42,15 +47,41 @@ export function PlacePreviewSheet({ marker, onOpenChange }: PlacePreviewSheetPro
                     <StatBadge key={tag.label} label={tag.label} tone={tag.tone} />
                   ))}
                 </div>
-                <div className="text-outline font-label-md mt-sm gap-base flex items-center">
+                <div className="text-outline font-label-md mt-sm flex items-center gap-1.5">
                   <Footprints className="size-4" />
-                  <span>
-                    현재 위치에서 {marker.distanceLabel} •{' '}
-                    <Star className="text-secondary inline size-3.5 fill-current" /> {marker.rating}{' '}
-                    ({marker.reviewCount})
-                  </span>
+                  <span>현재 위치에서 {marker.distanceLabel}</span>
                 </div>
               </div>
+            </div>
+            <div className="bg-primary/6 border-primary/10 mt-base flex items-center justify-between rounded-lg border px-4 py-3">
+              <div className="flex items-center gap-3">
+                <span className="bg-primary grid size-10 place-items-center rounded-full text-white">
+                  <Utensils className="size-5" />
+                </span>
+                <div>
+                  <p className="text-on-surface-variant text-xs">혼밥 평점</p>
+                  {hasDisplayableSoloRating(marker.soloRating, marker.soloReviewCount) ? (
+                    <p className="text-primary text-lg font-bold">
+                      {marker.soloRating!.toFixed(1)}
+                      <span className="text-on-surface-variant ml-1 text-xs font-medium">
+                        · 혼자 방문 {marker.soloReviewCount}명
+                      </span>
+                    </p>
+                  ) : (
+                    <p className="text-on-surface text-sm font-semibold">
+                      {marker.soloReviewCount > 0
+                        ? '평가가 모이고 있어요'
+                        : '첫 혼밥 평가를 기다리고 있어요'}
+                    </p>
+                  )}
+                </div>
+              </div>
+              {marker.rating !== undefined && (
+                <span className="text-on-surface-variant text-xs">
+                  <Star className="text-secondary mr-1 inline size-3.5 fill-current" />
+                  일반 {marker.rating.toFixed(1)}
+                </span>
+              )}
             </div>
             <div className="mt-lg gap-sm flex">
               <button
@@ -60,13 +91,14 @@ export function PlacePreviewSheet({ marker, onOpenChange }: PlacePreviewSheetPro
                 <Share2 className="size-5" />
                 공유하기
               </button>
-              <button
-                type="button"
+              <Link
+                to="/place/$placeId"
+                params={{ placeId: marker.id }}
                 className="font-label-md gap-xs bg-primary py-md text-on-primary flex flex-[2] items-center justify-center rounded-xl shadow-md transition-transform active:scale-95"
               >
                 <Star className="size-5" />
-                리뷰 보기
-              </button>
+                혼밥 후기 보기
+              </Link>
             </div>
           </>
         )}

@@ -17,9 +17,9 @@ export const Route = createFileRoute('/_shell/map/')({
 })
 
 function toPlacesParams(filter: string): ApiPlacesParams {
-  if (filter === 'cafe') return { type: '카페' }
-  if (filter === 'landmark') return { type: '명소' }
-  if (filter === 'safe-restaurant') return { soloFriendlyOnly: true }
+  if (filter === 'restaurant') return { type: 'RESTAURANT' }
+  if (filter === 'cafe') return { type: 'CAFE' }
+  if (filter === 'solo-friendly') return { soloFriendlyOnly: true, sort: 'SOLO_SCORE' }
   return {}
 }
 
@@ -49,7 +49,7 @@ function MapPage() {
       (placesQuery.data?.content ?? []).map((place) => ({
         id: place.placeId.toString(),
         name: place.name,
-        icon: place.type.includes('공원') || place.type.includes('park') ? 'park' : 'coffee',
+        icon: place.type.toUpperCase() === 'CAFE' ? 'coffee' : 'restaurant',
         lat: place.latitude,
         lng: place.longitude,
         imageUrl:
@@ -57,9 +57,12 @@ function MapPage() {
           `https://picsum.photos/seed/place-${place.placeId.toString()}/480/480`,
         imageAlt: place.name,
         distanceLabel: formatDistanceMeters(place.distanceM),
-        rating: place.rating ?? 0,
-        reviewCount: 0,
-        tags: place.soloFriendlyBadge ? [{ label: '혼행 친화', tone: 'secondary' as const }] : [],
+        ...(place.rating !== undefined && { rating: place.rating }),
+        soloRating: place.soloRating,
+        soloReviewCount: place.soloReviewCount,
+        tags: place.soloFriendlyBadge
+          ? [{ label: '혼밥 편한 곳', tone: 'secondary' as const }]
+          : [],
       })),
     [placesQuery.data],
   )

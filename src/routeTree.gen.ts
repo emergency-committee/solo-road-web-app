@@ -30,6 +30,7 @@ import { Route as ShellMySavedPlacesRouteImport } from './routes/_shell/my/saved
 import { Route as ShellMyTitlesRouteImport } from './routes/_shell/my/titles'
 import { Route as ShellTravelersTravelerIdRouteImport } from './routes/_shell/travelers/$travelerId'
 import { Route as LoginKakaoCallbackRouteImport } from './routes/login/kakao/callback'
+import { Route as PlacePlaceIdReviewRouteImport } from './routes/place/$placeId_.review'
 import { Route as ShellCourseCourseIdIndexRouteImport } from './routes/_shell/course/$courseId/index'
 import { Route as ShellCourseCourseIdEditRouteImport } from './routes/_shell/course/$courseId/edit'
 import { Route as ShellCourseCourseIdMapRouteImport } from './routes/_shell/course/$courseId/map'
@@ -139,6 +140,11 @@ const LoginKakaoCallbackRoute = LoginKakaoCallbackRouteImport.update({
   path: '/login/kakao/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlacePlaceIdReviewRoute = PlacePlaceIdReviewRouteImport.update({
+  id: '/place/$placeId_/review',
+  path: '/place/$placeId/review',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShellCourseCourseIdIndexRoute =
   ShellCourseCourseIdIndexRouteImport.update({
     id: '/course/$courseId/',
@@ -174,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/my/titles': typeof ShellMyTitlesRoute
   '/travelers/$travelerId': typeof ShellTravelersTravelerIdRoute
   '/login/kakao/callback': typeof LoginKakaoCallbackRoute
+  '/place/$placeId/review': typeof PlacePlaceIdReviewRoute
   '/course/': typeof ShellCourseIndexRoute
   '/map/': typeof ShellMapIndexRoute
   '/my/': typeof ShellMyIndexRoute
@@ -199,6 +206,7 @@ export interface FileRoutesByTo {
   '/my/titles': typeof ShellMyTitlesRoute
   '/travelers/$travelerId': typeof ShellTravelersTravelerIdRoute
   '/login/kakao/callback': typeof LoginKakaoCallbackRoute
+  '/place/$placeId/review': typeof PlacePlaceIdReviewRoute
   '/course': typeof ShellCourseIndexRoute
   '/map': typeof ShellMapIndexRoute
   '/my': typeof ShellMyIndexRoute
@@ -226,6 +234,7 @@ export interface FileRoutesById {
   '/_shell/my/titles': typeof ShellMyTitlesRoute
   '/_shell/travelers/$travelerId': typeof ShellTravelersTravelerIdRoute
   '/login/kakao/callback': typeof LoginKakaoCallbackRoute
+  '/place/$placeId_/review': typeof PlacePlaceIdReviewRoute
   '/_shell/course/': typeof ShellCourseIndexRoute
   '/_shell/map/': typeof ShellMapIndexRoute
   '/_shell/my/': typeof ShellMyIndexRoute
@@ -253,6 +262,7 @@ export interface FileRouteTypes {
     | '/my/titles'
     | '/travelers/$travelerId'
     | '/login/kakao/callback'
+    | '/place/$placeId/review'
     | '/course/'
     | '/map/'
     | '/my/'
@@ -278,6 +288,7 @@ export interface FileRouteTypes {
     | '/my/titles'
     | '/travelers/$travelerId'
     | '/login/kakao/callback'
+    | '/place/$placeId/review'
     | '/course'
     | '/map'
     | '/my'
@@ -304,6 +315,7 @@ export interface FileRouteTypes {
     | '/_shell/my/titles'
     | '/_shell/travelers/$travelerId'
     | '/login/kakao/callback'
+    | '/place/$placeId_/review'
     | '/_shell/course/'
     | '/_shell/map/'
     | '/_shell/my/'
@@ -319,6 +331,7 @@ export interface RootRouteChildren {
   OnboardingIndexRoute: typeof OnboardingIndexRoute
   RecommendIndexRoute: typeof RecommendIndexRoute
   LoginKakaoCallbackRoute: typeof LoginKakaoCallbackRoute
+  PlacePlaceIdReviewRoute: typeof PlacePlaceIdReviewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -470,6 +483,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginKakaoCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/place/$placeId_/review': {
+      id: '/place/$placeId_/review'
+      path: '/place/$placeId/review'
+      fullPath: '/place/$placeId/review'
+      preLoaderRoute: typeof PlacePlaceIdReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_shell/course/$courseId/': {
       id: '/_shell/course/$courseId/'
       path: '/course/$courseId'
@@ -545,6 +565,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingIndexRoute: OnboardingIndexRoute,
   RecommendIndexRoute: RecommendIndexRoute,
   LoginKakaoCallbackRoute: LoginKakaoCallbackRoute,
+  PlacePlaceIdReviewRoute: PlacePlaceIdReviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
