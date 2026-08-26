@@ -13,6 +13,8 @@ export interface MapMarkerData {
   tags: { label: string; tone: 'primary' | 'secondary' }[]
 }
 
+export type MapRatingMode = 'solo' | 'general'
+
 export const MAP_FILTERS: { value: string; label: string }[] = [
   { value: 'all', label: '전체' },
   { value: 'restaurant', label: '식당' },

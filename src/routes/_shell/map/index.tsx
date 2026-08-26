@@ -5,6 +5,8 @@ import {
   DEFAULT_MAP_CENTER,
   KakaoMap,
   type MapMarkerData,
+  type MapRatingMode,
+  MapRatingModeControl,
   MapSearchBar,
   PlacePreviewSheet,
 } from '@/features/map'
@@ -26,6 +28,7 @@ function toPlacesParams(filter: string): ApiPlacesParams {
 function MapPage() {
   const [filterValue, setFilterValue] = useState<string[]>(['all'])
   const [selectedMarker, setSelectedMarker] = useState<MapMarkerData | null>(null)
+  const [ratingMode, setRatingMode] = useState<MapRatingMode>('solo')
   const [center, setCenter] = useState(DEFAULT_MAP_CENTER)
 
   useEffect(() => {
@@ -81,19 +84,24 @@ function MapPage() {
       <KakaoMap
         center={center}
         markers={markers}
+        ratingMode={ratingMode}
         selectedId={selectedMarker?.id ?? null}
         onSelectMarker={setSelectedMarker}
         className="absolute inset-0 z-0"
       />
 
-      <button
-        type="button"
-        aria-label="현재 위치로 이동"
-        onClick={handleRecenter}
-        className="right-margin-mobile text-primary absolute top-1/2 z-30 flex size-12 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-md transition-transform active:scale-90"
-      >
-        <LocateFixed className="size-5" />
-      </button>
+      <div className="right-margin-mobile absolute top-1/2 z-30 flex -translate-y-1/2 flex-col items-center gap-3">
+        <MapRatingModeControl value={ratingMode} onChange={setRatingMode} />
+        <button
+          type="button"
+          title="현재 위치로 이동"
+          aria-label="현재 위치로 이동"
+          onClick={handleRecenter}
+          className="text-primary flex size-12 items-center justify-center rounded-full bg-white shadow-md transition-transform active:scale-90"
+        >
+          <LocateFixed className="size-5" />
+        </button>
+      </div>
 
       <PlacePreviewSheet
         marker={selectedMarker}

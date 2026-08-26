@@ -1,6 +1,7 @@
 export { MapSearchBar } from './components/MapSearchBar'
 export { MapMarker } from './components/MapMarker'
+export { MapRatingModeControl } from './components/MapRatingModeControl'
 export { PlacePreviewSheet } from './components/PlacePreviewSheet'
 export { KakaoMap } from './components/KakaoMap'
-export type { MapMarkerData } from './types/map.types'
+export type { MapMarkerData, MapRatingMode } from './types/map.types'
 export { MAP_FILTERS, DEFAULT_MAP_CENTER } from './types/map.types'

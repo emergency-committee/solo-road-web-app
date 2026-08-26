@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { cn } from '@/shared/lib/utils'
 import { loadKakaoMapsSdk } from '../lib/load-kakao-maps'
-import type { MapMarkerData } from '../types/map.types'
+import type { MapMarkerData, MapRatingMode } from '../types/map.types'
 import { CurrentLocationDot } from './CurrentLocationDot'
 import { MapMarker } from './MapMarker'
 
@@ -16,6 +16,7 @@ interface KakaoMapProps {
   center: { lat: number; lng: number }
   level?: number
   markers?: MapMarkerData[]
+  ratingMode?: MapRatingMode
   selectedId?: string | null
   onSelectMarker?: (marker: MapMarkerData) => void
   className?: string
@@ -30,6 +31,7 @@ export function KakaoMap({
   center,
   level = 4,
   markers = [],
+  ratingMode = 'solo',
   selectedId = null,
   onSelectMarker,
   className,
@@ -120,7 +122,12 @@ export function KakaoMap({
 
       if (existing) {
         existing.root.render(
-          <MapMarker marker={marker} selected={isSelected} onSelect={onSelectMarker ?? (() => {})} />,
+          <MapMarker
+            marker={marker}
+            ratingMode={ratingMode}
+            selected={isSelected}
+            onSelect={onSelectMarker ?? (() => {})}
+          />,
         )
         existing.overlay.setZIndex(isSelected ? 3 : 2)
         continue
@@ -129,7 +136,12 @@ export function KakaoMap({
       const content = document.createElement('div')
       const root = createRoot(content)
       root.render(
-        <MapMarker marker={marker} selected={isSelected} onSelect={onSelectMarker ?? (() => {})} />,
+        <MapMarker
+          marker={marker}
+          ratingMode={ratingMode}
+          selected={isSelected}
+          onSelect={onSelectMarker ?? (() => {})}
+        />,
       )
 
       const overlay = new kakaoSdk.maps.CustomOverlay({
@@ -142,7 +154,7 @@ export function KakaoMap({
       overlay.setMap(map)
       overlays.set(marker.id, { overlay, root })
     }
-  }, [markers, selectedId, onSelectMarker, status])
+  }, [markers, ratingMode, selectedId, onSelectMarker, status])
 
   return (
     <div className={cn('relative size-full', className)}>
