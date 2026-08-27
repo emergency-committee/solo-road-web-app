@@ -11,12 +11,16 @@ export interface ApiSoloDiningItem {
   distanceM?: number
   soloFriendlyBadge: boolean
   tags: string[]
+  /** 등록된 이미지가 없으면 null. */
+  thumbnailUrl?: string | null
 }
 
 export interface ApiHiddenGemItem {
   placeId: number
   name: string
   type: string
+  /** 등록된 이미지가 없으면 null. */
+  thumbnailUrl?: string | null
 }
 
 export interface ApiPlaceRecommendations {

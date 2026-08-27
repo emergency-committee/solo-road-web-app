@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { MapPin, Search, SlidersHorizontal } from 'lucide-react'
 import { HiddenGemsGrid, MiniMapPreviewCard, SoloFriendlySection } from '@/features/home'
 import type { HomePlaceCardData } from '@/features/home'
+import { sortByImageFirst } from '@/features/home/lib/sort-by-image'
 import { usePlaceRecommendations } from '@/features/place'
 import { formatDistanceMeters } from '@/shared/lib/format'
 
@@ -12,26 +13,36 @@ export const Route = createFileRoute('/_shell/')({
 function HomePage() {
   const { data } = usePlaceRecommendations()
 
-  const soloDiningPlaces: HomePlaceCardData[] = (data?.soloDining ?? []).map((place) => ({
-    id: place.placeId.toString(),
-    title: place.name,
-    imageUrl: `https://picsum.photos/seed/place-${place.placeId.toString()}/480/270`,
-    imageAlt: place.name,
-    subtitle:
-      place.distanceM !== undefined
-        ? formatDistanceMeters(place.distanceM)
-        : '거리 정보 준비 중',
-    badges: place.tags.map((tag) => ({ label: tag, tone: 'secondary' as const })),
-  }))
+  const soloDiningPlaces: HomePlaceCardData[] = sortByImageFirst(
+    (data?.soloDining ?? []).map((place) => ({
+      id: place.placeId.toString(),
+      title: place.name,
+      imageUrl:
+        place.thumbnailUrl ??
+        `https://picsum.photos/seed/place-${place.placeId.toString()}/480/270`,
+      imageAlt: place.name,
+      subtitle:
+        place.distanceM !== undefined
+          ? formatDistanceMeters(place.distanceM)
+          : '거리 정보 준비 중',
+      badges: place.tags.map((tag) => ({ label: tag, tone: 'secondary' as const })),
+      hasImage: place.thumbnailUrl != null,
+    })),
+  )
 
-  const hiddenGems: HomePlaceCardData[] = (data?.hiddenGems ?? []).map((place) => ({
-    id: place.placeId.toString(),
-    title: place.name,
-    imageUrl: `https://picsum.photos/seed/place-${place.placeId.toString()}/480/480`,
-    imageAlt: place.name,
-    subtitle: place.type,
-    badges: [],
-  }))
+  const hiddenGems: HomePlaceCardData[] = sortByImageFirst(
+    (data?.hiddenGems ?? []).map((place) => ({
+      id: place.placeId.toString(),
+      title: place.name,
+      imageUrl:
+        place.thumbnailUrl ??
+        `https://picsum.photos/seed/place-${place.placeId.toString()}/480/480`,
+      imageAlt: place.name,
+      subtitle: place.type,
+      badges: [],
+      hasImage: place.thumbnailUrl != null,
+    })),
+  )
 
   return (
     <div className="bg-background min-h-screen">
