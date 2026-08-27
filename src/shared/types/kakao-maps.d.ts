@@ -71,6 +71,19 @@ declare global {
     }
 
     function load(callback: () => void): void
+
+    namespace event {
+      function addListener(
+        target: Map,
+        type: 'idle' | 'dragend' | 'zoom_changed' | 'center_changed',
+        handler: () => void,
+      ): void
+      function removeListener(
+        target: Map,
+        type: 'idle' | 'dragend' | 'zoom_changed' | 'center_changed',
+        handler: () => void,
+      ): void
+    }
   }
 
   interface Window {

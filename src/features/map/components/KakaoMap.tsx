@@ -19,6 +19,8 @@ interface KakaoMapProps {
   ratingMode?: MapRatingMode
   selectedId?: string | null
   onSelectMarker?: (marker: MapMarkerData) => void
+  /** 사용자가 지도를 드래그/확대해 중심이 바뀔 때마다 호출된다. 새 위치 기준으로 마커를 다시 불러오는 데 쓴다. */
+  onCenterChanged?: (center: { lat: number; lng: number }) => void
   className?: string
 }
 
@@ -34,14 +36,24 @@ export function KakaoMap({
   ratingMode = 'solo',
   selectedId = null,
   onSelectMarker,
+  onCenterChanged,
   className,
 }: KakaoMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<kakao.maps.Map | null>(null)
   const currentLocationOverlayRef = useRef<kakao.maps.CustomOverlay | null>(null)
   const overlaysRef = useRef<Map<string, OverlayEntry>>(new Map())
+  const onCenterChangedRef = useRef(onCenterChanged)
+  // idle에서 올라온 center 변경을 부모가 그대로 되돌려줄 때, 아래 panTo 이펙트가
+  // 다시 같은 위치로 panTo를 걸어 idle을 재발생시키는 루프를 막기 위한 플래그.
+  const skipNextPanRef = useRef(false)
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState('')
+
+  // 최초 1회만 붙는 idle 리스너가 항상 최신 콜백을 부르도록 ref로 동기화한다.
+  useEffect(() => {
+    onCenterChangedRef.current = onCenterChanged
+  }, [onCenterChanged])
 
   // 지도 최초 1회 생성
   useEffect(() => {
@@ -68,6 +80,9 @@ export function KakaoMap({
         overlay.setMap(map)
         currentLocationOverlayRef.current = overlay
 
+        // 드래그/확대 등으로 지도가 움직임을 멈추면(idle) 새 중심 기준으로 마커를 다시 불러오게 알린다.
+        kakaoSdk.maps.event.addListener(map, 'idle', handleIdle)
+
         setStatus('ready')
       })
       .catch((error: unknown) => {
@@ -75,8 +90,19 @@ export function KakaoMap({
         setStatus('error')
       })
 
+    function handleIdle() {
+      const map = mapRef.current
+      if (!map) return
+      const position = map.getCenter()
+      skipNextPanRef.current = true
+      onCenterChangedRef.current?.({ lat: position.getLat(), lng: position.getLng() })
+    }
+
     return () => {
       cancelled = true
+      if (mapRef.current) {
+        window.kakao.maps.event.removeListener(mapRef.current, 'idle', handleIdle)
+      }
       for (const entry of overlaysRef.current.values()) {
         entry.overlay.setMap(null)
         entry.root.unmount()
@@ -90,8 +116,14 @@ export function KakaoMap({
   }, [])
 
   // 사용자 위치(center)가 바뀌면(최초 GPS 수신, "현재 위치로" 버튼) 지도를 이동시킨다.
+  // idle 콜백이 이 center를 부모 상태로 되돌려준 경우(드래그/줌으로 인한 변경)에는
+  // 이미 그 위치에 있으므로 다시 panTo하지 않는다.
   useEffect(() => {
     if (status !== 'ready') return
+    if (skipNextPanRef.current) {
+      skipNextPanRef.current = false
+      return
+    }
     const kakaoSdk = window.kakao
     const position = new kakaoSdk.maps.LatLng(center.lat, center.lng)
     mapRef.current?.panTo(position)

@@ -87,6 +87,7 @@ function MapPage() {
         ratingMode={ratingMode}
         selectedId={selectedMarker?.id ?? null}
         onSelectMarker={setSelectedMarker}
+        onCenterChanged={setCenter}
         className="absolute inset-0 z-0"
       />
 
