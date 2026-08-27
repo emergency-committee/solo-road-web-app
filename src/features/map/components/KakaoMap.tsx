@@ -15,6 +15,12 @@ interface KakaoMapProps {
   /** 현재(사용자) 위치이자 초기 지도 중심. */
   center: { lat: number; lng: number }
   level?: number
+  /**
+   * 지도를 이 레벨보다 더 축소할 수 없게 한다(기본값: 8 ≈ 반경 2km 안팎).
+   * 장소 조회가 중심 좌표 기준 근처 결과 위주라, 제한 없이 축소하면
+   * 화면엔 넓은 지역이 보여도 마커는 중심 근처 몇 개만 몰려 찍혀 텅 빈 지도처럼 보인다.
+   */
+  maxLevel?: number
   markers?: MapMarkerData[]
   ratingMode?: MapRatingMode
   selectedId?: string | null
@@ -32,6 +38,7 @@ interface KakaoMapProps {
 export function KakaoMap({
   center,
   level = 4,
+  maxLevel = 8,
   markers = [],
   ratingMode = 'solo',
   selectedId = null,
@@ -67,6 +74,7 @@ export function KakaoMap({
           center: new kakaoSdk.maps.LatLng(center.lat, center.lng),
           level,
         })
+        map.setMaxLevel(maxLevel)
         mapRef.current = map
 
         const dotContainer = document.createElement('div')
