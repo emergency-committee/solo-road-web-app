@@ -76,7 +76,7 @@ export function PlacePreviewSheet({ marker, onOpenChange }: PlacePreviewSheetPro
                   )}
                 </div>
               </div>
-              {marker.rating !== undefined && (
+              {marker.rating != null && (
                 <span className="text-on-surface-variant text-xs">
                   <Star className="text-secondary mr-1 inline size-3.5 fill-current" />
                   일반 {marker.rating.toFixed(1)}

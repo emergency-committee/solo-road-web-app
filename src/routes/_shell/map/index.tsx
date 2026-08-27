@@ -60,7 +60,7 @@ function MapPage() {
           `https://picsum.photos/seed/place-${place.placeId.toString()}/480/480`,
         imageAlt: place.name,
         distanceLabel: formatDistanceMeters(place.distanceM),
-        ...(place.rating !== undefined && { rating: place.rating }),
+        ...(place.rating != null && { rating: place.rating }),
         soloRating: place.soloRating,
         soloReviewCount: place.soloReviewCount,
         tags: place.soloFriendlyBadge
