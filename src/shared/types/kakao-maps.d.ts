@@ -23,6 +23,10 @@ declare global {
       setCenter(latlng: LatLng): void
       getCenter(): LatLng
       setLevel(level: number): void
+      /** 지도를 확대할 수 있는 최소 레벨(이 레벨보다 더 확대할 수 없음)을 설정한다. */
+      setMinLevel(minLevel: number): void
+      /** 지도를 축소할 수 있는 최대 레벨(이 레벨보다 더 축소할 수 없음)을 설정한다. */
+      setMaxLevel(maxLevel: number): void
       panTo(latlng: LatLng): void
       setBounds(
         bounds: LatLngBounds,
