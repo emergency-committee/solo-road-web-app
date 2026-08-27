@@ -28,7 +28,8 @@ export interface ApiPlaceSummary {
   placeId: number
   name: string
   type: string
-  rating?: number
+  /** 아직 리뷰가 없는 장소는 백엔드가 null로 내려준다(필드 자체가 빠지지 않음). */
+  rating?: number | null
   soloRating?: number | null
   soloReviewCount: number
   summary?: string
@@ -81,7 +82,8 @@ export interface ApiPlaceDetail {
   placeId: number
   name: string
   type: string
-  rating?: number
+  /** 아직 리뷰가 없는 장소는 백엔드가 null로 내려준다(필드 자체가 빠지지 않음). */
+  rating?: number | null
   address?: string
   priceLevel?: string
   businessVerified: boolean

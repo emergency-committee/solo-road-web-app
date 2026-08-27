@@ -64,7 +64,7 @@ function RecommendPage() {
                 imageAlt={place.name}
                 title={place.name}
                 subtitle={`${place.type} • ${formatDistanceMeters(place.distanceM)}`}
-                {...(place.rating !== undefined && { rating: place.rating })}
+                {...(place.rating != null && { rating: place.rating })}
                 badges={place.soloFriendlyBadge ? [{ label: '혼행 친화', tone: 'secondary' }] : []}
                 onClick={() =>
                   navigate({ to: '/place/$placeId', params: { placeId: place.placeId.toString() } })

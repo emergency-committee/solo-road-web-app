@@ -7,7 +7,7 @@ export interface MapMarkerData {
   imageUrl: string
   imageAlt: string
   distanceLabel: string
-  rating?: number
+  rating?: number | null
   soloRating: number | null | undefined
   soloReviewCount: number
   tags: { label: string; tone: 'primary' | 'secondary' }[]

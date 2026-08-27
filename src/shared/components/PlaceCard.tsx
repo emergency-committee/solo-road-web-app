@@ -14,7 +14,7 @@ interface PlaceCardProps {
   title: string
   subtitle?: string
   badges?: PlaceCardBadge[]
-  rating?: number
+  rating?: number | null
   reviewCount?: number
   saved?: boolean
   onToggleSave?: () => void
@@ -70,7 +70,7 @@ export function PlaceCard({
           <h3 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">
             {title}
           </h3>
-          {rating !== undefined && (
+          {rating != null && (
             <RatingStars rating={rating} {...(reviewCount !== undefined && { reviewCount })} />
           )}
         </div>
