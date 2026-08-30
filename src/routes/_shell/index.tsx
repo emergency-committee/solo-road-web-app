@@ -6,6 +6,7 @@ import type { HomePlaceCardData } from '@/features/home'
 import { sortByImageFirst } from '@/features/home/lib/sort-by-image'
 import { usePlaceRecommendations } from '@/features/place'
 import { formatDistanceMeters } from '@/shared/lib/format'
+import { useCurrentRegionLabel } from '@/shared/hooks/use-current-region-label'
 
 export const Route = createFileRoute('/_shell/')({
   component: HomePage,
@@ -13,6 +14,7 @@ export const Route = createFileRoute('/_shell/')({
 
 function HomePage() {
   const { data } = usePlaceRecommendations()
+  const { label: regionLabel, status: regionStatus } = useCurrentRegionLabel()
   const navigate = useNavigate()
   const [keyword, setKeyword] = useState('')
 
@@ -26,9 +28,7 @@ function HomePage() {
     (data?.soloDining ?? []).map((place) => ({
       id: place.placeId.toString(),
       title: place.name,
-      imageUrl:
-        place.thumbnailUrl ??
-        `https://picsum.photos/seed/place-${place.placeId.toString()}/480/270`,
+      imageUrl: place.thumbnailUrl ?? null,
       imageAlt: place.name,
       subtitle:
         place.distanceM !== undefined
@@ -43,9 +43,7 @@ function HomePage() {
     (data?.hiddenGems ?? []).map((place) => ({
       id: place.placeId.toString(),
       title: place.name,
-      imageUrl:
-        place.thumbnailUrl ??
-        `https://picsum.photos/seed/place-${place.placeId.toString()}/480/480`,
+      imageUrl: place.thumbnailUrl ?? null,
       imageAlt: place.name,
       subtitle: place.type,
       badges: [],
@@ -59,7 +57,11 @@ function HomePage() {
         <div className="gap-xs flex items-center">
           <MapPin className="text-primary size-5" />
           <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold">
-            서울시 강남구
+            {regionStatus === 'ready' && regionLabel
+              ? regionLabel
+              : regionStatus === 'error'
+                ? '위치 정보 없음'
+                : '위치 확인 중...'}
           </h1>
         </div>
       </header>

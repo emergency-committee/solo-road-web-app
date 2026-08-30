@@ -11,7 +11,7 @@ function SavedPlaceCard({ place }: { place: ApiSavedPlace }) {
 
   return (
     <PlaceCard
-      imageUrl={place.thumbnailUrl ?? `https://picsum.photos/seed/place-${place.placeId.toString()}/480/270`}
+      imageUrl={place.thumbnailUrl ?? null}
       imageAlt={place.name}
       title={place.name}
       badges={place.soloFriendlyBadge ? [{ label: '혼행 친화', tone: 'secondary' }] : []}

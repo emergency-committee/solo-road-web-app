@@ -53,12 +53,10 @@ function PlaceDetailPage() {
     )
   }
 
-  const imageUrl = `https://picsum.photos/seed/place-${placeId}/800/600`
-
   return (
     <div className="bg-background min-h-screen">
       <PlaceDetailHero
-        imageUrl={imageUrl}
+        imageUrl={null}
         imageAlt={place.name}
         liked={place.isLiked}
         onToggleLike={() => toggleLike.mutate(place.isLiked)}

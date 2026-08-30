@@ -4,7 +4,8 @@ export interface MapMarkerData {
   icon: 'restaurant' | 'coffee'
   lat: number
   lng: number
-  imageUrl: string
+  /** 등록된 이미지가 없으면 null. */
+  imageUrl: string | null
   imageAlt: string
   distanceLabel: string
   rating?: number | null

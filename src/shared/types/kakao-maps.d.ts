@@ -88,6 +88,32 @@ declare global {
         handler: () => void,
       ): void
     }
+
+    /** SDK 로드 시 `&libraries=services`를 붙여야 사용할 수 있다. */
+    namespace services {
+      enum Status {
+        OK = 'OK',
+        ZERO_RESULT = 'ZERO_RESULT',
+        ERROR = 'ERROR',
+      }
+
+      interface RegionCode {
+        region_type: 'H' | 'B'
+        address_name: string
+        region_1depth_name: string
+        region_2depth_name: string
+        region_3depth_name: string
+        code: string
+      }
+
+      class Geocoder {
+        coord2RegionCode(
+          lng: number,
+          lat: number,
+          callback: (result: RegionCode[], status: Status) => void,
+        ): void
+      }
+    }
   }
 
   interface Window {

@@ -60,7 +60,7 @@ function RecommendPage() {
             {places.map((place) => (
               <PlaceCard
                 key={place.placeId}
-                imageUrl={place.thumbnailUrl ?? `https://picsum.photos/seed/place-${place.placeId.toString()}/480/270`}
+                imageUrl={place.thumbnailUrl ?? null}
                 imageAlt={place.name}
                 title={place.name}
                 subtitle={`${place.type} • ${formatDistanceMeters(place.distanceM)}`}
