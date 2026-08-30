@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { LocateFixed } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import {
@@ -12,9 +12,17 @@ import {
 } from '@/features/map'
 import { usePlaces } from '@/features/place'
 import { formatDistanceMeters } from '@/shared/lib/format'
+import { useDebouncedValue } from '@/shared/lib/use-debounced-value'
 import type { ApiPlacesParams } from '@/features/place'
 
+interface MapSearch {
+  keyword?: string
+}
+
 export const Route = createFileRoute('/_shell/map/')({
+  validateSearch: (search: Record<string, unknown>): MapSearch => ({
+    ...(typeof search.keyword === 'string' && { keyword: search.keyword }),
+  }),
   component: MapPage,
 })
 
@@ -26,10 +34,14 @@ function toPlacesParams(filter: string): ApiPlacesParams {
 }
 
 function MapPage() {
+  const { keyword: keywordFromUrl } = Route.useSearch()
+  const navigate = useNavigate({ from: Route.fullPath })
   const [filterValue, setFilterValue] = useState<string[]>(['all'])
   const [selectedMarker, setSelectedMarker] = useState<MapMarkerData | null>(null)
   const [ratingMode, setRatingMode] = useState<MapRatingMode>('solo')
   const [center, setCenter] = useState(DEFAULT_MAP_CENTER)
+  const [keyword, setKeyword] = useState(keywordFromUrl ?? '')
+  const debouncedKeyword = useDebouncedValue(keyword.trim(), 300)
 
   useEffect(() => {
     if (!navigator.geolocation) return
@@ -41,8 +53,18 @@ function MapPage() {
     )
   }, [])
 
+  // 검색어를 URL에도 반영해 새로고침/공유 시에도 검색 결과가 유지되도록 한다.
+  useEffect(() => {
+    void navigate({
+      search: () => (debouncedKeyword ? { keyword: debouncedKeyword } : {}),
+      replace: true,
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedKeyword])
+
   const placesQuery = usePlaces({
     ...toPlacesParams(filterValue[0] ?? 'all'),
+    ...(debouncedKeyword && { keyword: debouncedKeyword }),
     lat: center.lat,
     lng: center.lng,
   })
@@ -79,7 +101,12 @@ function MapPage() {
 
   return (
     <div className="bg-surface-container relative h-[calc(100vh-4rem)] w-full overflow-hidden">
-      <MapSearchBar filterValue={filterValue} onFilterChange={setFilterValue} />
+      <MapSearchBar
+        filterValue={filterValue}
+        onFilterChange={setFilterValue}
+        keyword={keyword}
+        onKeywordChange={setKeyword}
+      />
 
       <KakaoMap
         center={center}

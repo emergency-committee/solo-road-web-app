@@ -1,13 +1,20 @@
-import { MapPin, Search } from 'lucide-react'
+import { MapPin, Search, X } from 'lucide-react'
 import { FilterChipGroup } from '@/shared/components/FilterChip'
 import { MAP_FILTERS } from '../types/map.types'
 
 interface MapSearchBarProps {
   filterValue: string[]
   onFilterChange: (value: string[]) => void
+  keyword: string
+  onKeywordChange: (value: string) => void
 }
 
-export function MapSearchBar({ filterValue, onFilterChange }: MapSearchBarProps) {
+export function MapSearchBar({
+  filterValue,
+  onFilterChange,
+  keyword,
+  onKeywordChange,
+}: MapSearchBarProps) {
   return (
     <header className="px-margin-mobile pt-sm pb-base fixed inset-x-0 top-0 z-30">
       <div className="border-outline-variant bg-surface-container-lowest px-md py-sm flex items-center rounded-xl border shadow-sm">
@@ -16,7 +23,19 @@ export function MapSearchBar({ filterValue, onFilterChange }: MapSearchBarProps)
           className="text-body-md placeholder:text-outline-variant flex-1 border-none bg-transparent p-0 focus:ring-0"
           placeholder="어디로 떠나볼까요?"
           type="text"
+          value={keyword}
+          onChange={(event) => onKeywordChange(event.target.value)}
         />
+        {keyword && (
+          <button
+            type="button"
+            aria-label="검색어 지우기"
+            onClick={() => onKeywordChange('')}
+            className="text-outline mr-sm"
+          >
+            <X className="size-4" />
+          </button>
+        )}
         <div className="bg-outline-variant mx-sm h-6 w-px" />
         <MapPin className="text-outline size-5" />
       </div>

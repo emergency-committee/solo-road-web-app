@@ -1,5 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { MapPin, Search, SlidersHorizontal } from 'lucide-react'
+import { useState } from 'react'
 import { HiddenGemsGrid, MiniMapPreviewCard, SoloFriendlySection } from '@/features/home'
 import type { HomePlaceCardData } from '@/features/home'
 import { sortByImageFirst } from '@/features/home/lib/sort-by-image'
@@ -12,6 +13,14 @@ export const Route = createFileRoute('/_shell/')({
 
 function HomePage() {
   const { data } = usePlaceRecommendations()
+  const navigate = useNavigate()
+  const [keyword, setKeyword] = useState('')
+
+  const goToSearch = () => {
+    const trimmed = keyword.trim()
+    if (!trimmed) return
+    void navigate({ to: '/map', search: { keyword: trimmed } })
+  }
 
   const soloDiningPlaces: HomePlaceCardData[] = sortByImageFirst(
     (data?.soloDining ?? []).map((place) => ({
@@ -57,11 +66,23 @@ function HomePage() {
       <main className="space-y-xl px-margin-mobile pb-8">
         <section className="relative">
           <div className="border-outline-variant bg-surface-container-lowest px-md py-sm flex items-center rounded-xl border shadow-sm">
-            <Search className="mr-xs text-outline size-5" />
+            <button
+              type="button"
+              aria-label="검색"
+              onClick={goToSearch}
+              className="mr-xs text-outline shrink-0"
+            >
+              <Search className="size-5" />
+            </button>
             <input
               className="placeholder:text-outline-variant text-body-md w-full border-none bg-transparent focus:ring-0"
               placeholder="어디로 혼자 떠나볼까요?"
               type="text"
+              value={keyword}
+              onChange={(event) => setKeyword(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') goToSearch()
+              }}
             />
             <SlidersHorizontal className="ml-xs text-primary size-5" />
           </div>
