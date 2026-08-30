@@ -13,7 +13,7 @@ import {
 import { usePlaces } from '@/features/place'
 import { formatDistanceMeters } from '@/shared/lib/format'
 import { useDebouncedValue } from '@/shared/lib/use-debounced-value'
-import type { ApiPlacesParams } from '@/features/place'
+import type { ApiPlacesParams, ApiPlaceSummary } from '@/features/place'
 
 interface MapSearch {
   keyword?: string
@@ -31,6 +31,23 @@ function toPlacesParams(filter: string): ApiPlacesParams {
   if (filter === 'cafe') return { type: 'CAFE' }
   if (filter === 'solo-friendly') return { soloFriendlyOnly: true, sort: 'SOLO_SCORE' }
   return {}
+}
+
+function toMarkerData(place: ApiPlaceSummary): MapMarkerData {
+  return {
+    id: place.placeId.toString(),
+    name: place.name,
+    icon: place.type.toUpperCase() === 'CAFE' ? 'coffee' : 'restaurant',
+    lat: place.latitude,
+    lng: place.longitude,
+    imageUrl: place.thumbnailUrl ?? null,
+    imageAlt: place.name,
+    distanceLabel: formatDistanceMeters(place.distanceM),
+    ...(place.rating != null && { rating: place.rating }),
+    soloRating: place.soloRating,
+    soloReviewCount: place.soloReviewCount,
+    tags: place.soloFriendlyBadge ? [{ label: '혼밥 편한 곳', tone: 'secondary' as const }] : [],
+  }
 }
 
 function MapPage() {
@@ -70,23 +87,7 @@ function MapPage() {
   })
 
   const markers: MapMarkerData[] = useMemo(
-    () =>
-      (placesQuery.data?.content ?? []).map((place) => ({
-        id: place.placeId.toString(),
-        name: place.name,
-        icon: place.type.toUpperCase() === 'CAFE' ? 'coffee' : 'restaurant',
-        lat: place.latitude,
-        lng: place.longitude,
-        imageUrl: place.thumbnailUrl ?? null,
-        imageAlt: place.name,
-        distanceLabel: formatDistanceMeters(place.distanceM),
-        ...(place.rating != null && { rating: place.rating }),
-        soloRating: place.soloRating,
-        soloReviewCount: place.soloReviewCount,
-        tags: place.soloFriendlyBadge
-          ? [{ label: '혼밥 편한 곳', tone: 'secondary' as const }]
-          : [],
-      })),
+    () => (placesQuery.data?.content ?? []).map(toMarkerData),
     [placesQuery.data],
   )
 
@@ -97,6 +98,12 @@ function MapPage() {
     )
   }
 
+  const handleSelectSuggestion = (place: ApiPlaceSummary) => {
+    setKeyword(place.name)
+    setCenter({ lat: place.latitude, lng: place.longitude })
+    setSelectedMarker(toMarkerData(place))
+  }
+
   return (
     <div className="bg-surface-container relative h-[calc(100vh-4rem)] w-full overflow-hidden">
       <MapSearchBar
@@ -104,6 +111,7 @@ function MapPage() {
         onFilterChange={setFilterValue}
         keyword={keyword}
         onKeywordChange={setKeyword}
+        onSelectPlace={handleSelectSuggestion}
       />
 
       <KakaoMap
