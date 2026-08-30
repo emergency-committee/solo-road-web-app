@@ -1,4 +1,4 @@
-import { Heart } from 'lucide-react'
+import { Heart, ImageOff } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { RatingStars } from './RatingStars'
 import { StatBadge } from './StatBadge'
@@ -9,7 +9,8 @@ interface PlaceCardBadge {
 }
 
 interface PlaceCardProps {
-  imageUrl: string
+  /** 등록된 이미지가 없으면 null. 있는 것처럼 보이는 대체 이미지를 붙이지 말고 그대로 null을 넘긴다. */
+  imageUrl: string | null
   imageAlt: string
   title: string
   subtitle?: string
@@ -45,11 +46,18 @@ export function PlaceCard({
       )}
     >
       <div className="relative aspect-[2/1] w-full overflow-hidden">
-        <img
-          src={imageUrl}
-          alt={imageAlt}
-          className="size-full object-cover transition-transform duration-700 group-hover:scale-110"
-        />
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={imageAlt}
+            className="size-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+        ) : (
+          <div className="bg-surface-container text-outline flex size-full flex-col items-center justify-center gap-1">
+            <ImageOff className="size-6" />
+            <span className="font-label-md text-label-md">등록된 사진 없음</span>
+          </div>
+        )}
         {onToggleSave && (
           <button
             type="button"

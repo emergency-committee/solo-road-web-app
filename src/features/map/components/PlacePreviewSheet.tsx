@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Footprints, Heart, Share2, Star, Utensils } from 'lucide-react'
+import { Footprints, Heart, ImageOff, Share2, Star, Utensils } from 'lucide-react'
 import { Sheet, SheetContent, SheetTitle } from '@/shared/components/ui/sheet'
 import { StatBadge } from '@/shared/components/StatBadge'
 import { hasDisplayableSoloRating } from '@/features/place/lib/solo-rating'
@@ -23,11 +23,17 @@ export function PlacePreviewSheet({ marker, onOpenChange }: PlacePreviewSheetPro
             <div className="mb-sm mt-sm bg-surface-container-highest mx-auto h-1.5 w-12 rounded-full" />
             <div className="gap-md flex">
               <div className="size-24 shrink-0 overflow-hidden rounded-xl">
-                <img
-                  src={marker.imageUrl}
-                  alt={marker.imageAlt}
-                  className="size-full object-cover"
-                />
+                {marker.imageUrl ? (
+                  <img
+                    src={marker.imageUrl}
+                    alt={marker.imageAlt}
+                    className="size-full object-cover"
+                  />
+                ) : (
+                  <div className="bg-surface-container text-outline flex size-full items-center justify-center">
+                    <ImageOff className="size-6" />
+                  </div>
+                )}
               </div>
               <div className="flex-1">
                 <div className="flex items-start justify-between">

@@ -77,9 +77,7 @@ function MapPage() {
         icon: place.type.toUpperCase() === 'CAFE' ? 'coffee' : 'restaurant',
         lat: place.latitude,
         lng: place.longitude,
-        imageUrl:
-          place.thumbnailUrl ??
-          `https://picsum.photos/seed/place-${place.placeId.toString()}/480/480`,
+        imageUrl: place.thumbnailUrl ?? null,
         imageAlt: place.name,
         distanceLabel: formatDistanceMeters(place.distanceM),
         ...(place.rating != null && { rating: place.rating }),

@@ -1,9 +1,10 @@
 import { useRouter } from '@tanstack/react-router'
-import { ArrowLeft, Heart, Share2 } from 'lucide-react'
+import { ArrowLeft, Heart, ImageOff, Share2 } from 'lucide-react'
 import { useState } from 'react'
 
 interface PlaceDetailHeroProps {
-  imageUrl: string
+  /** 등록된 이미지가 없으면 null. */
+  imageUrl: string | null
   imageAlt: string
   liked?: boolean
   onToggleLike?: () => void
@@ -24,7 +25,14 @@ export function PlaceDetailHero({ imageUrl, imageAlt, liked, onToggleLike }: Pla
 
   return (
     <header className="relative h-[397px] w-full overflow-hidden">
-      <img src={imageUrl} alt={imageAlt} className="absolute inset-0 size-full object-cover" />
+      {imageUrl ? (
+        <img src={imageUrl} alt={imageAlt} className="absolute inset-0 size-full object-cover" />
+      ) : (
+        <div className="bg-surface-container text-outline absolute inset-0 flex flex-col items-center justify-center gap-2">
+          <ImageOff className="size-8" />
+          <span className="font-label-md text-label-md">등록된 사진 없음</span>
+        </div>
+      )}
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent" />
       <div className="px-margin-mobile py-lg absolute inset-x-0 top-0 z-10 flex items-center justify-between">
         <button

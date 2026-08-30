@@ -30,7 +30,8 @@ export function loadKakaoMapsSdk(): Promise<typeof kakao> {
     }
 
     const script = document.createElement('script')
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JS_KEY}&autoload=false`
+    // libraries=services: 좌표 → 행정구역 변환(Geocoder) 등 위치 검색 라이브러리를 함께 불러온다.
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JS_KEY}&libraries=services&autoload=false`
     script.async = true
     script.onerror = () => {
       reject(new Error('카카오맵 SDK 스크립트를 불러오지 못했습니다.'))
