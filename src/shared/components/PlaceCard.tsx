@@ -1,5 +1,6 @@
-import { Heart, ImageOff } from 'lucide-react'
+import { Heart } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
+import { PlaceImagePlaceholder } from './PlaceImagePlaceholder'
 import { RatingStars } from './RatingStars'
 import { StatBadge } from './StatBadge'
 
@@ -53,10 +54,7 @@ export function PlaceCard({
             className="size-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
         ) : (
-          <div className="bg-surface-container text-outline flex size-full flex-col items-center justify-center gap-1">
-            <ImageOff className="size-6" />
-            <span className="font-label-md text-label-md">등록된 사진 없음</span>
-          </div>
+          <PlaceImagePlaceholder />
         )}
         {onToggleSave && (
           <button

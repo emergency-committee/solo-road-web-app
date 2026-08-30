@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
-import { Footprints, Heart, ImageOff, Share2, Star, Utensils } from 'lucide-react'
+import { Footprints, Heart, Share2, Star, Utensils } from 'lucide-react'
 import { Sheet, SheetContent, SheetTitle } from '@/shared/components/ui/sheet'
+import { PlaceImagePlaceholder } from '@/shared/components/PlaceImagePlaceholder'
 import { StatBadge } from '@/shared/components/StatBadge'
 import { hasDisplayableSoloRating } from '@/features/place/lib/solo-rating'
 import type { MapMarkerData } from '../types/map.types'
@@ -30,9 +31,7 @@ export function PlacePreviewSheet({ marker, onOpenChange }: PlacePreviewSheetPro
                     className="size-full object-cover"
                   />
                 ) : (
-                  <div className="bg-surface-container text-outline flex size-full items-center justify-center">
-                    <ImageOff className="size-6" />
-                  </div>
+                  <PlaceImagePlaceholder />
                 )}
               </div>
               <div className="flex-1">
