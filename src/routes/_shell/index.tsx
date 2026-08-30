@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { HiddenGemsGrid, MiniMapPreviewCard, SoloFriendlySection } from '@/features/home'
 import type { HomePlaceCardData } from '@/features/home'
 import { sortByImageFirst } from '@/features/home/lib/sort-by-image'
-import { usePlaceRecommendations } from '@/features/place'
+import { PlaceSuggestionList, usePlaceAutocomplete, usePlaceRecommendations } from '@/features/place'
+import type { ApiPlaceSummary } from '@/features/place'
 import { formatDistanceMeters } from '@/shared/lib/format'
 import { useCurrentRegionLabel } from '@/shared/hooks/use-current-region-label'
 
@@ -17,11 +18,18 @@ function HomePage() {
   const { label: regionLabel, status: regionStatus } = useCurrentRegionLabel()
   const navigate = useNavigate()
   const [keyword, setKeyword] = useState('')
+  const [isSearchFocused, setIsSearchFocused] = useState(false)
+  const { suggestions } = usePlaceAutocomplete(keyword)
 
   const goToSearch = () => {
     const trimmed = keyword.trim()
     if (!trimmed) return
     void navigate({ to: '/map', search: { keyword: trimmed } })
+  }
+
+  const goToPlace = (place: ApiPlaceSummary) => {
+    setIsSearchFocused(false)
+    void navigate({ to: '/place/$placeId', params: { placeId: place.placeId.toString() } })
   }
 
   const soloDiningPlaces: HomePlaceCardData[] = sortByImageFirst(
@@ -82,12 +90,17 @@ function HomePage() {
               type="text"
               value={keyword}
               onChange={(event) => setKeyword(event.target.value)}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') goToSearch()
               }}
             />
             <SlidersHorizontal className="ml-xs text-primary size-5" />
           </div>
+          {isSearchFocused && (
+            <PlaceSuggestionList suggestions={suggestions} onSelect={goToPlace} />
+          )}
         </section>
 
         <MiniMapPreviewCard />
