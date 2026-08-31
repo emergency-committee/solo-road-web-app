@@ -32,3 +32,4 @@ npm run format:check   # Prettier 포맷 검사
 
 - [`CLAUDE.md`](./CLAUDE.md) — 폴더 구조, 네이밍 컨벤션, API 연동 방식 등 프로젝트 상세 가이드
 - [`DESIGN.md`](./DESIGN.md) — 색상·타이포그래피·spacing 등 디자인 시스템 토큰
+- [`DEPLOY.md`](./DEPLOY.md) — S3 + CloudFront 정적 배포 설정 가이드

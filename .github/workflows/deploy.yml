@@ -1,0 +1,86 @@
+name: Deploy to S3 + CloudFront
+
+# soloroad.site 정적 배포 (Netlify -> AWS 이전)
+# 필요한 저장소 설정 (Settings > Secrets and variables > Actions):
+#   Secrets:
+#     AWS_ROLE_ARN                GitHub OIDC로 assume할 IAM Role ARN
+#     VITE_KAKAO_REST_API_KEY
+#     VITE_KAKAO_JS_KEY
+#   Variables:
+#     AWS_REGION                  예: ap-northeast-2
+#     S3_BUCKET                   배포 대상 버킷 이름
+#     CLOUDFRONT_DISTRIBUTION_ID
+#     VITE_API_BASE_URL           예: https://api.soloroad.site
+# 자세한 AWS 리소스(S3/CloudFront/IAM Role) 준비 절차는 DEPLOY.md 참고.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write # aws-actions/configure-aws-credentials OIDC용
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+          VITE_KAKAO_REST_API_KEY: ${{ secrets.VITE_KAKAO_REST_API_KEY }}
+          VITE_KAKAO_JS_KEY: ${{ secrets.VITE_KAKAO_JS_KEY }}
+          VITE_ENABLE_DEVTOOLS: 'false'
+          VITE_AUTH_MOCK: 'false'
+          VITE_PLACE_DEMO_ENABLED: 'false'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # 해시가 붙은 정적 자산(assets/*)은 영구 캐시, index.html·서비스워커·매니페스트는
+      # 배포 즉시 반영되어야 하므로 캐시하지 않는다. 그래서 두 단계로 나눠 sync한다.
+      - name: Sync hashed assets (long cache)
+        run: |
+          aws s3 sync dist/ s3://${{ vars.S3_BUCKET }} \
+            --delete \
+            --cache-control "public,max-age=31536000,immutable" \
+            --exclude "index.html" \
+            --exclude "sw.js" \
+            --exclude "manifest.webmanifest" \
+            --exclude "registerSW.js"
+
+      - name: Sync HTML/SW/manifest (no cache)
+        run: |
+          aws s3 cp dist/ s3://${{ vars.S3_BUCKET }} \
+            --recursive \
+            --cache-control "no-cache" \
+            --exclude "*" \
+            --include "index.html" \
+            --include "sw.js" \
+            --include "manifest.webmanifest" \
+            --include "registerSW.js"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/index.html" "/sw.js" "/manifest.webmanifest" "/registerSW.js"
