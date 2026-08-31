@@ -26,7 +26,7 @@ describe('지도 마커 평점 표시', () => {
     expect(getMapMarkerRating(marker, 'general')).toBe(4.1)
   })
 
-  it('혼밥 리뷰가 3건 미만이면 혼밥 평점을 숨긴다', () => {
-    expect(getMapMarkerRating({ ...marker, soloReviewCount: 2 }, 'solo')).toBeNull()
+  it('혼행 점수가 없으면 혼행 평점을 숨긴다', () => {
+    expect(getMapMarkerRating({ ...marker, soloRating: null, soloReviewCount: 8 }, 'solo')).toBeNull()
   })
 })

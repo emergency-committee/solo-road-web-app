@@ -11,16 +11,19 @@ import type {
   ApiPlaceSummary,
   ApiReview,
   ApiReviewTag,
+  CreatePlaceRequest,
+  CreatePlaceResponse,
   CreatePlaceReviewRequest,
   CreatePlaceReviewResponse,
 } from '../types/place.types'
 import {
+  createMockPlace,
   createMockPlaceReview,
   getMockPlaceDetail,
   getMockPlaceReviews,
   getMockPlaces,
+  getMockReviewTags,
   isMockPlace,
-  mockReviewTags,
   setMockPlaceLiked,
 } from '../mocks/place-rating-mocks'
 
@@ -86,12 +89,17 @@ export function getPlaceReviews(placeId: number, page = 0, size = 20) {
   )
 }
 
-export async function getReviewTags() {
-  if (AUTH_MOCK_ENABLED) return Promise.resolve({ tags: mockReviewTags })
+export async function getReviewTags(tagGroup?: 'dining' | 'travel') {
+  if (AUTH_MOCK_ENABLED) return Promise.resolve({ tags: getMockReviewTags(tagGroup) })
+  const qs = buildQueryString({ tagType: tagGroup === 'travel' ? 'SOLO_TRAVEL' : undefined })
   try {
-    return await apiRequest<{ tags: ApiReviewTag[] }>(`${API_PREFIX}/review-tags`)
+    const response = await apiRequest<{ tags: ApiReviewTag[] }>(`${API_PREFIX}/review-tags${qs}`)
+    if (tagGroup === 'dining') {
+      return { tags: response.tags.filter((tag) => tag.tagType !== 'SOLO_TRAVEL') }
+    }
+    return response
   } catch (error) {
-    if (PLACE_DEMO_ENABLED) return { tags: mockReviewTags }
+    if (PLACE_DEMO_ENABLED) return { tags: getMockReviewTags(tagGroup) }
     throw error
   }
 }
@@ -124,5 +132,21 @@ export function unlikePlace(placeId: number) {
   }
   return apiRequest<ApiLikeResponse>(`${API_PREFIX}/places/${placeId.toString()}/like`, {
     method: 'DELETE',
+  })
+}
+
+export function createPlace(request: CreatePlaceRequest): Promise<CreatePlaceResponse> {
+  if (AUTH_MOCK_ENABLED || PLACE_DEMO_ENABLED) {
+    return Promise.resolve(createMockPlace(request))
+  }
+  return apiRequest<CreatePlaceResponse>(`${API_PREFIX}/places`, {
+    method: 'POST',
+    body: JSON.stringify(request),
+  }).catch((error) => {
+    // 백엔드 API 에러 시 fallback to mock
+    if (PLACE_DEMO_ENABLED) {
+      return createMockPlace(request)
+    }
+    throw error
   })
 }

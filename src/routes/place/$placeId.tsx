@@ -28,6 +28,13 @@ function toHighlights(soloInfo: ApiSoloInfoSummary | undefined): PlaceHighlight[
   return highlights
 }
 
+const DINING_TYPES = ['RESTAURANT', 'CAFE', '식당', '카페', '맛집', '한식', '일식', '중식', '베이커리']
+
+function isDiningPlace(type: string) {
+  const upper = type.toUpperCase()
+  return DINING_TYPES.some((candidate) => upper.includes(candidate))
+}
+
 function PlaceDetailPage() {
   const { placeId } = Route.useParams()
   const placeIdNumber = Number(placeId)
@@ -53,6 +60,7 @@ function PlaceDetailPage() {
     )
   }
 
+  const isDining = isDiningPlace(place.type)
   return (
     <div className="bg-background min-h-screen">
       <PlaceDetailHero
@@ -74,12 +82,18 @@ function PlaceDetailPage() {
             )}
           </div>
           <h1 className="font-headline-xl text-headline-xl text-on-surface mb-xs">{place.name}</h1>
+          {place.summary && (
+            <p className="text-on-surface-variant mt-2 text-sm leading-relaxed">{place.summary}</p>
+          )}
         </section>
 
         <SoloAnalysisCard
+          scoreStatus={place.soloScore?.scoreStatus}
           soloRating={place.soloScore?.soloRating}
           reviewCount={place.soloScore?.soloReviewCount ?? 0}
           tags={place.soloTagSummaries ?? []}
+          context={isDining ? 'dining' : 'travel'}
+          tip={place.soloInfo?.cautionNote}
         />
         <KeyHighlightsList highlights={toHighlights(place.soloInfo)} />
 
@@ -112,7 +126,7 @@ function PlaceDetailPage() {
                     </span>
                     {review.visitedAlone && review.soloRating != null && (
                       <span className="bg-primary/8 text-primary rounded-full px-2 py-1 text-xs font-semibold">
-                        혼밥 {review.soloRating.toFixed(1)}
+                        {isDining ? '혼밥' : '혼행'} {review.soloRating.toFixed(1)}
                       </span>
                     )}
                   </div>

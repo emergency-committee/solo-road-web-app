@@ -5,22 +5,27 @@ import type { MapRatingMode } from '../types/map.types'
 interface MapRatingModeControlProps {
   value: MapRatingMode
   onChange: (value: MapRatingMode) => void
+  soloLabel?: string
 }
 
-const OPTIONS: {
-  value: MapRatingMode
-  label: string
-  shortLabel: string
-  icon: typeof Star
-}[] = [
-  { value: 'solo', label: '혼밥 평점으로 보기', shortLabel: '혼밥', icon: UserRound },
-  { value: 'general', label: '일반 평점으로 보기', shortLabel: '일반', icon: Star },
-]
+export function MapRatingModeControl({
+  value,
+  onChange,
+  soloLabel = '혼행',
+}: MapRatingModeControlProps) {
+  const options: {
+    value: MapRatingMode
+    label: string
+    shortLabel: string
+    icon: typeof Star
+  }[] = [
+    { value: 'solo', label: `${soloLabel} 평점으로 보기`, shortLabel: soloLabel, icon: UserRound },
+    { value: 'general', label: '일반 평점으로 보기', shortLabel: '일반', icon: Star },
+  ]
 
-export function MapRatingModeControl({ value, onChange }: MapRatingModeControlProps) {
   return (
     <div className="border-outline-variant/40 flex flex-col overflow-visible rounded-xl border bg-white shadow-md">
-      {OPTIONS.map((option, index) => {
+      {options.map((option, index) => {
         const selected = value === option.value
         const Icon = option.icon
         return (

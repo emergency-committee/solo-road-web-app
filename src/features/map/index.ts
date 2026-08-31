@@ -3,5 +3,11 @@ export { MapMarker } from './components/MapMarker'
 export { MapRatingModeControl } from './components/MapRatingModeControl'
 export { PlacePreviewSheet } from './components/PlacePreviewSheet'
 export { KakaoMap } from './components/KakaoMap'
-export type { MapMarkerData, MapRatingMode } from './types/map.types'
-export { MAP_FILTERS, DEFAULT_MAP_CENTER } from './types/map.types'
+export type { MapMarkerData, MapRatingMode, MapMode, MarkerIconType } from './types/map.types'
+export {
+  MAP_FILTERS,
+  ALL_MAP_FILTERS,
+  SOLO_TRAVEL_MAP_FILTERS,
+  SOLO_DINING_MAP_FILTERS,
+  DEFAULT_MAP_CENTER,
+} from './types/map.types'

@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Footprints, Heart, Share2, Star, Utensils } from 'lucide-react'
+import { Compass, Footprints, Heart, Share2, Star, Utensils } from 'lucide-react'
 import { Sheet, SheetContent, SheetTitle } from '@/shared/components/ui/sheet'
 import { PlaceImagePlaceholder } from '@/shared/components/PlaceImagePlaceholder'
 import { StatBadge } from '@/shared/components/StatBadge'
@@ -9,9 +9,18 @@ import type { MapMarkerData } from '../types/map.types'
 interface PlacePreviewSheetProps {
   marker: MapMarkerData | null
   onOpenChange: (open: boolean) => void
+  soloLabel?: string
 }
 
-export function PlacePreviewSheet({ marker, onOpenChange }: PlacePreviewSheetProps) {
+export function PlacePreviewSheet({
+  marker,
+  onOpenChange,
+  soloLabel = '혼행',
+}: PlacePreviewSheetProps) {
+  const isDining = marker?.icon === 'restaurant' || marker?.icon === 'coffee'
+  const SoloIcon = isDining ? Utensils : Compass
+  const scoreLabel = isDining ? '혼밥 평점' : `${soloLabel} 평점`
+
   return (
     <Sheet open={marker !== null} onOpenChange={onOpenChange}>
       <SheetContent
@@ -36,9 +45,16 @@ export function PlacePreviewSheet({ marker, onOpenChange }: PlacePreviewSheetPro
               </div>
               <div className="flex-1">
                 <div className="flex items-start justify-between">
-                  <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold">
-                    {marker.name}
-                  </h2>
+                  <div>
+                    {marker.categoryLabel && (
+                      <span className="text-[11px] font-bold text-primary mb-1 inline-block">
+                        {marker.categoryLabel}
+                      </span>
+                    )}
+                    <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold">
+                      {marker.name}
+                    </h2>
+                  </div>
                   <button
                     type="button"
                     aria-label="찜하기"
@@ -52,6 +68,11 @@ export function PlacePreviewSheet({ marker, onOpenChange }: PlacePreviewSheetPro
                     <StatBadge key={tag.label} label={tag.label} tone={tag.tone} />
                   ))}
                 </div>
+                {marker.summary && (
+                  <p className="text-on-surface-variant mt-sm line-clamp-2 text-xs leading-relaxed">
+                    {marker.summary}
+                  </p>
+                )}
                 <div className="text-outline font-label-md mt-sm flex items-center gap-1.5">
                   <Footprints className="size-4" />
                   <span>현재 위치에서 {marker.distanceLabel}</span>
@@ -61,22 +82,29 @@ export function PlacePreviewSheet({ marker, onOpenChange }: PlacePreviewSheetPro
             <div className="bg-primary/6 border-primary/10 mt-base flex items-center justify-between rounded-lg border px-4 py-3">
               <div className="flex items-center gap-3">
                 <span className="bg-primary grid size-10 place-items-center rounded-full text-white">
-                  <Utensils className="size-5" />
+                  <SoloIcon className="size-5" />
                 </span>
                 <div>
-                  <p className="text-on-surface-variant text-xs">혼밥 평점</p>
+                  <p className="text-on-surface-variant text-xs">{scoreLabel}</p>
                   {hasDisplayableSoloRating(marker.soloRating, marker.soloReviewCount) ? (
                     <p className="text-primary text-lg font-bold">
                       {marker.soloRating!.toFixed(1)}
-                      <span className="text-on-surface-variant ml-1 text-xs font-medium">
-                        · 혼자 방문 {marker.soloReviewCount}명
-                      </span>
+                      {marker.soloReviewCount > 0 && (
+                        <span className="text-on-surface-variant ml-1 text-xs font-medium">
+                          · 혼자 방문 후기 {marker.soloReviewCount}개
+                        </span>
+                      )}
                     </p>
                   ) : (
                     <p className="text-on-surface text-sm font-semibold">
                       {marker.soloReviewCount > 0
                         ? '평가가 모이고 있어요'
-                        : '첫 혼밥 평가를 기다리고 있어요'}
+                        : '첫 방문 평가를 기다리고 있어요'}
+                    </p>
+                  )}
+                  {marker.scoreStatus === 'PENDING' && (
+                    <p className="text-on-surface-variant mt-1 text-[11px]">
+                      혼행 적합도를 분석하고 있어요
                     </p>
                   )}
                 </div>
@@ -102,7 +130,7 @@ export function PlacePreviewSheet({ marker, onOpenChange }: PlacePreviewSheetPro
                 className="font-label-md gap-xs bg-primary py-md text-on-primary flex flex-[2] items-center justify-center rounded-xl shadow-md transition-transform active:scale-95"
               >
                 <Star className="size-5" />
-                혼밥 후기 보기
+                상세 및 후기 보기
               </Link>
             </div>
           </>
