@@ -30,7 +30,7 @@ export function loadKakaoMapsSdk(): Promise<typeof kakao> {
     }
 
     const script = document.createElement('script')
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JS_KEY}&autoload=false`
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JS_KEY}&autoload=false&libraries=services`
     script.async = true
     script.onerror = () => {
       reject(new Error('카카오맵 SDK 스크립트를 불러오지 못했습니다.'))

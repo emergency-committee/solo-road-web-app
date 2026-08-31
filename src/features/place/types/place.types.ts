@@ -29,6 +29,8 @@ export interface ApiPlaceSummary {
   name: string
   type: string
   rating?: number
+  soloScore?: number | null
+  scoreStatus?: 'PENDING' | 'DONE' | null
   soloRating?: number | null
   soloReviewCount: number
   summary?: string
@@ -47,6 +49,7 @@ export interface ApiPlacesParams {
   lat?: number
   lng?: number
   radius?: number
+  diningOnly?: boolean
   soloFriendlyOnly?: boolean
   sort?: string
   page?: number
@@ -55,7 +58,7 @@ export interface ApiPlacesParams {
 
 export interface ApiSoloScoreSummary {
   soloScore?: number
-  grade: 'HIGH' | 'MEDIUM' | 'LOW'
+  scoreStatus: 'PENDING' | 'DONE'
   soloRating?: number | null
   seatScore?: number
   safetyScore?: number
@@ -68,6 +71,7 @@ export interface ApiSoloInfoSummary {
   hasBarTable?: boolean
   quietLevel?: string
   soloSeatStatus?: string
+  cautionNote?: string | null
 }
 
 export interface ApiSoloTagSummary {
@@ -82,6 +86,7 @@ export interface ApiPlaceDetail {
   name: string
   type: string
   rating?: number
+  summary?: string | null | undefined
   address?: string
   priceLevel?: string
   businessVerified: boolean
@@ -131,5 +136,49 @@ export interface CreatePlaceReviewResponse {
   visitedAlone: boolean | null
   soloRating: number | null
   contents: string
+  createdAt: string
+}
+
+export type PlaceCategoryType =
+  | 'RESTAURANT'
+  | 'CAFE'
+  | 'ATTRACTION'
+  | 'NATURE'
+  | 'CULTURE'
+  | 'STAY'
+  | 'SPOT'
+
+export interface CreatePlaceRequest {
+  name: string
+  type: PlaceCategoryType | string
+  address: string
+  latitude: number
+  longitude: number
+  summary?: string
+  representativeMenu?: string
+  foodCategory?: string
+  priceLevel?: string
+  rating?: number
+  firstReviewSoloRating?: number
+  firstReviewContent?: string
+  firstReviewTagIds?: number[]
+  soloFriendlyBadge?: boolean
+  soloTip?: string
+  hasSoloSeat?: boolean
+  hasSoloMenu?: boolean
+  thumbnailUrl?: string
+}
+
+export interface CreatePlaceResponse {
+  placeId: number
+  name: string
+  type: string
+  address: string
+  latitude: number
+  longitude: number
+  summary?: string | undefined
+  rating?: number | undefined
+  soloFriendlyBadge: boolean
+  thumbnailUrl?: string | undefined
   createdAt: string
 }

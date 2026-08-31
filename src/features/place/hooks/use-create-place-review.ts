@@ -2,10 +2,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createPlaceReview, getReviewTags } from '../api/place-api'
 import type { CreatePlaceReviewRequest } from '../types/place.types'
 
-export function useReviewTags(enabled: boolean) {
+export function useReviewTags(enabled: boolean, tagGroup?: 'dining' | 'travel') {
   return useQuery({
-    queryKey: ['review-tags'],
-    queryFn: getReviewTags,
+    queryKey: ['review-tags', tagGroup ?? 'all'],
+    queryFn: () => getReviewTags(tagGroup),
     enabled,
     staleTime: 1000 * 60 * 30,
   })

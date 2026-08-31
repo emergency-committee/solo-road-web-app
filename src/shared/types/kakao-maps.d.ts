@@ -70,6 +70,45 @@ declare global {
       setZIndex(zIndex: number): void
     }
 
+    namespace services {
+      const Status: {
+        OK: 'OK'
+        ZERO_RESULT: 'ZERO_RESULT'
+        ERROR: 'ERROR'
+      }
+
+      interface PlacesSearchResult {
+        id: string
+        place_name: string
+        category_name: string
+        category_group_code: string
+        category_group_name: string
+        phone: string
+        address_name: string
+        road_address_name: string
+        x: string
+        y: string
+        place_url: string
+        distance?: string
+      }
+
+      type PlacesSearchStatus = 'OK' | 'ZERO_RESULT' | 'ERROR'
+
+      class Places {
+        keywordSearch(
+          keyword: string,
+          callback: (result: PlacesSearchResult[], status: PlacesSearchStatus) => void,
+          options?: {
+            location?: LatLng
+            radius?: number
+            sort?: 'accuracy' | 'distance'
+            page?: number
+            size?: number
+          },
+        ): void
+      }
+    }
+
     function load(callback: () => void): void
   }
 
