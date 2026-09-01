@@ -104,9 +104,9 @@ export interface ApiPlaceDetail {
   isLiked: boolean
 }
 
-export interface ApiLikeResponse {
+export interface ApiPlaceSaveResponse {
   placeId: number
-  isLiked: boolean
+  saved: boolean
 }
 
 export interface ApiReview {

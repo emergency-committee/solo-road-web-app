@@ -1,9 +1,10 @@
 import { Link } from '@tanstack/react-router'
-import { Compass, Footprints, Heart, Share2, Star, Utensils } from 'lucide-react'
+import { Bookmark, Compass, Footprints, Share2, Star, Utensils } from 'lucide-react'
 import { Sheet, SheetContent, SheetTitle } from '@/shared/components/ui/sheet'
 import { PlaceImagePlaceholder } from '@/shared/components/PlaceImagePlaceholder'
 import { StatBadge } from '@/shared/components/StatBadge'
 import { hasDisplayableSoloRating } from '@/features/place/lib/solo-rating'
+import { usePlaceSaveStatus, useTogglePlaceSave } from '@/features/place'
 import type { MapMarkerData } from '../types/map.types'
 
 interface PlacePreviewSheetProps {
@@ -18,6 +19,10 @@ export function PlacePreviewSheet({
   soloLabel = '혼행',
 }: PlacePreviewSheetProps) {
   const isDining = marker?.icon === 'restaurant' || marker?.icon === 'coffee'
+  const placeId = Number(marker?.id)
+  const saveStatus = usePlaceSaveStatus(placeId, marker !== null)
+  const toggleSave = useTogglePlaceSave(placeId)
+  const saved = saveStatus.data?.saved ?? false
   const SoloIcon = isDining ? Utensils : Compass
   const scoreLabel = isDining ? '혼밥 평점' : `${soloLabel} 평점`
 
@@ -57,10 +62,14 @@ export function PlacePreviewSheet({
                   </div>
                   <button
                     type="button"
-                    aria-label="찜하기"
-                    className="text-outline hover:text-error"
+                    onClick={() => toggleSave.mutate(saved)}
+                    disabled={toggleSave.isPending}
+                    aria-pressed={saved}
+                    aria-label={saved ? '저장 해제' : '장소 저장'}
+                    title={saved ? '저장 해제' : '장소 저장'}
+                    className={`${saved ? 'text-[#f05a47]' : 'text-outline'} transition-transform active:scale-90 disabled:cursor-wait disabled:opacity-50`}
                   >
-                    <Heart className="size-5" />
+                    <Bookmark className="size-6" fill={saved ? 'currentColor' : 'none'} />
                   </button>
                 </div>
                 <div className="mt-base gap-xs flex flex-wrap">

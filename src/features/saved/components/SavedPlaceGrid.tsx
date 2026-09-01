@@ -2,21 +2,37 @@ import { useNavigate } from '@tanstack/react-router'
 import { PlusCircle } from 'lucide-react'
 import { PlaceCard } from '@/shared/components/PlaceCard'
 import { EmptyState } from '@/shared/components/EmptyState'
-import { useTogglePlaceLike } from '@/features/place'
+import { useTogglePlaceSave } from '@/features/place'
 import type { ApiSavedPlace } from '../types/saved.types'
+
+const CATEGORY_LABELS: Record<string, string> = {
+  RESTAURANT: '식당',
+  CAFE: '카페',
+  WELLNESS: '웰니스',
+  STUDY: '스터디',
+  EXHIBITION: '전시·문화',
+  NATURE: '자연',
+  ACTIVITY: '체험·활동',
+  SHOPPING: '쇼핑',
+}
 
 function SavedPlaceCard({ place }: { place: ApiSavedPlace }) {
   const navigate = useNavigate()
-  const toggleLike = useTogglePlaceLike(place.placeId)
+  const toggleSave = useTogglePlaceSave(place.placeId)
 
   return (
     <PlaceCard
       imageUrl={place.thumbnailUrl ?? null}
       imageAlt={place.name}
       title={place.name}
-      badges={place.soloFriendlyBadge ? [{ label: '혼행 친화', tone: 'secondary' }] : []}
+      badges={[
+        { label: CATEGORY_LABELS[place.type] ?? place.type, tone: 'neutral' },
+        ...(place.soloFriendlyBadge
+          ? [{ label: '혼행 친화', tone: 'secondary' as const }]
+          : []),
+      ]}
       saved
-      onToggleSave={() => toggleLike.mutate(true)}
+      onToggleSave={() => toggleSave.mutate(true)}
       onClick={() => navigate({ to: '/place/$placeId', params: { placeId: place.placeId.toString() } })}
     />
   )

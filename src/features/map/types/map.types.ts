@@ -5,6 +5,11 @@ export type MarkerIconType =
   | 'nature'
   | 'culture'
   | 'stay'
+  | 'wellness'
+  | 'study'
+  | 'exhibition'
+  | 'activity'
+  | 'shopping'
   | 'spot'
 
 export interface MapMarkerData {
@@ -24,6 +29,7 @@ export interface MapMarkerData {
   scoreStatus?: 'PENDING' | 'DONE' | null | undefined
   soloRating: number | null | undefined
   soloReviewCount: number
+  saved: boolean
   tags: { label: string; tone: 'primary' | 'secondary' }[]
 }
 
@@ -35,10 +41,12 @@ export const ALL_MAP_FILTERS: { value: string; label: string }[] = [
   { value: 'solo-friendly', label: '혼행 추천' },
   { value: 'restaurant', label: '식당' },
   { value: 'cafe', label: '카페/디저트' },
-  { value: 'attraction', label: '명소' },
+  { value: 'wellness', label: '웰니스' },
+  { value: 'study', label: '스터디' },
+  { value: 'exhibition', label: '전시·문화' },
   { value: 'nature', label: '자연/힐링' },
-  { value: 'culture', label: '전시/문화' },
-  { value: 'stay', label: '숙소' },
+  { value: 'activity', label: '체험·활동' },
+  { value: 'shopping', label: '쇼핑' },
 ]
 
 export const SOLO_DINING_MAP_FILTERS: { value: string; label: string }[] = [

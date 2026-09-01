@@ -1,4 +1,4 @@
-import { Heart } from 'lucide-react'
+import { Bookmark } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { PlaceImagePlaceholder } from './PlaceImagePlaceholder'
 import { RatingStars } from './RatingStars'
@@ -64,10 +64,10 @@ export function PlaceCard({
               onToggleSave()
             }}
             aria-pressed={saved}
-            aria-label="저장하기"
-            className="text-secondary absolute top-3 right-3 z-10 flex size-9 items-center justify-center rounded-full bg-white/90 shadow-sm transition-transform active:scale-90"
+            aria-label={saved ? '저장 해제' : '장소 저장'}
+            className={`${saved ? 'text-[#f05a47]' : 'text-outline'} absolute top-3 right-3 z-10 flex size-9 items-center justify-center rounded-full bg-white/90 shadow-sm transition-transform active:scale-90`}
           >
-            <Heart className="size-4" fill={saved ? 'currentColor' : 'none'} />
+            <Bookmark className="size-4" fill={saved ? 'currentColor' : 'none'} />
           </button>
         )}
       </div>

@@ -1,5 +1,5 @@
 import { useRouter } from '@tanstack/react-router'
-import { ArrowLeft, Heart, Share2 } from 'lucide-react'
+import { ArrowLeft, Bookmark, Share2 } from 'lucide-react'
 import { useState } from 'react'
 import { PlaceImagePlaceholder } from '@/shared/components/PlaceImagePlaceholder'
 
@@ -7,18 +7,25 @@ interface PlaceDetailHeroProps {
   /** 등록된 이미지가 없으면 null. */
   imageUrl: string | null
   imageAlt: string
-  liked?: boolean
-  onToggleLike?: () => void
+  saved?: boolean
+  saveDisabled?: boolean
+  onToggleSave?: () => void
 }
 
-export function PlaceDetailHero({ imageUrl, imageAlt, liked, onToggleLike }: PlaceDetailHeroProps) {
+export function PlaceDetailHero({
+  imageUrl,
+  imageAlt,
+  saved: controlledSaved,
+  saveDisabled,
+  onToggleSave,
+}: PlaceDetailHeroProps) {
   const router = useRouter()
   const [localSaved, setLocalSaved] = useState(false)
-  const saved = liked ?? localSaved
+  const saved = controlledSaved ?? localSaved
 
   function handleToggle() {
-    if (onToggleLike) {
-      onToggleLike()
+    if (onToggleSave) {
+      onToggleSave()
       return
     }
     setLocalSaved((prev) => !prev)
@@ -52,11 +59,13 @@ export function PlaceDetailHero({ imageUrl, imageAlt, liked, onToggleLike }: Pla
           <button
             type="button"
             onClick={handleToggle}
+            disabled={saveDisabled}
             aria-pressed={saved}
-            aria-label="찜하기"
-            className="glass-effect text-primary flex size-10 items-center justify-center rounded-full shadow-md active:scale-95"
+            aria-label={saved ? '저장 해제' : '장소 저장'}
+            title={saved ? '저장 해제' : '장소 저장'}
+            className={`glass-effect ${saved ? 'text-[#f05a47]' : 'text-on-surface-variant'} flex size-10 items-center justify-center rounded-full shadow-md active:scale-95 disabled:cursor-wait disabled:opacity-50`}
           >
-            <Heart className="size-5" fill={saved ? 'currentColor' : 'none'} />
+            <Bookmark className="size-5" fill={saved ? 'currentColor' : 'none'} />
           </button>
         </div>
       </div>

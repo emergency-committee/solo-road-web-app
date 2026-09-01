@@ -2,6 +2,7 @@
 export interface ApiSavedPlace {
   placeId: number
   name: string
+  type: string
   thumbnailUrl?: string
   soloFriendlyBadge: boolean
 }

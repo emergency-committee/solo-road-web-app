@@ -14,6 +14,7 @@ import {
 } from '@/features/map'
 import { CreatePlaceModal, usePlaces } from '@/features/place'
 import type { ApiPlacesParams, ApiPlaceSummary } from '@/features/place'
+import { useSavedPlaces } from '@/features/saved'
 import { formatDistanceMeters } from '@/shared/lib/format'
 import { useDebouncedValue } from '@/shared/lib/use-debounced-value'
 
@@ -56,16 +57,36 @@ function toPlacesParams(filter: string, mapMode: MapMode): ApiPlacesParams {
   }
   if (filter === 'restaurant') return { type: 'RESTAURANT' }
   if (filter === 'cafe') return { type: 'CAFE' }
+  if (filter === 'wellness') return { type: 'WELLNESS' }
+  if (filter === 'study') return { type: 'STUDY' }
+  if (filter === 'exhibition') return { type: 'EXHIBITION' }
   if (filter === 'attraction') return { type: 'ATTRACTION' }
   if (filter === 'nature') return { type: 'NATURE' }
   if (filter === 'culture') return { type: 'CULTURE' }
   if (filter === 'stay') return { type: 'STAY' }
+  if (filter === 'activity') return { type: 'ACTIVITY' }
+  if (filter === 'shopping') return { type: 'SHOPPING' }
   if (mapMode === 'solo_dining') return { diningOnly: true, sort: 'DISTANCE' }
   return { sort: 'DISTANCE' }
 }
 
 function getMarkerIconAndLabel(type: string): { icon: MarkerIconType; label: string } {
   const upper = type.toUpperCase()
+  if (upper.includes('WELLNESS') || upper.includes('웰니스')) {
+    return { icon: 'wellness', label: '웰니스' }
+  }
+  if (upper.includes('STUDY') || upper.includes('스터디') || upper.includes('독서실')) {
+    return { icon: 'study', label: '스터디' }
+  }
+  if (upper.includes('EXHIBITION') || upper.includes('전시')) {
+    return { icon: 'exhibition', label: '전시·문화' }
+  }
+  if (upper.includes('ACTIVITY') || upper.includes('체험') || upper.includes('액티비티')) {
+    return { icon: 'activity', label: '체험·활동' }
+  }
+  if (upper.includes('SHOPPING') || upper.includes('쇼핑') || upper.includes('시장')) {
+    return { icon: 'shopping', label: '쇼핑' }
+  }
   if (upper.includes('CAFE') || upper.includes('카페') || upper.includes('베이커리')) {
     return { icon: 'coffee', label: '카페/디저트' }
   }
@@ -107,6 +128,7 @@ function toMarkerData(
   place: ApiPlaceSummary,
   mapMode: MapMode,
   isRecommendationView: boolean,
+  saved: boolean,
 ): MapMarkerData {
   const { icon, label } = getMarkerIconAndLabel(place.type)
   return {
@@ -125,6 +147,7 @@ function toMarkerData(
     scoreStatus: place.scoreStatus,
     soloRating: place.soloRating,
     soloReviewCount: place.soloReviewCount,
+    saved,
     tags:
       isRecommendationView && place.scoreStatus === 'DONE'
         ? [
@@ -180,14 +203,21 @@ function MapPage() {
     lat: center.lat,
     lng: center.lng,
   })
+  const savedPlacesQuery = useSavedPlaces(0, 500)
+  const savedPlaceIds = useMemo(
+    () => new Set((savedPlacesQuery.data?.content ?? []).map((place) => place.placeId)),
+    [savedPlacesQuery.data],
+  )
 
   const isRecommendationView = filterValue[0] === 'solo-friendly'
   const markers: MapMarkerData[] = useMemo(
     () =>
       (placesQuery.data?.content ?? [])
         .filter((place) => mapMode !== 'solo_dining' || isDiningPlace(place.type))
-        .map((place) => toMarkerData(place, mapMode, isRecommendationView)),
-    [placesQuery.data, mapMode, isRecommendationView],
+        .map((place) =>
+          toMarkerData(place, mapMode, isRecommendationView, savedPlaceIds.has(place.placeId)),
+        ),
+    [placesQuery.data, mapMode, isRecommendationView, savedPlaceIds],
   )
 
   const handleRecenter = () => {
@@ -200,7 +230,9 @@ function MapPage() {
   const handleSelectSuggestion = (place: ApiPlaceSummary) => {
     setKeyword(place.name)
     setCenter({ lat: place.latitude, lng: place.longitude })
-    setSelectedMarker(toMarkerData(place, mapMode, isRecommendationView))
+    setSelectedMarker(
+      toMarkerData(place, mapMode, isRecommendationView, savedPlaceIds.has(place.placeId)),
+    )
   }
 
   const isSoloDining = mapMode === 'solo_dining'
