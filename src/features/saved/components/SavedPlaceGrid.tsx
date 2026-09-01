@@ -14,6 +14,10 @@ const CATEGORY_LABELS: Record<string, string> = {
   NATURE: '자연',
   ACTIVITY: '체험·활동',
   SHOPPING: '쇼핑',
+  ATTRACTION: '명소',
+  CULTURE: '전시·문화',
+  STAY: '숙소',
+  SPOT: '명소',
 }
 
 function SavedPlaceCard({ place }: { place: ApiSavedPlace }) {
@@ -25,6 +29,7 @@ function SavedPlaceCard({ place }: { place: ApiSavedPlace }) {
       imageUrl={place.thumbnailUrl ?? null}
       imageAlt={place.name}
       title={place.name}
+      imageAspect="compact"
       badges={[
         { label: CATEGORY_LABELS[place.type] ?? place.type, tone: 'neutral' },
         ...(place.soloFriendlyBadge
@@ -42,7 +47,7 @@ export function SavedPlaceGrid({ places }: { places: ApiSavedPlace[] }) {
   const navigate = useNavigate()
 
   return (
-    <div className="gap-md grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+    <div className="gap-md grid [grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr))]">
       {places.map((place) => (
         <SavedPlaceCard key={place.placeId} place={place} />
       ))}
@@ -52,6 +57,7 @@ export function SavedPlaceGrid({ places }: { places: ApiSavedPlace[] }) {
         description="내 주변의 안전한 장소를 찾아보세요"
         actionLabel="둘러보기"
         onAction={() => navigate({ to: '/map' })}
+        className="min-h-64 justify-center [&_p]:break-keep"
       />
     </div>
   )
