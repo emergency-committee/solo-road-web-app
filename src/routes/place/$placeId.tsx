@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Link } from '@tanstack/react-router'
-import { MapPinPlus, MessageSquarePlus, Navigation, Star } from 'lucide-react'
+import { Bookmark, MapPinPlus, MessageSquarePlus, Navigation, Star } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { EmptyState } from '@/shared/components/EmptyState'
@@ -10,8 +10,9 @@ import {
   PlaceDetailHero,
   SoloAnalysisCard,
   usePlaceDetail,
+  usePlaceSaveStatus,
   usePlaceReviews,
-  useTogglePlaceLike,
+  useTogglePlaceSave,
   type PlaceHighlight,
 } from '@/features/place'
 
@@ -40,7 +41,9 @@ function PlaceDetailPage() {
   const placeIdNumber = Number(placeId)
   const { data: place, isLoading, isError } = usePlaceDetail(placeIdNumber)
   const { data: reviewPage } = usePlaceReviews(placeIdNumber, 0, 5)
-  const toggleLike = useTogglePlaceLike(placeIdNumber)
+  const saveStatus = usePlaceSaveStatus(placeIdNumber)
+  const toggleSave = useTogglePlaceSave(placeIdNumber)
+  const saved = saveStatus.data?.saved ?? false
 
   if (isLoading) {
     return (
@@ -66,8 +69,9 @@ function PlaceDetailPage() {
       <PlaceDetailHero
         imageUrl={null}
         imageAlt={place.name}
-        liked={place.isLiked}
-        onToggleLike={() => toggleLike.mutate(place.isLiked)}
+        saved={saved}
+        saveDisabled={toggleSave.isPending}
+        onToggleSave={() => toggleSave.mutate(saved)}
       />
       <main className="bg-surface px-margin-mobile pt-lg relative -mt-8 min-h-[calc(100vh-365px)] rounded-t-[32px] pb-28 shadow-[0_-8px_24px_rgba(0,0,0,0.05)]">
         <section className="mb-lg">
@@ -169,11 +173,16 @@ function PlaceDetailPage() {
           </button>
           <button
             type="button"
-            onClick={() => toggleLike.mutate(place.isLiked)}
+            onClick={() => toggleSave.mutate(saved)}
+            disabled={toggleSave.isPending}
+            aria-pressed={saved}
             className="border-outline-variant/30 gap-xs bg-surface-container-highest px-lg text-on-surface-variant flex h-14 items-center justify-center rounded-xl border font-bold active:scale-95"
           >
-            <MapPinPlus className="size-5" />
-            <span>{place.isLiked ? '저장됨' : '추가'}</span>
+            <Bookmark
+              className={`size-5 ${saved ? 'text-[#f05a47]' : ''}`}
+              fill={saved ? 'currentColor' : 'none'}
+            />
+            <span>{saved ? '저장됨' : '저장'}</span>
           </button>
         </div>
       </PlaceBottomActionBar>

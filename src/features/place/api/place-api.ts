@@ -4,7 +4,7 @@ import { buildQueryString } from '@/shared/api/query-string'
 import { AUTH_MOCK_ENABLED, PLACE_DEMO_ENABLED } from '@/shared/api/config'
 import type { PageResponse } from '@/shared/api/types'
 import type {
-  ApiLikeResponse,
+  ApiPlaceSaveResponse,
   ApiPlaceDetail,
   ApiPlaceRecommendations,
   ApiPlacesParams,
@@ -117,20 +117,30 @@ export function createPlaceReview(placeId: number, request: CreatePlaceReviewReq
   )
 }
 
-export function likePlace(placeId: number) {
+export function getPlaceSaveStatus(placeId: number) {
   if ((AUTH_MOCK_ENABLED || PLACE_DEMO_ENABLED) && isMockPlace(placeId)) {
-    return Promise.resolve(setMockPlaceLiked(placeId, true))
+    const place = getMockPlaceDetail(placeId)
+    return Promise.resolve({ placeId, saved: place?.isLiked ?? false })
   }
-  return apiRequest<ApiLikeResponse>(`${API_PREFIX}/places/${placeId.toString()}/like`, {
+  return apiRequest<ApiPlaceSaveResponse>(`${API_PREFIX}/places/${placeId.toString()}/save`)
+}
+
+export function savePlace(placeId: number) {
+  if ((AUTH_MOCK_ENABLED || PLACE_DEMO_ENABLED) && isMockPlace(placeId)) {
+    setMockPlaceLiked(placeId, true)
+    return Promise.resolve({ placeId, saved: true })
+  }
+  return apiRequest<ApiPlaceSaveResponse>(`${API_PREFIX}/places/${placeId.toString()}/save`, {
     method: 'POST',
   })
 }
 
-export function unlikePlace(placeId: number) {
+export function unsavePlace(placeId: number) {
   if ((AUTH_MOCK_ENABLED || PLACE_DEMO_ENABLED) && isMockPlace(placeId)) {
-    return Promise.resolve(setMockPlaceLiked(placeId, false))
+    setMockPlaceLiked(placeId, false)
+    return Promise.resolve({ placeId, saved: false })
   }
-  return apiRequest<ApiLikeResponse>(`${API_PREFIX}/places/${placeId.toString()}/like`, {
+  return apiRequest<ApiPlaceSaveResponse>(`${API_PREFIX}/places/${placeId.toString()}/save`, {
     method: 'DELETE',
   })
 }

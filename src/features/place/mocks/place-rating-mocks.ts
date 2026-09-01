@@ -54,7 +54,7 @@ const mockPlaces: ApiPlaceSummary[] = [
     soloFriendlyBadge: true,
     thumbnailUrl: 'https://picsum.photos/seed/solo-dining-oroti/480/480',
     distanceM: 120,
-    isLiked: false,
+    isLiked: true,
   },
   {
     placeId: 980002,
@@ -225,7 +225,7 @@ const mockDetails: Record<number, ApiPlaceDetail> = {
       { tagId: 4, name: '조용해요', positiveCount: 9, negativeCount: 2 },
     ],
     analysisTags: ['1인석 있음', '1인 메뉴 있음', '조용해요'],
-    isLiked: false,
+    isLiked: true,
   },
   980004: {
     placeId: 980004,

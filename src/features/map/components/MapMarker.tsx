@@ -1,9 +1,15 @@
 import {
   Bed,
+  Bookmark,
+  BookOpen,
   Coffee,
+  HeartPulse,
+  Images,
   Landmark,
   MapPin,
   Palette,
+  ShoppingBag,
+  Ticket,
   Trees,
   Utensils,
 } from 'lucide-react'
@@ -18,6 +24,11 @@ const ICON_MAP: Record<MarkerIconType, typeof Utensils> = {
   nature: Trees,
   culture: Palette,
   stay: Bed,
+  wellness: HeartPulse,
+  study: BookOpen,
+  exhibition: Images,
+  activity: Ticket,
+  shopping: ShoppingBag,
   spot: MapPin,
 }
 
@@ -28,6 +39,11 @@ const CATEGORY_STYLE: Record<MarkerIconType, { bg: string; tail: string }> = {
   nature: { bg: 'bg-[#059669]', tail: 'bg-[#059669]' },
   culture: { bg: 'bg-[#7c3aed]', tail: 'bg-[#7c3aed]' },
   stay: { bg: 'bg-[#4f46e5]', tail: 'bg-[#4f46e5]' },
+  wellness: { bg: 'bg-[#0f766e]', tail: 'bg-[#0f766e]' },
+  study: { bg: 'bg-[#475569]', tail: 'bg-[#475569]' },
+  exhibition: { bg: 'bg-[#7c3aed]', tail: 'bg-[#7c3aed]' },
+  activity: { bg: 'bg-[#db2777]', tail: 'bg-[#db2777]' },
+  shopping: { bg: 'bg-[#ca8a04]', tail: 'bg-[#ca8a04]' },
   spot: { bg: 'bg-primary', tail: 'bg-primary' },
 }
 
@@ -67,11 +83,19 @@ export function MapMarker({
           'relative flex h-9 min-w-9 items-center justify-center gap-1 rounded-full border-2 border-white px-2 text-white shadow-lg transition-transform group-hover:scale-105',
           displayRating != null && 'min-w-[58px]',
           selected && 'scale-110 ring-2 ring-white/80',
+          marker.saved &&
+            !selected &&
+            'ring-2 ring-[#f05a47] ring-offset-2 ring-offset-white',
         )}
       >
         <Icon className="size-4 shrink-0" />
         {displayRating != null && (
           <span className="text-xs font-bold tabular-nums">{displayRating.toFixed(1)}</span>
+        )}
+        {marker.saved && (
+          <span className="absolute -top-2 -right-2 grid size-5 place-items-center rounded-full border border-[#f05a47]/25 bg-white text-[#f05a47] shadow-md ring-2 ring-white">
+            <Bookmark className="size-3 fill-current" aria-hidden="true" />
+          </span>
         )}
         <div
           className={cn(

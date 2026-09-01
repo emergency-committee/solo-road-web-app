@@ -14,6 +14,7 @@ const marker: MapMarkerData = {
   rating: 4.1,
   soloRating: 4.7,
   soloReviewCount: 8,
+  saved: false,
   tags: [],
 }
 

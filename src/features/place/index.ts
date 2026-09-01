@@ -12,7 +12,7 @@ export { usePlaceDetail } from './hooks/use-place-detail'
 export { usePlaceReviews } from './hooks/use-place-reviews'
 export { useCreatePlaceReview, useReviewTags } from './hooks/use-create-place-review'
 export { useCreatePlace } from './hooks/use-create-place'
-export { useTogglePlaceLike } from './hooks/use-toggle-place-like'
+export { usePlaceSaveStatus, useTogglePlaceSave } from './hooks/use-place-save'
 export type {
   ApiHiddenGemItem,
   ApiPlaceDetail,
