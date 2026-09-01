@@ -18,6 +18,7 @@ interface PlaceCardProps {
   badges?: PlaceCardBadge[]
   rating?: number | null
   reviewCount?: number
+  imageAspect?: 'standard' | 'compact'
   saved?: boolean
   onToggleSave?: () => void
   onClick?: () => void
@@ -32,6 +33,7 @@ export function PlaceCard({
   badges,
   rating,
   reviewCount,
+  imageAspect = 'standard',
   saved = false,
   onToggleSave,
   onClick,
@@ -46,7 +48,12 @@ export function PlaceCard({
         className,
       )}
     >
-      <div className="relative aspect-[2/1] w-full overflow-hidden">
+      <div
+        className={cn(
+          'relative w-full overflow-hidden',
+          imageAspect === 'compact' ? 'aspect-[3/1]' : 'aspect-[2/1]',
+        )}
+      >
         {imageUrl ? (
           <img
             src={imageUrl}

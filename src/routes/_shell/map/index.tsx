@@ -210,15 +210,32 @@ function MapPage() {
   )
 
   const isRecommendationView = filterValue[0] === 'solo-friendly'
-  const markers: MapMarkerData[] = useMemo(
-    () =>
-      (placesQuery.data?.content ?? [])
-        .filter((place) => mapMode !== 'solo_dining' || isDiningPlace(place.type))
-        .map((place) =>
-          toMarkerData(place, mapMode, isRecommendationView, savedPlaceIds.has(place.placeId)),
-        ),
-    [placesQuery.data, mapMode, isRecommendationView, savedPlaceIds],
-  )
+  const markers: MapMarkerData[] = useMemo(() => {
+    const visiblePlaces = (placesQuery.data?.content ?? []).filter(
+      (place) => mapMode !== 'solo_dining' || isDiningPlace(place.type),
+    )
+    const placesById = new Map(visiblePlaces.map((place) => [place.placeId, place]))
+
+    if (filterValue[0] === 'all') {
+      for (const savedPlace of savedPlacesQuery.data?.content ?? []) {
+        if (mapMode === 'solo_dining' && !isDiningPlace(savedPlace.type)) continue
+        if (!placesById.has(savedPlace.placeId)) {
+          placesById.set(savedPlace.placeId, { ...savedPlace, isLiked: true })
+        }
+      }
+    }
+
+    return [...placesById.values()].map((place) =>
+      toMarkerData(place, mapMode, isRecommendationView, savedPlaceIds.has(place.placeId)),
+    )
+  }, [
+    placesQuery.data,
+    savedPlacesQuery.data,
+    mapMode,
+    filterValue,
+    isRecommendationView,
+    savedPlaceIds,
+  ])
 
   const handleRecenter = () => {
     if (!navigator.geolocation) return
