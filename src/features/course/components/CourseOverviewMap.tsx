@@ -116,7 +116,7 @@ export function CourseOverviewMap({
 
   return (
     <div className="relative size-full">
-      <div ref={containerRef} className="size-full" />
+      <div ref={containerRef} data-no-drag-scroll className="size-full" />
       {stopsByDay.length > 1 && (
         <div
           className={`bg-surface/95 pointer-events-none absolute z-10 flex flex-wrap gap-2 rounded-lg px-2.5 py-2 shadow-md backdrop-blur-sm ${legendClassName}`}

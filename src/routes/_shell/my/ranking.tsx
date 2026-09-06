@@ -3,6 +3,7 @@ import { ArrowLeft, Copy, Heart, Map, Trophy } from 'lucide-react'
 import { useLayoutEffect } from 'react'
 import { useTravelerRanking } from '@/features/course'
 import { EmptyState } from '@/shared/components/EmptyState'
+import { scrollFrameToTop } from '@/shared/lib/app-frame'
 
 export const Route = createFileRoute('/_shell/my/ranking')({ component: TravelerRankingPage })
 
@@ -12,7 +13,7 @@ function TravelerRankingPage() {
   const travelers = rankingQuery.data?.content ?? []
 
   useLayoutEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' })
+    scrollFrameToTop()
   }, [])
 
   return (
