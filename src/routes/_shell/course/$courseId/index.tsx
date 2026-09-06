@@ -24,7 +24,7 @@ import {
 import { CourseRouteViewer } from '@/features/course-route'
 import { EmptyState } from '@/shared/components/EmptyState'
 import { Timeline, TimelineItem } from '@/shared/components/Timeline'
-import { getAppFrameElement } from '@/shared/lib/app-frame'
+import { scrollFrameToTop } from '@/shared/lib/app-frame'
 import { formatDistanceMeters, formatDurationMinutes } from '@/shared/lib/format'
 
 export const Route = createFileRoute('/_shell/course/$courseId/')({
@@ -56,8 +56,7 @@ function CourseDetailPage() {
   )
 
   useLayoutEffect(() => {
-    getAppFrameElement()?.scrollTo(0, 0)
-    window.scrollTo(0, 0)
+    scrollFrameToTop()
   }, [courseId])
 
   if (demoCourse) {

@@ -9,7 +9,7 @@ import {
   useCourseEditStore,
 } from '@/features/course'
 import { EmptyState } from '@/shared/components/EmptyState'
-import { getAppFrameElement } from '@/shared/lib/app-frame'
+import { scrollFrameToTop } from '@/shared/lib/app-frame'
 
 export const Route = createFileRoute('/_shell/course/$courseId/map')({
   component: CourseMapPage,
@@ -23,8 +23,7 @@ function CourseMapPage() {
   const { data: course, isLoading, isError } = useCourseDetail(Number(courseId))
 
   useLayoutEffect(() => {
-    getAppFrameElement()?.scrollTo(0, 0)
-    window.scrollTo(0, 0)
+    scrollFrameToTop()
   }, [courseId])
 
   if (!demoCourse && isLoading) {

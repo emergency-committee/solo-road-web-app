@@ -198,7 +198,7 @@ export function KakaoMap({
 
   return (
     <div className={cn('relative size-full', className)}>
-      <div ref={containerRef} className="size-full" />
+      <div ref={containerRef} data-no-drag-scroll className="size-full" />
       {status === 'error' && (
         <div className="bg-surface-container absolute inset-0 z-10 flex items-center justify-center px-8 text-center">
           <p className="text-body-sm text-on-surface-variant">
