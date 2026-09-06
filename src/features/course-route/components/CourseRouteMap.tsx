@@ -270,7 +270,7 @@ export function CourseRouteMap({
 
   return (
     <div className="absolute inset-0" aria-label="일정 구간 안심 경로 지도">
-      <div ref={containerRef} className="absolute inset-0" />
+      <div ref={containerRef} data-no-drag-scroll className="absolute inset-0" />
       <div className="absolute top-[320px] right-3 z-20 flex flex-col overflow-hidden rounded-md border border-gray-300 bg-white shadow-sm">
         <MapButton label="지도 확대" onClick={() => changeLevel(-1)}>
           <Plus size={18} />
