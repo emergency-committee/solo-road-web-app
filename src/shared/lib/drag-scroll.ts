@@ -40,6 +40,11 @@ export function findScrollable(start: Element | null, axis: Axis): Element | nul
 }
 
 export function enableDragScroll() {
+  // 터치가 주 입력인 기기(폰·태블릿·인앱 브라우저)에서는 아예 리스너를 달지 않는다.
+  // pointerType만 믿으면, 터치를 'mouse'로 잘못 보고하는 인앱 브라우저에서
+  // 네이티브 터치 스크롤을 preventDefault로 죽여버린다.
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
+
   let targetX: Element | null = null
   let targetY: Element | null = null
   let startX = 0
@@ -69,7 +74,14 @@ export function enableDragScroll() {
   }
 
   function onPointerMove(event: PointerEvent) {
+    if (event.pointerType !== 'mouse') return
     if (!targetX && !targetY) return
+    // 창 밖에서 버튼을 떼면 pointerup을 못 받아 상태가 남는다. 그대로 두면 이후의
+    // 모든 이동(터치 포함)이 preventDefault되어 스크롤이 통째로 죽는다.
+    if (event.buttons === 0) {
+      onPointerUp()
+      return
+    }
     const dx = event.clientX - startX
     const dy = event.clientY - startY
 

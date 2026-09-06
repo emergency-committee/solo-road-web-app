@@ -20,9 +20,25 @@ function pointer(type: string, clientX: number, clientY: number) {
     clientX,
     clientY,
     button: 0,
+    buttons: type === 'pointerup' ? 0 : 1, // 버튼을 누른 채 움직이는 상태
   })
   Object.defineProperty(event, 'pointerType', { value: 'mouse' })
   return event
+}
+
+/** 터치 포인터 이벤트 (버튼 없음). */
+function touch(type: string, clientX: number, clientY: number) {
+  const event = new MouseEvent(type, { bubbles: true, cancelable: true, clientX, clientY })
+  Object.defineProperty(event, 'pointerType', { value: 'touch' })
+  return event
+}
+
+/** jsdom의 matchMedia는 늘 matches:false라 "마우스 있는 기기" 게이트를 열어준다. */
+function asPointerFineDevice() {
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    value: (query: string) => ({ matches: true, media: query }),
+  })
 }
 
 beforeEach(() => {
@@ -81,6 +97,7 @@ describe('enableDragScroll', () => {
     const link = document.createElement('a')
     frame.appendChild(link)
     document.body.appendChild(frame)
+    asPointerFineDevice()
     enableDragScroll()
 
     let clicks = 0
@@ -111,5 +128,60 @@ describe('enableDragScroll', () => {
     document.dispatchEvent(pointer('pointerup', 100, 400))
     click()
     expect(clicks).toBe(2)
+  })
+  it('터치 포인터는 스크롤을 가로채지 않는다', () => {
+    const frame = makeBox('overflow-y: auto', {
+      scrollHeight: 2000,
+      clientHeight: 800,
+      scrollWidth: 430,
+      clientWidth: 430,
+    })
+    const child = document.createElement('span')
+    frame.appendChild(child)
+    document.body.appendChild(frame)
+    asPointerFineDevice()
+    enableDragScroll()
+
+    child.dispatchEvent(touch('pointerdown', 100, 400))
+    const move = touch('pointermove', 100, 200)
+    document.dispatchEvent(move)
+
+    // 네이티브 터치 스크롤이 살아있어야 한다: 우리가 굴리지도, preventDefault 하지도 않는다
+    expect(frame.scrollTop).toBe(0)
+    expect(move.defaultPrevented).toBe(false)
+  })
+
+  it('창 밖에서 버튼을 뗀 뒤 남은 상태가 이후 스크롤을 막지 않는다', () => {
+    const frame = makeBox('overflow-y: auto', {
+      scrollHeight: 2000,
+      clientHeight: 800,
+      scrollWidth: 430,
+      clientWidth: 430,
+    })
+    const child = document.createElement('span')
+    frame.appendChild(child)
+    document.body.appendChild(frame)
+    asPointerFineDevice()
+    enableDragScroll()
+
+    // 드래그 시작 → pointerup 없이 버튼만 떼진 상태(창 밖에서 뗀 경우)
+    child.dispatchEvent(pointer('pointerdown', 100, 400))
+    document.dispatchEvent(pointer('pointermove', 100, 300))
+    expect(frame.scrollTop).toBe(100)
+    const released = new MouseEvent('pointermove', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 100,
+      clientY: 250,
+      buttons: 0,
+    })
+    Object.defineProperty(released, 'pointerType', { value: 'mouse' })
+    document.dispatchEvent(released)
+
+    // 상태가 털렸으므로 이후 터치 이동은 아무 영향도 받지 않는다
+    const afterTouch = touch('pointermove', 100, 100)
+    document.dispatchEvent(afterTouch)
+    expect(afterTouch.defaultPrevented).toBe(false)
+    expect(frame.scrollTop).toBe(100)
   })
 })
