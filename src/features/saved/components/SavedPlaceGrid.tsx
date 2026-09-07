@@ -20,6 +20,17 @@ const CATEGORY_LABELS: Record<string, string> = {
   SPOT: '명소',
 }
 
+function getPlaceholderVariant(type: string) {
+  const upper = type.toUpperCase()
+  return upper.includes('RESTAURANT') ||
+    upper.includes('CAFE') ||
+    upper.includes('식당') ||
+    upper.includes('카페') ||
+    upper.includes('맛집')
+    ? 'food'
+    : 'place'
+}
+
 function SavedPlaceCard({ place }: { place: ApiSavedPlace }) {
   const navigate = useNavigate()
   const toggleSave = useTogglePlaceSave(place.placeId)
@@ -28,6 +39,7 @@ function SavedPlaceCard({ place }: { place: ApiSavedPlace }) {
     <PlaceCard
       imageUrl={place.thumbnailUrl ?? null}
       imageAlt={place.name}
+      placeholderVariant={getPlaceholderVariant(place.type)}
       title={place.name}
       imageAspect="compact"
       badges={[

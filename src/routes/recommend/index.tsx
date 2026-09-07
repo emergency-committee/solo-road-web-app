@@ -36,6 +36,17 @@ const ALL_FILTERS = [
   { value: 'cafe', label: '카페' },
 ]
 
+function getPlaceholderVariant(type: string) {
+  const upper = type.toUpperCase()
+  return upper.includes('RESTAURANT') ||
+    upper.includes('CAFE') ||
+    upper.includes('식당') ||
+    upper.includes('카페') ||
+    upper.includes('맛집')
+    ? 'food'
+    : 'place'
+}
+
 export const Route = createFileRoute('/recommend/')({
   component: RecommendPage,
 })
@@ -197,6 +208,7 @@ function RecommendPage() {
                 key={place.placeId}
                 imageUrl={place.thumbnailUrl ?? null}
                 imageAlt={place.name}
+                placeholderVariant={getPlaceholderVariant(place.type)}
                 title={place.name}
                 subtitle={`${place.type} • ${formatDistanceMeters(place.distanceM)}`}
                 {...(place.rating != null && { rating: place.rating })}

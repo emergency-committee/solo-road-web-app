@@ -7,7 +7,8 @@ import {
   ShieldCheck,
   SlidersHorizontal,
 } from 'lucide-react'
-import { ProfileHeader, ProfileMenuList, ProfileStatsGrid } from '@/features/profile'
+import { useState } from 'react'
+import { ProfileEditDialog, ProfileHeader, ProfileMenuList, ProfileStatsGrid } from '@/features/profile'
 import { useLogout } from '@/features/auth'
 import { useSessionStore } from '@/shared/auth/session-store'
 import { useSavedPlaces } from '@/features/saved'
@@ -24,15 +25,18 @@ function MyPage() {
   const user = useSessionStore((state) => state.user)
   const savedPlacesQuery = useSavedPlaces(0, 1)
   const myReviewsQuery = useMyReviews(0, 1)
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false)
+  const nickname = user?.nickname ?? '솔로더 여행자'
 
   return (
     <main className="px-margin-mobile pt-lg mx-auto min-h-screen max-w-2xl pb-8">
       <h2 className="font-headline-xl text-headline-xl text-on-surface mb-xl mt-lg">마이페이지</h2>
 
       <ProfileHeader
-        name={user?.nickname ?? '솔로더 여행자'}
-        avatarUrl={user?.profileImageUrl ?? 'https://picsum.photos/seed/solo-road-profile/160/160'}
+        name={nickname}
         avatarAlt="프로필 사진"
+        onEdit={() => setProfileDialogOpen(true)}
+        {...(user?.profileImageUrl ? { avatarUrl: user.profileImageUrl } : {})}
       />
       <ProfileStatsGrid
         stats={[
@@ -99,6 +103,11 @@ function MyPage() {
           로그아웃
         </button>
       </div>
+      <ProfileEditDialog
+        open={profileDialogOpen}
+        onOpenChange={setProfileDialogOpen}
+        nickname={nickname}
+      />
     </main>
   )
 }

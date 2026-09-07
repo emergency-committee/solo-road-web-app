@@ -19,6 +19,7 @@ export function SoloFriendlySection({ places }: { places: HomePlaceCardData[] })
             key={place.id}
             imageUrl={place.imageUrl}
             imageAlt={place.imageAlt}
+            {...(place.placeholderVariant ? { placeholderVariant: place.placeholderVariant } : {})}
             title={place.title}
             subtitle={place.subtitle}
             badges={place.badges}

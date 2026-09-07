@@ -1,12 +1,16 @@
 import { useRouter } from '@tanstack/react-router'
 import { ArrowLeft, Bookmark, Share2 } from 'lucide-react'
 import { useState } from 'react'
-import { PlaceImagePlaceholder } from '@/shared/components/PlaceImagePlaceholder'
+import {
+  PlaceImagePlaceholder,
+  type PlaceImagePlaceholderVariant,
+} from '@/shared/components/PlaceImagePlaceholder'
 
 interface PlaceDetailHeroProps {
   /** 등록된 이미지가 없으면 null. */
   imageUrl: string | null
   imageAlt: string
+  placeholderVariant?: PlaceImagePlaceholderVariant
   saved?: boolean
   saveDisabled?: boolean
   onToggleSave?: () => void
@@ -15,6 +19,7 @@ interface PlaceDetailHeroProps {
 export function PlaceDetailHero({
   imageUrl,
   imageAlt,
+  placeholderVariant = 'place',
   saved: controlledSaved,
   saveDisabled,
   onToggleSave,
@@ -36,7 +41,7 @@ export function PlaceDetailHero({
       {imageUrl ? (
         <img src={imageUrl} alt={imageAlt} className="absolute inset-0 size-full object-cover" />
       ) : (
-        <PlaceImagePlaceholder className="absolute inset-0" />
+        <PlaceImagePlaceholder className="absolute inset-0" variant={placeholderVariant} />
       )}
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent" />
       <div className="px-margin-mobile py-lg absolute inset-x-0 top-0 z-10 flex items-center justify-between">

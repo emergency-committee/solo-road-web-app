@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, Copy, Heart, Map, Route as RouteIcon } from 'lucide-react'
+import { ArrowLeft, Copy, Heart, Map, Route as RouteIcon, UserRound } from 'lucide-react'
 import { useLayoutEffect, type ReactNode } from 'react'
 import {
   PublicCourseCard,
@@ -48,14 +48,17 @@ function TravelerProfilePage() {
         <>
           <section className="bg-primary text-on-primary px-margin-mobile py-6">
             <div className="flex items-center gap-4">
-              <img
-                src={
-                  profile?.profileImageUrl ??
-                  `https://picsum.photos/seed/traveler-${travelerId}/160/160`
-                }
-                alt={`${profile?.nickname ?? '여행자'} 프로필`}
-                className="size-20 rounded-full border-2 border-white/60 object-cover"
-              />
+              {profile?.profileImageUrl ? (
+                <img
+                  src={profile.profileImageUrl}
+                  alt={`${profile.nickname ?? '여행자'} 프로필`}
+                  className="size-20 rounded-full border-2 border-white/60 object-cover"
+                />
+              ) : (
+                <div className="bg-on-primary/15 text-on-primary grid size-20 shrink-0 place-items-center rounded-full border-2 border-white/60">
+                  <UserRound className="size-9" />
+                </div>
+              )}
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <h2 className="truncate text-2xl font-bold">{profile?.nickname ?? '여행자'}</h2>

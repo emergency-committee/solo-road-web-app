@@ -10,7 +10,7 @@ export interface CourseStop {
   memo?: string
   latitude?: number
   longitude?: number
-  imageUrl: string
+  imageUrl?: string
   imageAlt: string
   badges?: { label: string; tone: 'primary' | 'success' }[]
 }

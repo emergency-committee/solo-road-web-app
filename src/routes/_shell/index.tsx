@@ -38,6 +38,7 @@ function HomePage() {
       title: place.name,
       imageUrl: place.thumbnailUrl ?? null,
       imageAlt: place.name,
+      placeholderVariant: 'food',
       subtitle:
         place.distanceM !== undefined
           ? formatDistanceMeters(place.distanceM)
@@ -53,6 +54,7 @@ function HomePage() {
       title: place.name,
       imageUrl: place.thumbnailUrl ?? null,
       imageAlt: place.name,
+      placeholderVariant: 'place',
       subtitle: place.type,
       badges: [],
       hasImage: place.thumbnailUrl != null,

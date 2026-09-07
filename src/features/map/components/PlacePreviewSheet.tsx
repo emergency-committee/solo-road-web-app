@@ -45,7 +45,7 @@ export function PlacePreviewSheet({
                     className="size-full object-cover"
                   />
                 ) : (
-                  <PlaceImagePlaceholder />
+                  <PlaceImagePlaceholder variant={isDining ? 'food' : 'place'} />
                 )}
               </div>
               <div className="flex-1">

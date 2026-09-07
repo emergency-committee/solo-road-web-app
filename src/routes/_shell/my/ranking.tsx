@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, Copy, Heart, Map, Trophy } from 'lucide-react'
+import { ArrowLeft, Copy, Heart, Map, Trophy, UserRound } from 'lucide-react'
 import { useLayoutEffect } from 'react'
 import { useTravelerRanking } from '@/features/course'
 import { EmptyState } from '@/shared/components/EmptyState'
@@ -67,14 +67,17 @@ function TravelerRankingPage() {
               >
                 {traveler.ranking}
               </div>
-              <img
-                src={
-                  traveler.profileImageUrl ??
-                  `https://picsum.photos/seed/traveler-${traveler.userId.toString()}/120/120`
-                }
-                alt={`${traveler.nickname} 프로필`}
-                className="size-12 shrink-0 rounded-full object-cover"
-              />
+              {traveler.profileImageUrl ? (
+                <img
+                  src={traveler.profileImageUrl}
+                  alt={`${traveler.nickname} 프로필`}
+                  className="size-12 shrink-0 rounded-full object-cover"
+                />
+              ) : (
+                <div className="bg-primary/10 text-primary grid size-12 shrink-0 place-items-center rounded-full">
+                  <UserRound className="size-5" />
+                </div>
+              )}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <p className="truncate font-bold">{traveler.nickname}</p>

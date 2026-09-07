@@ -27,6 +27,7 @@ import {
 } from '@/features/course'
 import { usePlaces, type ApiPlaceSummary } from '@/features/place'
 import { Timeline, TimelineItem } from '@/shared/components/Timeline'
+import { PlaceImagePlaceholder } from '@/shared/components/PlaceImagePlaceholder'
 import { TopAppBar } from '@/shared/components/layout/TopAppBar'
 import { formatDurationMinutes } from '@/shared/lib/format'
 
@@ -100,9 +101,7 @@ function CourseEditPage() {
         ...(stop.memo !== undefined && { memo: stop.memo }),
         latitude: stop.latitude,
         longitude: stop.longitude,
-        imageUrl:
-          stop.thumbnailUrl ??
-          `https://picsum.photos/seed/place-${stop.placeId.toString()}/240/240`,
+        ...(stop.thumbnailUrl ? { imageUrl: stop.thumbnailUrl } : {}),
         imageAlt: stop.name,
         ...(stop.stayDurationMinutes !== undefined && {
           stayDurationMinutes: stop.stayDurationMinutes,
@@ -288,7 +287,7 @@ function SortableCourseStop({
         isLast={index === total - 1}
         durationLabel={stop.durationLabel}
         title={stop.title}
-        imageUrl={stop.imageUrl}
+        {...(stop.imageUrl ? { imageUrl: stop.imageUrl } : {})}
         imageAlt={stop.imageAlt}
         editable
         onEdit={() => setEditingMemo((open) => !open)}
@@ -485,14 +484,17 @@ function PlaceSearchResults({
               const added = existingPlaceIds.has(place.placeId)
               return (
                 <li key={place.placeId} className="gap-sm flex items-center py-3">
-                  <img
-                    src={
-                      place.thumbnailUrl ??
-                      `https://picsum.photos/seed/place-${place.placeId.toString()}/160/160`
-                    }
-                    alt=""
-                    className="size-12 shrink-0 rounded-lg object-cover"
-                  />
+                  <div className="size-12 shrink-0 overflow-hidden rounded-lg">
+                    {place.thumbnailUrl ? (
+                      <img src={place.thumbnailUrl} alt="" className="size-full object-cover" />
+                    ) : (
+                      <PlaceImagePlaceholder
+                        variant={
+                          place.type === 'RESTAURANT' || place.type === 'CAFE' ? 'food' : 'place'
+                        }
+                      />
+                    )}
+                  </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-semibold">{place.name}</p>
                     <p className="text-body-sm text-on-surface-variant truncate">{place.type}</p>
@@ -526,8 +528,7 @@ function toCourseStop(place: ApiPlaceSummary): CourseStop {
     subtitle: place.type,
     latitude: place.latitude,
     longitude: place.longitude,
-    imageUrl:
-      place.thumbnailUrl ?? `https://picsum.photos/seed/place-${place.placeId.toString()}/240/240`,
+    ...(place.thumbnailUrl ? { imageUrl: place.thumbnailUrl } : {}),
     imageAlt: place.name,
   }
 }
