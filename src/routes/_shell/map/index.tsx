@@ -169,6 +169,7 @@ function MapPage() {
   const [selectedMarker, setSelectedMarker] = useState<MapMarkerData | null>(null)
   const [ratingMode, setRatingMode] = useState<MapRatingMode>('solo')
   const [center, setCenter] = useState(DEFAULT_MAP_CENTER)
+  const [bbox, setBbox] = useState<string | undefined>(undefined)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const debouncedKeyword = useDebouncedValue(keyword.trim(), 300)
 
@@ -197,11 +198,17 @@ function MapPage() {
     setSelectedMarker(null)
   }
 
+  const filterParams = toPlacesParams(filterValue[0] ?? 'all', mapMode)
   const placesQuery = usePlaces({
-    ...toPlacesParams(filterValue[0] ?? 'all', mapMode),
+    ...filterParams,
     ...(debouncedKeyword && { keyword: debouncedKeyword }),
     lat: center.lat,
     lng: center.lng,
+    // '혼밥/혼행 추천' 칩은 중심 기준 고정 반경(radius) 추천이라 화면 영역과 무관하게 유지한다.
+    // 그 외에는 실제로 지도에 보이는 영역(bbox) 기준으로 불러와, 축소하면 넓게 흩어져 보이고
+    // 확대하면 그 범위만큼만 보이게 한다.
+    ...(filterParams.radius == null && bbox && { bbox }),
+    size: 60,
   })
   const savedPlacesQuery = useSavedPlaces(0, 500)
   const savedPlaceIds = useMemo(
@@ -273,6 +280,7 @@ function MapPage() {
         selectedId={selectedMarker?.id ?? null}
         onSelectMarker={setSelectedMarker}
         onCenterChanged={setCenter}
+        onBoundsChanged={setBbox}
         className="absolute inset-0 z-0"
       />
 
