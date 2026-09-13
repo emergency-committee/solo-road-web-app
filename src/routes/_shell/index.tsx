@@ -14,8 +14,8 @@ export const Route = createFileRoute('/_shell/')({
 })
 
 function HomePage() {
-  const { data } = usePlaceRecommendations()
-  const { label: regionLabel, status: regionStatus } = useCurrentRegionLabel()
+  const { label: regionLabel, status: regionStatus, coords } = useCurrentRegionLabel()
+  const { data } = usePlaceRecommendations(coords ? { lat: coords.lat, lng: coords.lng } : {})
   const navigate = useNavigate()
   const [keyword, setKeyword] = useState('')
   const [isSearchFocused, setIsSearchFocused] = useState(false)
