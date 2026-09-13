@@ -1,4 +1,5 @@
 export { useGenerateCourse } from './hooks/use-generate-course'
+export { useCreateCourse } from './hooks/use-create-course'
 export { useCourseRecommendations } from './hooks/use-course-recommendations'
 export { useMyCourses } from './hooks/use-my-courses'
 export { useCourseDetail } from './hooks/use-course-detail'
@@ -11,6 +12,7 @@ export {
   useCourseTags,
   useCreateCourseReview,
   useEquipTitle,
+  useLikedCourses,
   useMyGamification,
   usePublicCourses,
   usePublishCourse,
@@ -24,6 +26,8 @@ export type {
   CourseDetailResponse,
   CourseDetailStop,
   CourseRecommendationItem,
+  CreateCourseRequest,
+  CreateCourseResponse,
   GenerateCourseRequest,
   GenerateCourseResponse,
   MyCourseItem,
@@ -38,7 +42,7 @@ export type {
 } from './types/course.types'
 
 export { CourseCreateForm } from './components/CourseCreateForm'
-export type { CourseCreateFormData } from './components/CourseCreateForm'
+export type { CourseCreateFormData, ManualCourseStopInput } from './components/CourseCreateForm'
 export { CourseDateRangeCalendar } from './components/CourseDateRangeCalendar'
 export { CourseLegButton } from './components/CourseLegButton'
 export { CourseOverviewMap } from './components/CourseOverviewMap'

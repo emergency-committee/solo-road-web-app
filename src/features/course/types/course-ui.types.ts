@@ -7,6 +7,9 @@ export interface CourseStop {
   durationLabel: string
   title: string
   subtitle?: string
+  type?: string
+  address?: string
+  kakaoPlaceId?: string
   memo?: string
   latitude?: number
   longitude?: number

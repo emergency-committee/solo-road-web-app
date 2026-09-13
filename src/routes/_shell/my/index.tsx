@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
   Bookmark,
   Database,
+  Heart,
   MessageSquare,
   Route as RouteIcon,
   ShieldCheck,
@@ -58,6 +59,11 @@ function MyPage() {
             icon: <RouteIcon className="size-5" />,
             label: '저장한 코스',
             onClick: () => navigate({ to: '/my/saved-courses' }),
+          },
+          {
+            icon: <Heart className="size-5" />,
+            label: '좋아요한 코스',
+            onClick: () => navigate({ to: '/my/liked-courses' }),
           },
           {
             icon: <MessageSquare className="size-5" />,

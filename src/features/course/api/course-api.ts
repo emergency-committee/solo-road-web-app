@@ -5,6 +5,8 @@ import type { PageResponse } from '@/shared/api/types'
 import type {
   CourseDetailResponse,
   CopyCourseResponse,
+  CreateCourseRequest,
+  CreateCourseResponse,
   CourseLikeResponse,
   CourseReview,
   CourseTag,
@@ -49,6 +51,13 @@ function isCommunityDemoCourse(courseId: number) {
 
 export function generateCourse(req: GenerateCourseRequest) {
   return apiRequest<GenerateCourseResponse>(`${API_PREFIX}/courses/generate`, {
+    method: 'POST',
+    body: JSON.stringify(req),
+  })
+}
+
+export function createCourse(req: CreateCourseRequest) {
+  return apiRequest<CreateCourseResponse>(`${API_PREFIX}/courses`, {
     method: 'POST',
     body: JSON.stringify(req),
   })
@@ -163,6 +172,23 @@ export function getPublicCourses(params: DiscoverCoursesParams = {}) {
   return apiRequest<PageResponse<PublicCourseItem>>(`${API_PREFIX}/courses/discover${qs}`)
 }
 
+export function getLikedCourses(page = 0, size = 20) {
+  if (isCommunityMockEnabled()) {
+    const filtered = mockCommunityPublicCourses.filter(
+      (course) => mockCommunityCourseDetails[course.courseId]?.liked === true,
+    )
+    return Promise.resolve({
+      content: filtered.slice(page * size, page * size + size),
+      page,
+      size,
+      totalElements: filtered.length,
+      hasNext: (page + 1) * size < filtered.length,
+    })
+  }
+  const qs = buildQueryString({ page, size })
+  return apiRequest<PageResponse<PublicCourseItem>>(`${API_PREFIX}/users/me/liked-courses${qs}`)
+}
+
 export function getTravelerPublicCourses(travelerId: number, page = 0, size = 20) {
   if (isCommunityMockEnabled() || mockTravelerProfiles[travelerId] !== undefined) {
     const filtered = mockCommunityPublicCourses.filter((course) => course.authorId === travelerId)
@@ -199,6 +225,8 @@ export function publishCourse(courseId: number, req: PublishCourseRequest) {
     else delete mockCourse.authorComment
     mockCourse.tags = mockCommunityTags.filter((tag) => req.tagIds.includes(tag.tagId))
     mockCourse.publishedAt = new Date().toISOString()
+    const myCourse = mockCopiedCourses.find((course) => course.courseId === courseId)
+    if (myCourse) myCourse.visibility = 'PUBLIC'
     return Promise.resolve(mockCourse)
   }
   return apiRequest<CourseDetailResponse>(`${API_PREFIX}/courses/${courseId.toString()}/publish`, {
@@ -211,6 +239,8 @@ export function unpublishCourse(courseId: number) {
   const mockCourse = mockCommunityCourseDetails[courseId]
   if ((isCommunityMockEnabled() || isCommunityDemoCourse(courseId)) && mockCourse) {
     mockCourse.visibility = 'PRIVATE'
+    const myCourse = mockCopiedCourses.find((course) => course.courseId === courseId)
+    if (myCourse) myCourse.visibility = 'PRIVATE'
     return Promise.resolve()
   }
   return apiRequest<void>(`${API_PREFIX}/courses/${courseId.toString()}/publish`, {
@@ -261,7 +291,11 @@ export function copyCourse(courseId: number) {
         copiedFromCourseId: source.courseId,
       })
     }
-    return Promise.resolve({ courseId: copiedCourseId, copiedFromCourseId: courseId, title: `${source.title} 나의 일정` })
+    return Promise.resolve({
+      courseId: copiedCourseId,
+      copiedFromCourseId: courseId,
+      title: `${source.title} 나의 일정`,
+    })
   }
   return apiRequest<CopyCourseResponse>(`${API_PREFIX}/courses/${courseId.toString()}/copy`, {
     method: 'POST',

@@ -21,6 +21,29 @@ export interface GenerateCourseResponse {
   stops: GeneratedStop[]
 }
 
+export interface CreateCourseRequest {
+  title: string
+  region?: string
+  startDate?: string
+  endDate?: string
+  startPointName?: string
+  startLatitude?: number
+  startLongitude?: number
+  preferredMood?: string
+  safetyPriority?: boolean
+  copiedFromCourseId?: number
+  placeIds?: number[]
+  stops?: CourseStopInput[]
+}
+
+export interface CreateCourseResponse {
+  courseId: number
+  title: string
+  totalDurationMinutes: number
+  totalDistanceM: number
+  stops: CourseStopResponse[]
+}
+
 export interface CourseStopResponse {
   courseStopId: number
   stopOrder: number

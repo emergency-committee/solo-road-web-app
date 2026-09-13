@@ -1,11 +1,19 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { CalendarDays, ChevronRight, Flame, PlusCircle, Route as RouteIcon } from 'lucide-react'
+import {
+  CalendarDays,
+  ChevronRight,
+  Flame,
+  Heart,
+  PlusCircle,
+  Route as RouteIcon,
+} from 'lucide-react'
 import {
   PublicCourseCard,
   formatCourseDateRange,
   mockSavedCourseRows,
   resolveFeaturedCourses,
   useCourseRecommendations,
+  useLikedCourses,
   useMyCourses,
   usePublicCourses,
 } from '@/features/course'
@@ -20,11 +28,13 @@ function CoursePage() {
   const recommendationsQuery = useCourseRecommendations()
   const myCoursesQuery = useMyCourses()
   const hotCoursesQuery = usePublicCourses({ sort: 'HOT', size: 2 })
+  const likedCoursesQuery = useLikedCourses()
 
   const recommendations = recommendationsQuery.data?.content ?? []
   const myCourses = myCoursesQuery.data?.content ?? []
   const liveHotCourses = hotCoursesQuery.data?.content ?? []
   const hotCourses = resolveFeaturedCourses(liveHotCourses)
+  const likedCourses = likedCoursesQuery.data?.content ?? []
 
   return (
     <main className="space-y-xl px-margin-mobile pt-lg mx-auto min-h-screen max-w-4xl pb-8">
@@ -69,6 +79,27 @@ function CoursePage() {
           ))}
         </div>
       </section>
+
+      {likedCourses.length > 0 && (
+        <section className="space-y-md">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Heart className="size-5 text-[#e05b64]" fill="currentColor" />
+              <h3 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">
+                좋아요한 코스
+              </h3>
+            </div>
+            <Link to="/my/liked-courses" className="font-label-md text-label-md text-primary">
+              전체보기
+            </Link>
+          </div>
+          <div className="space-y-2">
+            {likedCourses.slice(0, 2).map((course) => (
+              <PublicCourseCard key={course.courseId} course={course} variant="compact" />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="space-y-md">
         <div className="flex items-center justify-between">

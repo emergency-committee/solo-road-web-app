@@ -5,6 +5,7 @@ import {
   equipTitle,
   getCourseReviews,
   getCourseTags,
+  getLikedCourses,
   getMyGamification,
   getPublicCourses,
   getTravelerProfile,
@@ -21,6 +22,13 @@ export function usePublicCourses(params: DiscoverCoursesParams = {}) {
   return useQuery({
     queryKey: ['courses', 'public', params],
     queryFn: () => getPublicCourses(params),
+  })
+}
+
+export function useLikedCourses() {
+  return useQuery({
+    queryKey: ['courses', 'liked'],
+    queryFn: () => getLikedCourses(),
   })
 }
 
@@ -54,6 +62,7 @@ export function useToggleCourseLike(courseId: number) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['courses', 'detail', courseId] })
       void queryClient.invalidateQueries({ queryKey: ['courses', 'public'] })
+      void queryClient.invalidateQueries({ queryKey: ['courses', 'liked'] })
     },
   })
 }
