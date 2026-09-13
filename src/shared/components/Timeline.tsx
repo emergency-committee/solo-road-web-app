@@ -72,7 +72,7 @@ export function TimelineItem({
           />
         )}
       </div>
-      <div className="pb-lg flex-1">
+      <div className="pb-lg min-w-0 flex-1">
         {time && (
           <div className="mb-xs flex items-center gap-2">
             <span className="font-label-md text-label-md bg-primary-fixed text-primary rounded px-2 py-0.5">
@@ -93,11 +93,11 @@ export function TimelineItem({
             <div className="p-md flex min-w-0 flex-1 justify-between gap-2">
               <div className="flex min-w-0 flex-1 flex-col justify-between">
                 <div className="min-w-0">
-                  <h4 className="font-headline-lg-mobile text-on-surface truncate text-[16px] leading-tight font-semibold">
+                  <h4 className="font-headline-lg-mobile text-on-surface line-clamp-2 text-[16px] leading-tight font-semibold break-keep [overflow-wrap:anywhere]">
                     {title}
                   </h4>
                   {subtitle && (
-                    <p className="text-body-sm text-on-surface-variant line-clamp-2 leading-snug">
+                    <p className="text-body-sm text-on-surface-variant line-clamp-2 leading-snug break-keep [overflow-wrap:anywhere]">
                       {subtitle}
                     </p>
                   )}

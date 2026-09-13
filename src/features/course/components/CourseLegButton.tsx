@@ -26,11 +26,11 @@ export function CourseLegButton({
       </span>
       <span className="min-w-0 flex-1">
         <span className="text-on-surface-variant block text-[10px] font-semibold">{label}</span>
-        <span className="text-on-surface block truncate text-xs font-bold">
+        <span className="text-on-surface line-clamp-2 text-xs leading-snug font-bold break-keep [overflow-wrap:anywhere]">
           {originName} → {destinationName}
         </span>
         {description && (
-          <span className="text-on-surface-variant mt-0.5 block truncate text-[10px]">
+          <span className="text-on-surface-variant mt-0.5 line-clamp-2 text-[10px] leading-snug break-keep">
             {description}
           </span>
         )}
