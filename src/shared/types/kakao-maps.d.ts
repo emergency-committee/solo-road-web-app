@@ -35,12 +35,16 @@ declare global {
         paddingBottom?: number,
         paddingLeft?: number,
       ): void
+      /** 현재 화면에 보이는 지도 영역(뷰포트)의 좌표 범위. */
+      getBounds(): LatLngBounds
       relayout(): void
     }
 
     class LatLngBounds {
       constructor()
       extend(latlng: LatLng): void
+      getSouthWest(): LatLng
+      getNorthEast(): LatLng
     }
 
     interface PolylineOptions {
@@ -118,12 +122,12 @@ declare global {
     namespace event {
       function addListener(
         target: Map,
-        type: 'idle' | 'dragend' | 'zoom_changed' | 'center_changed',
+        type: 'idle' | 'dragend' | 'zoom_changed' | 'center_changed' | 'bounds_changed',
         handler: () => void,
       ): void
       function removeListener(
         target: Map,
-        type: 'idle' | 'dragend' | 'zoom_changed' | 'center_changed',
+        type: 'idle' | 'dragend' | 'zoom_changed' | 'center_changed' | 'bounds_changed',
         handler: () => void,
       ): void
     }

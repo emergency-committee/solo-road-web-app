@@ -69,6 +69,7 @@ function PlaceDetailPage() {
       <PlaceDetailHero
         imageUrl={null}
         imageAlt={place.name}
+        placeholderVariant={isDining ? 'food' : 'place'}
         saved={saved}
         saveDisabled={toggleSave.isPending}
         onToggleSave={() => toggleSave.mutate(saved)}

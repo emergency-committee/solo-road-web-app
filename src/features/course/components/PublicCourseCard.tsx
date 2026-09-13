@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Clock3, Copy, Heart, MapPin, MessageCircle } from 'lucide-react'
+import { Clock3, Copy, Heart, MapPin, MessageCircle, Route } from 'lucide-react'
 import type { PublicCourseItem } from '../types/course.types'
 import { paceLabel, soloImpressionLabel } from '../lib/course-community-labels'
 import { formatDurationMinutes } from '@/shared/lib/format'
@@ -21,24 +21,12 @@ export function PublicCourseCard({
       <Link
         to="/course/$courseId"
         params={{ courseId: course.courseId.toString() }}
-        className="border-outline-variant/30 bg-surface flex min-h-25 overflow-hidden rounded-lg border shadow-sm transition-transform active:scale-[0.99]"
+        className="border-outline-variant/30 bg-surface flex min-h-25 gap-3 rounded-lg border p-3 shadow-sm transition-transform active:scale-[0.99]"
       >
-        <div className="bg-surface-container-high relative w-26 shrink-0 overflow-hidden">
-          <img
-            src={
-              course.thumbnailUrl ??
-              `https://picsum.photos/seed/public-course-${course.courseId.toString()}/240/240`
-            }
-            alt={course.title}
-            className="size-full object-cover"
-          />
-          {rank !== undefined && (
-            <span className="bg-primary text-on-primary absolute top-2 left-2 grid size-6 place-items-center rounded-full text-xs font-bold shadow-sm">
-              {rank}
-            </span>
-          )}
+        <div className="bg-primary/10 text-primary grid size-9 shrink-0 place-items-center rounded-full text-xs font-bold">
+          {rank ?? <Route className="size-4" />}
         </div>
-        <div className="flex min-w-0 flex-1 flex-col justify-between p-3">
+        <div className="flex min-w-0 flex-1 flex-col justify-between">
           <div>
             <h4 className="text-on-surface line-clamp-2 text-sm leading-snug font-bold break-keep">
               {course.title}
@@ -69,27 +57,17 @@ export function PublicCourseCard({
     <Link
       to="/course/$courseId"
       params={{ courseId: course.courseId.toString() }}
-      className="border-outline-variant/30 bg-surface block overflow-hidden rounded-lg border shadow-sm transition-transform active:scale-[0.99]"
+      className="border-outline-variant/30 bg-surface block rounded-lg border p-4 shadow-sm transition-transform active:scale-[0.99]"
     >
-      <div className="bg-surface-container-high relative aspect-[16/8] overflow-hidden">
-        <img
-          src={
-            course.thumbnailUrl ??
-            `https://picsum.photos/seed/public-course-${course.courseId.toString()}/720/360`
-          }
-          alt={course.title}
-          className="size-full object-cover"
-        />
-        {rank !== undefined && (
-          <span className="bg-primary text-on-primary absolute top-3 left-3 grid size-8 place-items-center rounded-full text-sm font-bold shadow-md">
-            {rank}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <span className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-bold">
+            {rank !== undefined ? `${rank}위` : '공개 코스'}
           </span>
-        )}
-        <span className="bg-surface/90 text-primary absolute right-3 bottom-3 rounded-full px-3 py-1 text-xs font-semibold backdrop-blur-sm">
-          {soloImpressionLabel(course.soloImpression) ?? '혼행 코스'}
-        </span>
-      </div>
-      <div className="space-y-3 p-4">
+          <span className="bg-surface-container text-on-surface-variant rounded-md px-2 py-1 text-xs font-semibold">
+            {soloImpressionLabel(course.soloImpression) ?? '혼행 코스'}
+          </span>
+        </div>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h4 className="text-on-surface line-clamp-2 text-lg leading-snug font-bold break-keep">

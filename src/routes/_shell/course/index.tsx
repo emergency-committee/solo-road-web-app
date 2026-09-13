@@ -9,7 +9,6 @@ import {
   useMyCourses,
   usePublicCourses,
 } from '@/features/course'
-import { PlaceCard } from '@/shared/components/PlaceCard'
 import { SectionHeader } from '@/shared/components/SectionHeader'
 import { formatDurationMinutes } from '@/shared/lib/format'
 
@@ -107,11 +106,9 @@ function CoursePage() {
                 params={{ courseId: course.courseId.toString() }}
                 className="border-outline-variant/30 bg-surface flex min-h-20 items-center gap-3 rounded-lg border p-3 shadow-sm transition-transform active:scale-[0.99]"
               >
-                <img
-                  src={`https://picsum.photos/seed/course-${course.courseId.toString()}/160/160`}
-                  alt={course.title}
-                  className="size-14 shrink-0 rounded-md object-cover"
-                />
+                <div className="bg-primary/10 text-primary grid size-10 shrink-0 place-items-center rounded-full">
+                  <RouteIcon className="size-5" />
+                </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className="truncate font-bold">{course.title}</p>
@@ -152,18 +149,38 @@ function CoursePage() {
         ) : (
           <div className="no-scrollbar -mx-margin-mobile gap-md px-margin-mobile pb-xs flex overflow-x-auto">
             {recommendations.map((course) => (
-              <PlaceCard
+              <Link
                 key={course.courseId}
-                imageUrl={
-                  course.thumbnailUrl ??
-                  `https://picsum.photos/seed/course-${course.courseId.toString()}/480/270`
-                }
-                imageAlt={course.title}
-                title={course.title}
-                subtitle={`${course.region ?? '지역 정보 없음'} • ${formatDurationMinutes(course.totalDurationMinutes)}`}
-                badges={course.badges.map((label) => ({ label, tone: 'primary' as const }))}
-                className="w-70 shrink-0"
-              />
+                to="/course/$courseId"
+                params={{ courseId: course.courseId.toString() }}
+                className="border-outline-variant/30 bg-surface w-70 shrink-0 rounded-lg border p-4 shadow-sm transition-transform active:scale-[0.99]"
+              >
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  <span className="bg-primary/10 text-primary rounded-md px-2 py-1 text-xs font-bold">
+                    추천 코스
+                  </span>
+                  <ChevronRight className="text-on-surface-variant size-4 shrink-0" />
+                </div>
+                <h4 className="text-on-surface line-clamp-2 text-base leading-snug font-bold break-keep">
+                  {course.title}
+                </h4>
+                <p className="text-on-surface-variant mt-2 text-xs">
+                  {course.region ?? '지역 정보 없음'} ·{' '}
+                  {formatDurationMinutes(course.totalDurationMinutes)}
+                </p>
+                {course.badges.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {course.badges.slice(0, 2).map((label) => (
+                      <span
+                        key={label}
+                        className="bg-surface-container text-on-surface-variant rounded-md px-2 py-1 text-xs"
+                      >
+                        {label}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </Link>
             ))}
           </div>
         )}
@@ -177,16 +194,12 @@ function CoursePage() {
               key={course.id}
               to="/course/$courseId"
               params={{ courseId: course.id }}
-              className="group border-outline-variant/20 hover:bg-surface-container-high bg-surface-container flex min-h-28 overflow-hidden rounded-xl border transition-colors"
+              className="group border-outline-variant/20 hover:bg-surface-container-high bg-surface-container flex min-h-24 rounded-xl border p-4 transition-colors"
             >
-              <div className="w-28 shrink-0">
-                <img
-                  src={course.imageUrl}
-                  alt={course.imageAlt}
-                  className="size-full object-cover"
-                />
+              <div className="bg-primary/10 text-primary mr-3 grid size-10 shrink-0 place-items-center rounded-full">
+                <RouteIcon className="size-5" />
               </div>
-              <div className="p-md min-w-0 flex-1">
+              <div className="min-w-0 flex-1">
                 <h6 className="font-label-md text-label-md mb-xs text-primary tracking-widest uppercase">
                   Safety Demo
                 </h6>

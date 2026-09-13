@@ -555,9 +555,7 @@ export function createMockPlace(request: CreatePlaceRequest): CreatePlaceRespons
     latitude: request.latitude,
     longitude: request.longitude,
     soloFriendlyBadge: request.soloFriendlyBadge ?? true,
-    thumbnailUrl:
-      request.thumbnailUrl ||
-      `https://picsum.photos/seed/user-place-${newPlaceId.toString()}/480/480`,
+    ...(request.thumbnailUrl ? { thumbnailUrl: request.thumbnailUrl } : {}),
     distanceM: 200,
     isLiked: false,
   }

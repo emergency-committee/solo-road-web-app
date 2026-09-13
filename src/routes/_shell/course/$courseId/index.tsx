@@ -12,7 +12,6 @@ import {
   formatTripLength,
   paceLabel,
   soloImpressionLabel,
-  useCopyCourse,
   useCourseDetail,
   useCourseEditStore,
   useToggleCourseLike,
@@ -39,7 +38,6 @@ function CourseDetailPage() {
   const { data: course, isLoading, isError } = useCourseDetail(courseIdNumber)
   const [publishOpen, setPublishOpen] = useState(false)
   const toggleLike = useToggleCourseLike(courseIdNumber)
-  const copyCourse = useCopyCourse(courseIdNumber)
   const unpublish = useUnpublishCourse(courseIdNumber)
 
   const overviewStops = useMemo(
@@ -106,25 +104,9 @@ function CourseDetailPage() {
         }}
       />
 
-      <main className="pt-14">
-        <section className="bg-surface-container-high relative h-[210px] w-full overflow-hidden">
-          {course.stops[0] ? (
-            <img
-              src={
-                course.stops[0].thumbnailUrl ??
-                `https://picsum.photos/seed/course-${course.courseId.toString()}/720/420`
-              }
-              alt={course.title}
-              className="size-full object-cover"
-            />
-          ) : (
-            <MapPin className="text-primary/40 absolute inset-0 m-auto size-12" />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
-        </section>
-
-        <div className="px-margin-mobile relative z-10 -mt-6">
-          <div className="glass-effect p-md rounded-lg shadow-xl">
+      <main className="px-margin-mobile space-y-lg pt-20">
+        <section>
+          <div className="bg-surface p-md rounded-lg border border-outline-variant/30 shadow-sm">
             <div className="mb-xs flex items-start justify-between">
               <div className="min-w-0 pr-3">
                 <h2 className="font-headline-lg text-headline-lg text-on-surface mb-1 break-keep">
@@ -172,13 +154,13 @@ function CourseDetailPage() {
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
         {(course.description ||
           course.soloImpression ||
           course.paceType ||
           course.tags.length > 0) && (
-          <section className="mt-lg px-margin-mobile space-y-4">
+          <section className="space-y-4">
             {course.copiedFromCourseId && (
               <Link
                 to="/course/$courseId"
@@ -233,7 +215,7 @@ function CourseDetailPage() {
         )}
 
         {course.owner && (
-          <section className="mt-lg px-margin-mobile">
+          <section>
             <div className="bg-surface-container-low flex items-center justify-between gap-3 rounded-lg p-4">
               <div>
                 <p className="font-bold">
@@ -268,7 +250,7 @@ function CourseDetailPage() {
         )}
 
         {overviewStops.length > 0 && (
-          <section className="mt-lg px-margin-mobile">
+          <section>
             <h3 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-md">
               코스 한눈에 보기
             </h3>
@@ -278,7 +260,7 @@ function CourseDetailPage() {
           </section>
         )}
 
-        <section className="mt-lg px-margin-mobile">
+        <section>
           <h3 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-md">
             일정 타임라인
           </h3>
@@ -298,10 +280,7 @@ function CourseDetailPage() {
                       index={index + 1}
                       isLast={index === dayStops.length - 1}
                       title={stop.name}
-                      imageUrl={
-                        stop.thumbnailUrl ??
-                        `https://picsum.photos/seed/place-${stop.placeId.toString()}/240/240`
-                      }
+                      {...(stop.thumbnailUrl ? { imageUrl: stop.thumbnailUrl } : {})}
                       imageAlt={stop.name}
                       {...(stop.address && { subtitle: stop.address })}
                       {...(stop.memo && { note: stop.memo })}
@@ -317,7 +296,7 @@ function CourseDetailPage() {
         </section>
 
         {course.visibility === 'PUBLIC' && (
-          <div className="px-margin-mobile">
+          <div>
             <CourseReviewsSection courseId={course.courseId} owner={course.owner} />
           </div>
         )}
@@ -353,23 +332,15 @@ function CourseDetailPage() {
             >
               <Heart className={`size-5 ${course.liked ? 'fill-current' : ''}`} />
             </button>
-            <button
-              type="button"
-              disabled={copyCourse.isPending}
-              onClick={() =>
-                copyCourse.mutate(undefined, {
-                  onSuccess: (copied) =>
-                    void router.navigate({
-                      to: '/course/$courseId/edit',
-                      params: { courseId: copied.courseId.toString() },
-                    }),
-                })
-              }
-              className="font-headline-lg-mobile text-headline-lg-mobile bg-primary text-on-primary flex h-12 flex-1 items-center justify-center gap-2 rounded-xl font-bold shadow-lg disabled:opacity-50"
+            <Link
+              to="/course/$courseId/edit"
+              params={{ courseId }}
+              search={{ copy: true }}
+              className="font-headline-lg-mobile text-headline-lg-mobile bg-primary text-on-primary flex h-12 flex-1 items-center justify-center gap-2 rounded-xl font-bold shadow-lg"
             >
               <Copy className="size-5" />
-              {copyCourse.isPending ? '가져오는 중...' : '내 일정으로 가져오기'}
-            </button>
+              내 일정으로 가져오기
+            </Link>
           </>
         )}
       </CourseBottomActionBar>
@@ -393,7 +364,7 @@ function DemoCourseDetailPage({ course, onBack }: { course: CourseDetail; onBack
                 subtitle: stop.subtitle ?? '',
                 latitude: stop.latitude,
                 longitude: stop.longitude,
-                imageUrl: stop.imageUrl,
+                imageUrl: stop.imageUrl ?? '',
                 imageAlt: stop.imageAlt,
                 ...(stop.badges !== undefined && { badges: stop.badges }),
               },

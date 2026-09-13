@@ -16,9 +16,10 @@ interface KakaoMapProps {
   center: { lat: number; lng: number }
   level?: number
   /**
-   * 지도를 이 레벨보다 더 축소할 수 없게 한다(기본값: 8 ≈ 반경 2km 안팎).
-   * 장소 조회가 중심 좌표 기준 근처 결과 위주라, 제한 없이 축소하면
-   * 화면엔 넓은 지역이 보여도 마커는 중심 근처 몇 개만 몰려 찍혀 텅 빈 지도처럼 보인다.
+   * 지도를 이 레벨보다 더 축소할 수 없게 한다(기본값: 12 ≈ 도시 단위 광역).
+   * 장소 조회를 화면에 보이는 영역(bbox) 기준으로 하므로 축소해도 그 영역 안의 결과가
+   * 그대로 넓게 흩어져 보이지만, 끝없이 축소하면(전국 단위) 응답에 담긴 결과 수/마커 렌더링
+   * 비용이 과하게 커질 수 있어 도시 광역 수준에서 상한을 둔다.
    */
   maxLevel?: number
   markers?: MapMarkerData[]
@@ -27,7 +28,24 @@ interface KakaoMapProps {
   onSelectMarker?: (marker: MapMarkerData) => void
   /** 사용자가 지도를 드래그/확대해 중심이 바뀔 때마다 호출된다. 새 위치 기준으로 마커를 다시 불러오는 데 쓴다. */
   onCenterChanged?: (center: { lat: number; lng: number }) => void
+  /**
+   * 화면에 보이는 지도 영역(bbox)이 바뀔 때마다 호출된다("minLng,minLat,maxLng,maxLat" 형식,
+   * 백엔드 `/places?bbox=` 파라미터에 그대로 넘길 수 있는 형태). 드래그/확대 중에도 짧은 디바운스만
+   * 거쳐 계속 호출되므로, 드래그가 끝나길 기다리지 않고 잠깐 멈추기만 해도 그 영역 기준으로
+   * 다시 불러올 수 있다.
+   */
+  onBoundsChanged?: (bbox: string) => void
   className?: string
+}
+
+/** 드래그/줌 도중 bounds_changed 가 과도하게 자주 불리는 것을 막는 디바운스 간격(ms). */
+const BOUNDS_CHANGE_DEBOUNCE_MS = 350
+
+function boundsToBbox(map: kakao.maps.Map): string {
+  const bounds = map.getBounds()
+  const sw = bounds.getSouthWest()
+  const ne = bounds.getNorthEast()
+  return `${sw.getLng().toString()},${sw.getLat().toString()},${ne.getLng().toString()},${ne.getLat().toString()}`
 }
 
 /**
@@ -38,12 +56,13 @@ interface KakaoMapProps {
 export function KakaoMap({
   center,
   level = 4,
-  maxLevel = 8,
+  maxLevel = 12,
   markers = [],
   ratingMode = 'solo',
   selectedId = null,
   onSelectMarker,
   onCenterChanged,
+  onBoundsChanged,
   className,
 }: KakaoMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -51,16 +70,22 @@ export function KakaoMap({
   const currentLocationOverlayRef = useRef<kakao.maps.CustomOverlay | null>(null)
   const overlaysRef = useRef<Map<string, OverlayEntry>>(new Map())
   const onCenterChangedRef = useRef(onCenterChanged)
+  const onBoundsChangedRef = useRef(onBoundsChanged)
   // idle에서 올라온 center 변경을 부모가 그대로 되돌려줄 때, 아래 panTo 이펙트가
   // 다시 같은 위치로 panTo를 걸어 idle을 재발생시키는 루프를 막기 위한 플래그.
   const skipNextPanRef = useRef(false)
+  const boundsDebounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState('')
 
-  // 최초 1회만 붙는 idle 리스너가 항상 최신 콜백을 부르도록 ref로 동기화한다.
+  // 최초 1회만 붙는 idle/bounds_changed 리스너가 항상 최신 콜백을 부르도록 ref로 동기화한다.
   useEffect(() => {
     onCenterChangedRef.current = onCenterChanged
   }, [onCenterChanged])
+
+  useEffect(() => {
+    onBoundsChangedRef.current = onBoundsChanged
+  }, [onBoundsChanged])
 
   // 지도 최초 1회 생성
   useEffect(() => {
@@ -90,6 +115,11 @@ export function KakaoMap({
 
         // 드래그/확대 등으로 지도가 움직임을 멈추면(idle) 새 중심 기준으로 마커를 다시 불러오게 알린다.
         kakaoSdk.maps.event.addListener(map, 'idle', handleIdle)
+        // bounds_changed는 드래그/줌 도중에도 계속 발생하므로, 드롭을 기다리지 않고
+        // 잠깐 멈추기만 해도(디바운스 간격만큼) 그 시점 화면 영역 기준으로 다시 불러올 수 있다.
+        kakaoSdk.maps.event.addListener(map, 'bounds_changed', handleBoundsChanged)
+        // 최초 렌더 시점의 화면 영역도 바로 알려준다.
+        onBoundsChangedRef.current?.(boundsToBbox(map))
 
         setStatus('ready')
       })
@@ -106,10 +136,29 @@ export function KakaoMap({
       onCenterChangedRef.current?.({ lat: position.getLat(), lng: position.getLng() })
     }
 
+    function handleBoundsChanged() {
+      const map = mapRef.current
+      if (!map) return
+      if (boundsDebounceTimerRef.current != null) {
+        clearTimeout(boundsDebounceTimerRef.current)
+      }
+      boundsDebounceTimerRef.current = setTimeout(() => {
+        boundsDebounceTimerRef.current = null
+        const latestMap = mapRef.current
+        if (!latestMap) return
+        onBoundsChangedRef.current?.(boundsToBbox(latestMap))
+      }, BOUNDS_CHANGE_DEBOUNCE_MS)
+    }
+
     return () => {
       cancelled = true
+      if (boundsDebounceTimerRef.current != null) {
+        clearTimeout(boundsDebounceTimerRef.current)
+        boundsDebounceTimerRef.current = null
+      }
       if (mapRef.current) {
         window.kakao.maps.event.removeListener(mapRef.current, 'idle', handleIdle)
+        window.kakao.maps.event.removeListener(mapRef.current, 'bounds_changed', handleBoundsChanged)
       }
       for (const entry of overlaysRef.current.values()) {
         entry.overlay.setMap(null)

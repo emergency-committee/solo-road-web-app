@@ -1,6 +1,9 @@
 import { Bookmark } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
-import { PlaceImagePlaceholder } from './PlaceImagePlaceholder'
+import {
+  PlaceImagePlaceholder,
+  type PlaceImagePlaceholderVariant,
+} from './PlaceImagePlaceholder'
 import { RatingStars } from './RatingStars'
 import { StatBadge } from './StatBadge'
 
@@ -13,6 +16,7 @@ interface PlaceCardProps {
   /** 등록된 이미지가 없으면 null. 있는 것처럼 보이는 대체 이미지를 붙이지 말고 그대로 null을 넘긴다. */
   imageUrl: string | null
   imageAlt: string
+  placeholderVariant?: PlaceImagePlaceholderVariant
   title: string
   subtitle?: string
   badges?: PlaceCardBadge[]
@@ -28,6 +32,7 @@ interface PlaceCardProps {
 export function PlaceCard({
   imageUrl,
   imageAlt,
+  placeholderVariant = 'place',
   title,
   subtitle,
   badges,
@@ -61,7 +66,7 @@ export function PlaceCard({
             className="size-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
         ) : (
-          <PlaceImagePlaceholder />
+          <PlaceImagePlaceholder variant={placeholderVariant} />
         )}
         {onToggleSave && (
           <button

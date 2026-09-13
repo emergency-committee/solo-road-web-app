@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Route } from 'lucide-react'
 import type { MyCourseItem } from '@/features/course'
 import { formatDistanceMeters } from '@/shared/lib/format'
 
@@ -11,18 +11,14 @@ export function SavedCourseGrid({ courses }: { courses: MyCourseItem[] }) {
           key={course.courseId}
           to="/course/$courseId"
           params={{ courseId: course.courseId.toString() }}
-          className="group border-outline-variant/20 hover:bg-surface-container-high bg-surface-container flex overflow-hidden rounded-xl border transition-colors"
+          className="group border-outline-variant/20 hover:bg-surface-container-high bg-surface-container flex rounded-xl border p-md transition-colors"
         >
-          <div className="h-full w-24 shrink-0">
-            <img
-              src={`https://picsum.photos/seed/course-${course.courseId.toString()}/240/240`}
-              alt={course.title}
-              className="size-full object-cover"
-            />
+          <div className="bg-primary/10 text-primary mr-3 grid size-10 shrink-0 place-items-center rounded-full">
+            <Route className="size-5" />
           </div>
-          <div className="p-md flex flex-1 flex-col justify-between">
+          <div className="flex min-w-0 flex-1 flex-col justify-between">
             <div>
-              <h5 className="font-body-md text-body-md text-on-surface font-bold">
+              <h5 className="font-body-md text-body-md text-on-surface truncate font-bold">
                 {course.title}
               </h5>
               <p className="font-body-sm text-body-sm text-on-surface-variant">
