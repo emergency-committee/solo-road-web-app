@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react'
 import {
   mockCourseDetails,
   formatTripLength,
+  useCopyCourseWithEdits,
   useCourseDetail,
   useCourseEditStore,
   useUpdateCourse,
@@ -33,12 +34,16 @@ import { formatDurationMinutes } from '@/shared/lib/format'
 
 export const Route = createFileRoute('/_shell/course/$courseId/edit')({
   component: CourseEditPage,
+  validateSearch: (search: Record<string, unknown>): { copy?: true } => ({
+    ...((search.copy === true || search.copy === 'true') && { copy: true }),
+  }),
 })
 
 const MAX_COURSE_TITLE_LENGTH = 40
 
 function CourseEditPage() {
   const { courseId } = Route.useParams()
+  const { copy: copyMode } = Route.useSearch()
   const courseIdNumber = Number(courseId)
   const demoCourse = mockCourseDetails[courseId]
   const navigate = useNavigate()
@@ -56,7 +61,8 @@ function CourseEditPage() {
     updateStopDay,
     saveDemoStops,
   } = useCourseEditStore()
-  const updateCourse = useUpdateCourse(courseIdNumber)
+  const updateCourseMutation = useUpdateCourse(courseIdNumber)
+  const copyCourseMutation = useCopyCourseWithEdits(courseIdNumber)
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -88,7 +94,7 @@ function CourseEditPage() {
 
     if (!course) return
     initialize(
-      course.title,
+      copyMode ? `${course.title} 나의 일정` : course.title,
       course.stops.map((stop) => ({
         id: stop.courseStopId.toString(),
         placeId: stop.placeId,
@@ -108,7 +114,7 @@ function CourseEditPage() {
         }),
       })),
     )
-  }, [course, courseId, demoCourse, demoStopsByCourseId, initialize])
+  }, [course, courseId, copyMode, demoCourse, demoStopsByCourseId, initialize])
 
   const tripDays = demoCourse ? 1 : (course?.tripDays ?? 1)
   const trimmedTitle = title.trim()
@@ -127,26 +133,39 @@ function CourseEditPage() {
       .sort((a, b) => a.stop.dayNumber - b.stop.dayNumber || a.originalIndex - b.originalIndex)
       .map(({ stop }) => stop)
 
-    updateCourse.mutate(
-      {
-        title: trimmedTitle,
-        stops: orderedStops.map((stop, i) => ({
-          placeId: stop.placeId,
-          stopOrder: i,
-          dayNumber: stop.dayNumber,
-          ...(stop.stayDurationMinutes !== undefined && {
-            stayDurationMinutes: stop.stayDurationMinutes,
-          }),
-          ...(stop.memo?.trim() && { memo: stop.memo.trim() }),
-        })),
-      },
-      {
-        onSuccess: () => {
-          void navigate({ to: '/course/$courseId', params: { courseId } })
+    const payload = {
+      title: trimmedTitle,
+      stops: orderedStops.map((stop, i) => ({
+        placeId: stop.placeId,
+        stopOrder: i,
+        dayNumber: stop.dayNumber,
+        ...(stop.stayDurationMinutes !== undefined && {
+          stayDurationMinutes: stop.stayDurationMinutes,
+        }),
+        ...(stop.memo?.trim() && { memo: stop.memo.trim() }),
+      })),
+    }
+
+    if (copyMode) {
+      copyCourseMutation.mutate(payload, {
+        onSuccess: (copied) => {
+          void navigate({
+            to: '/course/$courseId',
+            params: { courseId: copied.courseId.toString() },
+          })
         },
+      })
+      return
+    }
+
+    updateCourseMutation.mutate(payload, {
+      onSuccess: () => {
+        void navigate({ to: '/course/$courseId', params: { courseId } })
       },
-    )
+    })
   }
+
+  const saveMutation = copyMode ? copyCourseMutation : updateCourseMutation
 
   function handleDragEnd({ active, over }: DragEndEvent) {
     if (over && active.id !== over.id) {
@@ -163,15 +182,15 @@ function CourseEditPage() {
           <button
             type="button"
             onClick={handleSave}
-            disabled={isTitleInvalid || (!demoCourse && updateCourse.isPending)}
+            disabled={isTitleInvalid || (!demoCourse && saveMutation.isPending)}
             className="font-label-md text-label-md bg-primary-container text-on-primary rounded-xl px-6 py-2 transition-opacity hover:opacity-90 active:scale-95 disabled:opacity-50"
           >
-            {!demoCourse && updateCourse.isPending ? '저장 중...' : '저장'}
+            {!demoCourse && saveMutation.isPending ? '저장 중...' : '저장'}
           </button>
         }
       />
       <main className="px-margin-mobile pt-lg pb-xl mx-auto max-w-2xl">
-        {!demoCourse && updateCourse.isError && (
+        {!demoCourse && saveMutation.isError && (
           <p className="text-error font-label-md mb-md">
             저장하지 못했어요. 잠시 후 다시 시도해주세요.
           </p>
