@@ -12,7 +12,6 @@ import {
   formatTripLength,
   paceLabel,
   soloImpressionLabel,
-  useCopyCourse,
   useCourseDetail,
   useCourseEditStore,
   useToggleCourseLike,
@@ -39,7 +38,6 @@ function CourseDetailPage() {
   const { data: course, isLoading, isError } = useCourseDetail(courseIdNumber)
   const [publishOpen, setPublishOpen] = useState(false)
   const toggleLike = useToggleCourseLike(courseIdNumber)
-  const copyCourse = useCopyCourse(courseIdNumber)
   const unpublish = useUnpublishCourse(courseIdNumber)
 
   const overviewStops = useMemo(
@@ -334,23 +332,15 @@ function CourseDetailPage() {
             >
               <Heart className={`size-5 ${course.liked ? 'fill-current' : ''}`} />
             </button>
-            <button
-              type="button"
-              disabled={copyCourse.isPending}
-              onClick={() =>
-                copyCourse.mutate(undefined, {
-                  onSuccess: (copied) =>
-                    void router.navigate({
-                      to: '/course/$courseId/edit',
-                      params: { courseId: copied.courseId.toString() },
-                    }),
-                })
-              }
-              className="font-headline-lg-mobile text-headline-lg-mobile bg-primary text-on-primary flex h-12 flex-1 items-center justify-center gap-2 rounded-xl font-bold shadow-lg disabled:opacity-50"
+            <Link
+              to="/course/$courseId/edit"
+              params={{ courseId }}
+              search={{ copy: true }}
+              className="font-headline-lg-mobile text-headline-lg-mobile bg-primary text-on-primary flex h-12 flex-1 items-center justify-center gap-2 rounded-xl font-bold shadow-lg"
             >
               <Copy className="size-5" />
-              {copyCourse.isPending ? '가져오는 중...' : '내 일정으로 가져오기'}
-            </button>
+              내 일정으로 가져오기
+            </Link>
           </>
         )}
       </CourseBottomActionBar>

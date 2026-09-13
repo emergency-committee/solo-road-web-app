@@ -3,6 +3,7 @@ export { useCourseRecommendations } from './hooks/use-course-recommendations'
 export { useMyCourses } from './hooks/use-my-courses'
 export { useCourseDetail } from './hooks/use-course-detail'
 export { useUpdateCourse } from './hooks/use-update-course'
+export { useCopyCourseWithEdits } from './hooks/use-copy-course-with-edits'
 export { useDeleteCourse } from './hooks/use-delete-course'
 export {
   useCopyCourse,
