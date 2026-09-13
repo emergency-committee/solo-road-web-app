@@ -21,6 +21,7 @@ import { Route as ShellCourseDiscoverRouteImport } from './routes/_shell/course/
 import { Route as ShellMapIndexRouteImport } from './routes/_shell/map/index'
 import { Route as ShellMyIndexRouteImport } from './routes/_shell/my/index'
 import { Route as ShellMyDataSourcesRouteImport } from './routes/_shell/my/data-sources'
+import { Route as ShellMyLikedCoursesRouteImport } from './routes/_shell/my/liked-courses'
 import { Route as ShellMyPermissionsRouteImport } from './routes/_shell/my/permissions'
 import { Route as ShellMyPreferencesRouteImport } from './routes/_shell/my/preferences'
 import { Route as ShellMyRankingRouteImport } from './routes/_shell/my/ranking'
@@ -92,6 +93,11 @@ const ShellMyIndexRoute = ShellMyIndexRouteImport.update({
 const ShellMyDataSourcesRoute = ShellMyDataSourcesRouteImport.update({
   id: '/my/data-sources',
   path: '/my/data-sources',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellMyLikedCoursesRoute = ShellMyLikedCoursesRouteImport.update({
+  id: '/my/liked-courses',
+  path: '/my/liked-courses',
   getParentRoute: () => ShellRoute,
 } as any)
 const ShellMyPermissionsRoute = ShellMyPermissionsRouteImport.update({
@@ -171,6 +177,7 @@ export interface FileRoutesByFullPath {
   '/course/create': typeof ShellCourseCreateRoute
   '/course/discover': typeof ShellCourseDiscoverRoute
   '/my/data-sources': typeof ShellMyDataSourcesRoute
+  '/my/liked-courses': typeof ShellMyLikedCoursesRoute
   '/my/permissions': typeof ShellMyPermissionsRoute
   '/my/preferences': typeof ShellMyPreferencesRoute
   '/my/ranking': typeof ShellMyRankingRoute
@@ -197,6 +204,7 @@ export interface FileRoutesByTo {
   '/course/create': typeof ShellCourseCreateRoute
   '/course/discover': typeof ShellCourseDiscoverRoute
   '/my/data-sources': typeof ShellMyDataSourcesRoute
+  '/my/liked-courses': typeof ShellMyLikedCoursesRoute
   '/my/permissions': typeof ShellMyPermissionsRoute
   '/my/preferences': typeof ShellMyPreferencesRoute
   '/my/ranking': typeof ShellMyRankingRoute
@@ -225,6 +233,7 @@ export interface FileRoutesById {
   '/_shell/course/create': typeof ShellCourseCreateRoute
   '/_shell/course/discover': typeof ShellCourseDiscoverRoute
   '/_shell/my/data-sources': typeof ShellMyDataSourcesRoute
+  '/_shell/my/liked-courses': typeof ShellMyLikedCoursesRoute
   '/_shell/my/permissions': typeof ShellMyPermissionsRoute
   '/_shell/my/preferences': typeof ShellMyPreferencesRoute
   '/_shell/my/ranking': typeof ShellMyRankingRoute
@@ -253,6 +262,7 @@ export interface FileRouteTypes {
     | '/course/create'
     | '/course/discover'
     | '/my/data-sources'
+    | '/my/liked-courses'
     | '/my/permissions'
     | '/my/preferences'
     | '/my/ranking'
@@ -279,6 +289,7 @@ export interface FileRouteTypes {
     | '/course/create'
     | '/course/discover'
     | '/my/data-sources'
+    | '/my/liked-courses'
     | '/my/permissions'
     | '/my/preferences'
     | '/my/ranking'
@@ -306,6 +317,7 @@ export interface FileRouteTypes {
     | '/_shell/course/create'
     | '/_shell/course/discover'
     | '/_shell/my/data-sources'
+    | '/_shell/my/liked-courses'
     | '/_shell/my/permissions'
     | '/_shell/my/preferences'
     | '/_shell/my/ranking'
@@ -420,6 +432,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellMyDataSourcesRouteImport
       parentRoute: typeof ShellRoute
     }
+    '/_shell/my/liked-courses': {
+      id: '/_shell/my/liked-courses'
+      path: '/my/liked-courses'
+      fullPath: '/my/liked-courses'
+      preLoaderRoute: typeof ShellMyLikedCoursesRouteImport
+      parentRoute: typeof ShellRoute
+    }
     '/_shell/my/permissions': {
       id: '/_shell/my/permissions'
       path: '/my/permissions'
@@ -519,6 +538,7 @@ interface ShellRouteChildren {
   ShellCourseCreateRoute: typeof ShellCourseCreateRoute
   ShellCourseDiscoverRoute: typeof ShellCourseDiscoverRoute
   ShellMyDataSourcesRoute: typeof ShellMyDataSourcesRoute
+  ShellMyLikedCoursesRoute: typeof ShellMyLikedCoursesRoute
   ShellMyPermissionsRoute: typeof ShellMyPermissionsRoute
   ShellMyPreferencesRoute: typeof ShellMyPreferencesRoute
   ShellMyRankingRoute: typeof ShellMyRankingRoute
@@ -540,6 +560,7 @@ const ShellRouteChildren: ShellRouteChildren = {
   ShellCourseCreateRoute: ShellCourseCreateRoute,
   ShellCourseDiscoverRoute: ShellCourseDiscoverRoute,
   ShellMyDataSourcesRoute: ShellMyDataSourcesRoute,
+  ShellMyLikedCoursesRoute: ShellMyLikedCoursesRoute,
   ShellMyPermissionsRoute: ShellMyPermissionsRoute,
   ShellMyPreferencesRoute: ShellMyPreferencesRoute,
   ShellMyRankingRoute: ShellMyRankingRoute,

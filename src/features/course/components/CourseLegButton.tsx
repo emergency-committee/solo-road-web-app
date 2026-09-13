@@ -4,9 +4,17 @@ interface CourseLegButtonProps {
   originName: string
   destinationName: string
   onClick: () => void
+  label?: string
+  description?: string
 }
 
-export function CourseLegButton({ originName, destinationName, onClick }: CourseLegButtonProps) {
+export function CourseLegButton({
+  originName,
+  destinationName,
+  onClick,
+  label = '안심 도보 경로',
+  description,
+}: CourseLegButtonProps) {
   return (
     <button
       type="button"
@@ -17,12 +25,15 @@ export function CourseLegButton({ originName, destinationName, onClick }: Course
         <Route className="size-4" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="text-on-surface-variant block text-[10px] font-semibold">
-          안심 도보 경로
-        </span>
+        <span className="text-on-surface-variant block text-[10px] font-semibold">{label}</span>
         <span className="text-on-surface block truncate text-xs font-bold">
           {originName} → {destinationName}
         </span>
+        {description && (
+          <span className="text-on-surface-variant mt-0.5 block truncate text-[10px]">
+            {description}
+          </span>
+        )}
       </span>
       <ChevronRight className="text-outline size-4 shrink-0" />
     </button>

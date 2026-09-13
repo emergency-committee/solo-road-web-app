@@ -1,5 +1,15 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
-import { ArrowLeft, Copy, Globe2, Heart, MapPin, Navigation, Share2, UserRound } from 'lucide-react'
+import {
+  ArrowLeft,
+  Copy,
+  Globe2,
+  Heart,
+  MapPin,
+  Navigation,
+  Route as RouteIcon,
+  Share2,
+  UserRound,
+} from 'lucide-react'
 import { useLayoutEffect, useMemo, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import {
@@ -24,6 +34,14 @@ import {
 import { CourseRouteViewer } from '@/features/course-route'
 import { EmptyState } from '@/shared/components/EmptyState'
 import { Timeline, TimelineItem } from '@/shared/components/Timeline'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/shared/components/ui/dialog'
 import { scrollFrameToTop } from '@/shared/lib/app-frame'
 import { formatDistanceMeters, formatDurationMinutes } from '@/shared/lib/format'
 
@@ -38,9 +56,15 @@ function CourseDetailPage() {
   const courseIdNumber = Number(courseId)
   const { data: course, isLoading, isError } = useCourseDetail(courseIdNumber)
   const [publishOpen, setPublishOpen] = useState(false)
+  const [selectedLeg, setSelectedLeg] = useState<{
+    origin: CourseDetailStop
+    destination: CourseDetailStop
+  } | null>(null)
+  const [copiedCourse, setCopiedCourse] = useState<{ courseId: number; title: string } | null>(null)
   const toggleLike = useToggleCourseLike(courseIdNumber)
   const copyCourse = useCopyCourse(courseIdNumber)
   const unpublish = useUnpublishCourse(courseIdNumber)
+  const isCopiedCourse = Boolean(course?.copiedFromCourseId)
 
   const overviewStops = useMemo(
     () =>
@@ -52,6 +76,13 @@ function CourseDetailPage() {
         latitude: stop.latitude,
         longitude: stop.longitude,
       })),
+    [course?.stops],
+  )
+  const orderedStops = useMemo(
+    () =>
+      [...(course?.stops ?? [])].sort(
+        (a, b) => a.stopOrder - b.stopOrder || a.courseStopId - b.courseStopId,
+      ),
     [course?.stops],
   )
 
@@ -82,19 +113,25 @@ function CourseDetailPage() {
   }
 
   const stopsByDay = Array.from(
-    course.stops.reduce((groups, stop) => {
+    orderedStops.reduce((groups, stop) => {
       const dayStops = groups.get(stop.dayNumber) ?? []
       dayStops.push(stop)
       groups.set(stop.dayNumber, dayStops)
       return groups
     }, new Map<number, CourseDetailStop[]>()),
   ).sort(([a], [b]) => a - b)
+  const nextStopById = new Map(
+    orderedStops
+      .slice(0, -1)
+      .map((stop, index) => [stop.courseStopId, orderedStops[index + 1]] as const),
+  )
 
   return (
     <div className="font-body-md text-body-md min-h-screen pb-32">
       <CourseHeader
         onBack={() => router.history.back()}
         liked={course.liked}
+        showLike={!course.owner}
         likeDisabled={course.owner || course.visibility !== 'PUBLIC' || toggleLike.isPending}
         onLike={() => toggleLike.mutate(!course.liked)}
         onShare={() => {
@@ -108,7 +145,7 @@ function CourseDetailPage() {
 
       <main className="px-margin-mobile space-y-lg pt-20">
         <section>
-          <div className="bg-surface p-md rounded-lg border border-outline-variant/30 shadow-sm">
+          <div className="bg-surface p-md border-outline-variant/30 rounded-lg border shadow-sm">
             <div className="mb-xs flex items-start justify-between">
               <div className="min-w-0 pr-3">
                 <h2 className="font-headline-lg text-headline-lg text-on-surface mb-1 break-keep">
@@ -167,11 +204,20 @@ function CourseDetailPage() {
               <Link
                 to="/course/$courseId"
                 params={{ courseId: course.copiedFromCourseId.toString() }}
-                className="bg-surface-container-low text-on-surface-variant block rounded-lg px-4 py-3 text-sm"
+                className="bg-surface-container-low text-on-surface-variant flex items-center gap-3 rounded-lg px-4 py-3 text-sm"
               >
-                <Copy className="mr-2 inline size-4" />
-                <strong className="text-on-surface">{course.copiedFromCourseTitle}</strong>에서
-                시작한 일정이에요.
+                <span className="bg-primary/10 text-primary grid size-8 shrink-0 place-items-center rounded-full">
+                  <RouteIcon className="size-4" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate">
+                    원본 코스:{' '}
+                    <strong className="text-on-surface">{course.copiedFromCourseTitle}</strong>
+                  </span>
+                  <span className="mt-0.5 block text-xs">
+                    눌러서 원본 일정을 다시 볼 수 있어요.
+                  </span>
+                </span>
               </Link>
             )}
             {course.description && (
@@ -221,23 +267,35 @@ function CourseDetailPage() {
             <div className="bg-surface-container-low flex items-center justify-between gap-3 rounded-lg p-4">
               <div>
                 <p className="font-bold">
-                  {course.visibility === 'PUBLIC' ? '여행자들에게 공개 중' : '나만 볼 수 있는 코스'}
+                  {isCopiedCourse
+                    ? '가져온 코스'
+                    : course.visibility === 'PUBLIC'
+                      ? '여행자들에게 공개 중'
+                      : '나만 볼 수 있는 코스'}
                 </p>
                 <p className="text-on-surface-variant text-xs">
-                  {course.visibility === 'PUBLIC'
-                    ? '공개 정보는 언제든 수정할 수 있어요.'
-                    : '혼행 경험을 더하면 코스를 공개할 수 있어요.'}
+                  {isCopiedCourse
+                    ? '원본 작성자의 코스라 공개할 수 없어요.'
+                    : course.visibility === 'PUBLIC'
+                      ? '공개 정보는 언제든 수정할 수 있어요.'
+                      : '혼행 경험을 더하면 코스를 공개할 수 있어요.'}
                 </p>
               </div>
               <button
                 type="button"
+                disabled={isCopiedCourse}
                 onClick={() => setPublishOpen(true)}
-                className="border-primary text-primary flex h-10 shrink-0 items-center gap-1.5 rounded-lg border px-3 text-sm font-semibold"
+                className="border-primary text-primary disabled:border-outline-variant disabled:text-outline disabled:bg-surface-container flex h-10 shrink-0 items-center gap-1.5 rounded-lg border px-3 text-sm font-semibold disabled:cursor-not-allowed"
               >
                 <Globe2 className="size-4" />{' '}
                 {course.visibility === 'PUBLIC' ? '정보 수정' : '공개하기'}
               </button>
             </div>
+            {isCopiedCourse && (
+              <p className="text-on-surface-variant mt-2 px-1 text-xs">
+                직접 만든 코스만 여행자들에게 공개할 수 있어요.
+              </p>
+            )}
             {course.visibility === 'PUBLIC' && (
               <button
                 type="button"
@@ -276,21 +334,39 @@ function CourseDetailPage() {
                   {formatCourseDayDate(course.startDate, dayNumber)}
                 </div>
                 <Timeline>
-                  {dayStops.map((stop, index) => (
-                    <TimelineItem
-                      key={stop.courseStopId}
-                      index={index + 1}
-                      isLast={index === dayStops.length - 1}
-                      title={stop.name}
-                      {...(stop.thumbnailUrl ? { imageUrl: stop.thumbnailUrl } : {})}
-                      imageAlt={stop.name}
-                      {...(stop.address && { subtitle: stop.address })}
-                      {...(stop.memo && { note: stop.memo })}
-                      {...(stop.stayDurationMinutes !== undefined && {
-                        durationLabel: `${formatDurationMinutes(stop.stayDurationMinutes)} 체류 예정`,
-                      })}
-                    />
-                  ))}
+                  {dayStops.map((stop, index) => {
+                    const nextStop = nextStopById.get(stop.courseStopId)
+                    return (
+                      <TimelineItem
+                        key={stop.courseStopId}
+                        index={index + 1}
+                        isLast={index === dayStops.length - 1}
+                        title={stop.name}
+                        {...(stop.thumbnailUrl ? { imageUrl: stop.thumbnailUrl } : {})}
+                        imageAlt={stop.name}
+                        {...(stop.address && { subtitle: stop.address })}
+                        {...(stop.memo && { note: stop.memo })}
+                        {...(stop.stayDurationMinutes !== undefined && {
+                          durationLabel: `${formatDurationMinutes(stop.stayDurationMinutes)} 체류 예정`,
+                        })}
+                        {...(nextStop
+                          ? {
+                              after: (
+                                <CourseLegButton
+                                  originName={stop.name}
+                                  destinationName={nextStop.name}
+                                  label="도보 경로 상세"
+                                  description="빠른경로와 안심경로를 확인할 수 있어요"
+                                  onClick={() =>
+                                    setSelectedLeg({ origin: stop, destination: nextStop })
+                                  }
+                                />
+                              ),
+                            }
+                          : {})}
+                      />
+                    )
+                  })}
                 </Timeline>
               </section>
             ))}
@@ -310,6 +386,7 @@ function CourseDetailPage() {
             <Link
               to="/course/$courseId/edit"
               params={{ courseId }}
+              search={{ copy: false }}
               className="font-headline-lg-mobile text-headline-lg-mobile hover:bg-primary-fixed border-primary bg-surface text-primary flex h-12 flex-1 items-center justify-center rounded-xl border transition-colors active:scale-95"
             >
               편집하기
@@ -340,22 +417,74 @@ function CourseDetailPage() {
               onClick={() =>
                 copyCourse.mutate(undefined, {
                   onSuccess: (copied) =>
-                    void router.navigate({
-                      to: '/course/$courseId/edit',
-                      params: { courseId: copied.courseId.toString() },
-                    }),
+                    setCopiedCourse({ courseId: copied.courseId, title: copied.title }),
                 })
               }
               className="font-headline-lg-mobile text-headline-lg-mobile bg-primary text-on-primary flex h-12 flex-1 items-center justify-center gap-2 rounded-xl font-bold shadow-lg disabled:opacity-50"
             >
               <Copy className="size-5" />
-              {copyCourse.isPending ? '가져오는 중...' : '내 일정으로 가져오기'}
+              {copyCourse.isPending ? '저장 중...' : '내 일정으로 가져오기'}
             </button>
           </>
         )}
       </CourseBottomActionBar>
 
-      <PublishCourseDialog course={course} open={publishOpen} onOpenChange={setPublishOpen} />
+      {!isCopiedCourse && (
+        <PublishCourseDialog course={course} open={publishOpen} onOpenChange={setPublishOpen} />
+      )}
+
+      <Dialog open={copiedCourse !== null} onOpenChange={(open) => !open && setCopiedCourse(null)}>
+        <DialogContent className="w-[min(22rem,calc(100vw-2rem))] max-w-none rounded-2xl p-5">
+          <DialogHeader className="text-left">
+            <DialogTitle className="text-xl">내 일정에 저장했어요</DialogTitle>
+            <DialogDescription>
+              지금 보고 있는 화면은 원본 코스예요. 저장한 코스는 내 일정에서 따로 확인할 수 있어요.
+            </DialogDescription>
+          </DialogHeader>
+          {copiedCourse && (
+            <p className="bg-surface-container-low text-on-surface rounded-xl px-4 py-3 text-sm font-semibold">
+              {copiedCourse.title}
+            </p>
+          )}
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={() => setCopiedCourse(null)}
+              className="border-outline-variant text-on-surface-variant h-11 rounded-xl border px-4 text-sm font-semibold"
+            >
+              계속 보기
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!copiedCourse) return
+                const nextCourseId = copiedCourse.courseId.toString()
+                setCopiedCourse(null)
+                void router.navigate({
+                  to: '/course/$courseId',
+                  params: { courseId: nextCourseId },
+                })
+              }}
+              className="bg-primary text-on-primary h-11 rounded-xl px-4 text-sm font-bold"
+            >
+              내 코스 보러가기
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {selectedLeg && (
+        <CourseRouteViewer
+          originName={selectedLeg.origin.name}
+          destinationName={selectedLeg.destination.name}
+          origin={{ lat: selectedLeg.origin.latitude, lng: selectedLeg.origin.longitude }}
+          destination={{
+            lat: selectedLeg.destination.latitude,
+            lng: selectedLeg.destination.longitude,
+          }}
+          onClose={() => setSelectedLeg(null)}
+        />
+      )}
     </div>
   )
 }
@@ -451,6 +580,8 @@ function DemoCourseDetailPage({ course, onBack }: { course: CourseDetail; onBack
                           <CourseLegButton
                             originName={stop.title}
                             destinationName={nextStop.title}
+                            label="도보 경로 상세"
+                            description="빠른경로와 안심경로를 확인할 수 있어요"
                             onClick={() => setSelectedLeg({ origin: stop, destination: nextStop })}
                           />
                         ),
@@ -467,6 +598,7 @@ function DemoCourseDetailPage({ course, onBack }: { course: CourseDetail; onBack
         <Link
           to="/course/$courseId/edit"
           params={{ courseId: course.id }}
+          search={{ copy: false }}
           className="font-headline-lg-mobile text-headline-lg-mobile hover:bg-primary-fixed gap-xs border-primary bg-surface text-primary flex h-12 flex-1 items-center justify-center rounded-xl border transition-colors active:scale-95"
         >
           편집하기
@@ -509,12 +641,14 @@ function CourseBottomActionBar({ children }: { children: ReactNode }) {
 function CourseHeader({
   onBack,
   liked = false,
+  showLike = true,
   likeDisabled = false,
   onLike,
   onShare,
 }: {
   onBack: () => void
   liked?: boolean
+  showLike?: boolean
   likeDisabled?: boolean
   onLike?: () => void
   onShare?: () => void
@@ -541,15 +675,17 @@ function CourseHeader({
         >
           <Share2 className="text-primary size-5" />
         </button>
-        <button
-          type="button"
-          aria-label={liked ? '좋아요 취소' : '좋아요'}
-          disabled={likeDisabled}
-          onClick={onLike}
-          className="hover:bg-surface-variant flex size-10 items-center justify-center rounded-full transition-colors active:scale-95"
-        >
-          <Heart className={`text-primary size-5 ${liked ? 'fill-current' : ''}`} />
-        </button>
+        {showLike && (
+          <button
+            type="button"
+            aria-label={liked ? '좋아요 취소' : '좋아요'}
+            disabled={likeDisabled}
+            onClick={onLike}
+            className="hover:bg-surface-variant flex size-10 items-center justify-center rounded-full transition-colors active:scale-95"
+          >
+            <Heart className={`text-primary size-5 ${liked ? 'fill-current' : ''}`} />
+          </button>
+        )}
       </div>
     </header>
   )

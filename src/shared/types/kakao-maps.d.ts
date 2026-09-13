@@ -47,6 +47,17 @@ declare global {
       getNorthEast(): LatLng
     }
 
+    interface MarkerOptions {
+      map?: Map
+      position: LatLng
+    }
+
+    class Marker {
+      constructor(options: MarkerOptions)
+      setMap(map: Map | null): void
+      setPosition(latlng: LatLng): void
+    }
+
     interface PolylineOptions {
       map?: Map
       path: LatLng[]

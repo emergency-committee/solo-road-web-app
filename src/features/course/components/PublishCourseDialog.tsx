@@ -168,13 +168,15 @@ export function PublishCourseDialog({
                 { onSuccess: () => onOpenChange(false) },
               )
             }}
-            className="bg-primary text-on-primary h-12 w-full rounded-lg font-bold disabled:opacity-40"
+            className="bg-primary text-on-primary h-12 w-full rounded-lg px-3 text-sm font-bold break-keep whitespace-normal disabled:opacity-40"
           >
             {publish.isPending
-              ? '공개하는 중...'
+              ? course.visibility === 'PUBLIC'
+                ? '수정 중...'
+                : '공개하는 중...'
               : course.visibility === 'PUBLIC'
-                ? '공개 정보 수정하기'
-                : '여행자들에게 공개하기'}
+                ? '수정 완료'
+                : '코스 공개하기'}
           </button>
         </div>
       </DialogContent>
