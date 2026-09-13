@@ -11,10 +11,12 @@ function formatRegionLabel(region: kakao.maps.services.RegionCode): string {
 /**
  * 브라우저 위치 권한으로 좌표를 얻고, 카카오 Geocoder(coord2RegionCode)로 그 좌표의
  * 시/구 단위 행정구역 이름을 가져온다. 위치 권한이 없거나 조회에 실패하면 label은 null.
+ * coords는 Geocoder 조회 성공 여부와 무관하게 좌표를 얻는 즉시 채워진다.
  */
 export function useCurrentRegionLabel() {
   const [label, setLabel] = useState<string | null>(null)
   const [status, setStatus] = useState<CurrentRegionStatus>('loading')
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -26,6 +28,9 @@ export function useCurrentRegionLabel() {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        if (!cancelled) {
+          setCoords({ lat: position.coords.latitude, lng: position.coords.longitude })
+        }
         loadKakaoMapsSdk()
           .then((kakaoSdk) => {
             if (cancelled) return
@@ -62,5 +67,5 @@ export function useCurrentRegionLabel() {
     }
   }, [])
 
-  return { label, status }
+  return { label, status, coords }
 }
