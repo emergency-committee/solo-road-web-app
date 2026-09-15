@@ -4,10 +4,17 @@ import { useState } from 'react'
 import { HiddenGemsGrid, MiniMapPreviewCard, SoloFriendlySection } from '@/features/home'
 import type { HomePlaceCardData } from '@/features/home'
 import { sortByImageFirst } from '@/features/home/lib/sort-by-image'
-import { PlaceSuggestionList, usePlaceAutocomplete, usePlaceRecommendations } from '@/features/place'
+import { CATEGORY_COLOR, classifyPlaceType } from '@/features/map/lib/category-style'
+import {
+  PlaceSuggestionList,
+  SearchSuggestionsPanel,
+  usePlaceAutocomplete,
+  usePlaceRecommendations,
+} from '@/features/place'
 import type { ApiPlaceSummary } from '@/features/place'
 import { formatDistanceMeters } from '@/shared/lib/format'
 import { useCurrentRegionLabel } from '@/shared/hooks/use-current-region-label'
+import { useRecentSearches } from '@/shared/hooks/use-recent-searches'
 
 export const Route = createFileRoute('/_shell/')({
   component: HomePage,
@@ -20,16 +27,24 @@ function HomePage() {
   const [keyword, setKeyword] = useState('')
   const [isSearchFocused, setIsSearchFocused] = useState(false)
   const { suggestions } = usePlaceAutocomplete(keyword)
+  const { recentSearches, addRecentSearch, removeRecentSearch } = useRecentSearches()
 
-  const goToSearch = () => {
-    const trimmed = keyword.trim()
+  const goToSearch = (term: string = keyword) => {
+    const trimmed = term.trim()
     if (!trimmed) return
+    addRecentSearch(trimmed)
+    setIsSearchFocused(false)
     void navigate({ to: '/map', search: { keyword: trimmed } })
   }
 
   const goToPlace = (place: ApiPlaceSummary) => {
     setIsSearchFocused(false)
     void navigate({ to: '/place/$placeId', params: { placeId: place.placeId.toString() } })
+  }
+
+  const goToPlaceId = (placeId: number) => {
+    setIsSearchFocused(false)
+    void navigate({ to: '/place/$placeId', params: { placeId: placeId.toString() } })
   }
 
   const soloDiningPlaces: HomePlaceCardData[] = sortByImageFirst(
@@ -43,22 +58,28 @@ function HomePage() {
         place.distanceM !== undefined
           ? formatDistanceMeters(place.distanceM)
           : '거리 정보 준비 중',
-      badges: place.tags.map((tag) => ({ label: tag, tone: 'secondary' as const })),
+      badges: place.tags.map((tag) => {
+        const { label, icon } = classifyPlaceType(tag)
+        return { label, tone: 'secondary' as const, color: CATEGORY_COLOR[icon] }
+      }),
       hasImage: place.thumbnailUrl != null,
     })),
   )
 
   const hiddenGems: HomePlaceCardData[] = sortByImageFirst(
-    (data?.hiddenGems ?? []).map((place) => ({
-      id: place.placeId.toString(),
-      title: place.name,
-      imageUrl: place.thumbnailUrl ?? null,
-      imageAlt: place.name,
-      placeholderVariant: 'place',
-      subtitle: place.type,
-      badges: [],
-      hasImage: place.thumbnailUrl != null,
-    })),
+    (data?.hiddenGems ?? []).map((place) => {
+      const { label, icon } = classifyPlaceType(place.type)
+      return {
+        id: place.placeId.toString(),
+        title: place.name,
+        imageUrl: place.thumbnailUrl ?? null,
+        imageAlt: place.name,
+        placeholderVariant: 'place' as const,
+        subtitle: '',
+        badges: [{ label, tone: 'secondary' as const, color: CATEGORY_COLOR[icon] }],
+        hasImage: place.thumbnailUrl != null,
+      }
+    }),
   )
 
   return (
@@ -81,7 +102,7 @@ function HomePage() {
             <button
               type="button"
               aria-label="검색"
-              onClick={goToSearch}
+              onClick={() => goToSearch()}
               className="mr-xs text-outline shrink-0"
             >
               <Search className="size-5" />
@@ -100,7 +121,16 @@ function HomePage() {
             />
             <SlidersHorizontal className="ml-xs text-primary size-5" />
           </div>
-          {isSearchFocused && (
+          {isSearchFocused && keyword.trim() === '' && (
+            <SearchSuggestionsPanel
+              recentSearches={recentSearches}
+              onSelectRecentSearch={goToSearch}
+              onRemoveRecentSearch={removeRecentSearch}
+              recommendedPlaces={(data?.soloDining ?? []).slice(0, 5)}
+              onSelectPlace={goToPlaceId}
+            />
+          )}
+          {isSearchFocused && keyword.trim() !== '' && (
             <PlaceSuggestionList suggestions={suggestions} onSelect={goToPlace} />
           )}
         </section>

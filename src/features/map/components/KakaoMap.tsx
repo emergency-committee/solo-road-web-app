@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { cn } from '@/shared/lib/utils'
 import { loadKakaoMapsSdk } from '../lib/load-kakao-maps'
@@ -41,6 +41,50 @@ interface KakaoMapProps {
 /** 드래그/줌 도중 bounds_changed 가 과도하게 자주 불리는 것을 막는 디바운스 간격(ms). */
 const BOUNDS_CHANGE_DEBOUNCE_MS = 350
 
+/** 화면 픽셀 기준, 이 거리보다 가까운 마커끼리는 겹친 것으로 보고 우선순위가 낮은 쪽을 제외한다. */
+const MARKER_OVERLAP_PX = 36
+
+/**
+ * 현재 지도 투영 기준으로 화면상 너무 가까운 마커를 솎아낸다.
+ * 우선순위(저장됨 > 평점/혼밥점수 높은 순 > 원래 순서)가 높은 마커를 그리디하게 먼저 채택하고,
+ * 이미 채택된 마커와 픽셀 거리가 MARKER_OVERLAP_PX 미만인 마커는 건너뛴다.
+ */
+function dedupeByScreenDistance(
+  markers: MapMarkerData[],
+  map: kakao.maps.Map,
+): MapMarkerData[] {
+  if (markers.length <= 1) return markers
+
+  const projection = map.getProjection()
+  const points = new Map<string, kakao.maps.Point>()
+  for (const marker of markers) {
+    points.set(
+      marker.id,
+      projection.containerPointFromCoords(new window.kakao.maps.LatLng(marker.lat, marker.lng)),
+    )
+  }
+
+  const priorityScore = (marker: MapMarkerData) =>
+    (marker.saved ? 1000 : 0) + (marker.rating ?? marker.soloScore ?? 0)
+
+  const ordered = [...markers].sort((a, b) => priorityScore(b) - priorityScore(a))
+  const kept: MapMarkerData[] = []
+  const keptPoints: kakao.maps.Point[] = []
+
+  for (const marker of ordered) {
+    const point = points.get(marker.id)
+    if (!point) continue
+    const isOverlapping = keptPoints.some(
+      (keptPoint) => Math.hypot(point.x - keptPoint.x, point.y - keptPoint.y) < MARKER_OVERLAP_PX,
+    )
+    if (isOverlapping) continue
+    kept.push(marker)
+    keptPoints.push(point)
+  }
+
+  return kept
+}
+
 function boundsToBbox(map: kakao.maps.Map): string {
   const bounds = map.getBounds()
   const sw = bounds.getSouthWest()
@@ -77,6 +121,8 @@ export function KakaoMap({
   const boundsDebounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState('')
+  // 지도가 멈출 때(idle)마다 bump해 화면 픽셀 기준 마커 겹침 필터를 다시 계산하게 한다.
+  const [viewportTick, setViewportTick] = useState(0)
 
   // 최초 1회만 붙는 idle/bounds_changed 리스너가 항상 최신 콜백을 부르도록 ref로 동기화한다.
   useEffect(() => {
@@ -134,6 +180,7 @@ export function KakaoMap({
       const position = map.getCenter()
       skipNextPanRef.current = true
       onCenterChangedRef.current?.({ lat: position.getLat(), lng: position.getLng() })
+      setViewportTick((tick) => tick + 1)
     }
 
     function handleBoundsChanged() {
@@ -188,6 +235,14 @@ export function KakaoMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [center.lat, center.lng, status])
 
+  // 지도 준비 전에는 필터링 없이 원본 마커를 그대로 쓴다(최초 idle 전 깜빡임 방지).
+  const visibleMarkers = useMemo(() => {
+    const map = mapRef.current
+    if (!map || status !== 'ready') return markers
+    return dedupeByScreenDistance(markers, map)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [markers, status, viewportTick])
+
   // 장소 마커 동기화 (추가/삭제/선택 상태 반영)
   useEffect(() => {
     const map = mapRef.current
@@ -195,7 +250,7 @@ export function KakaoMap({
 
     const kakaoSdk = window.kakao
     const overlays = overlaysRef.current
-    const nextIds = new Set(markers.map((marker) => marker.id))
+    const nextIds = new Set(visibleMarkers.map((marker) => marker.id))
 
     for (const [id, entry] of overlays) {
       if (!nextIds.has(id)) {
@@ -205,7 +260,7 @@ export function KakaoMap({
       }
     }
 
-    for (const marker of markers) {
+    for (const marker of visibleMarkers) {
       const isSelected = marker.id === selectedId
       const existing = overlays.get(marker.id)
 
@@ -243,7 +298,7 @@ export function KakaoMap({
       overlay.setMap(map)
       overlays.set(marker.id, { overlay, root })
     }
-  }, [markers, ratingMode, selectedId, onSelectMarker, status])
+  }, [visibleMarkers, ratingMode, selectedId, onSelectMarker, status])
 
   return (
     <div className={cn('relative size-full', className)}>

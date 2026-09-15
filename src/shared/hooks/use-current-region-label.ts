@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { loadKakaoMapsSdk } from '@/features/map/lib/load-kakao-maps'
+import { GEOLOCATION_OPTIONS } from '@/shared/lib/geolocation'
 
 export type CurrentRegionStatus = 'loading' | 'ready' | 'error'
 
@@ -60,6 +61,7 @@ export function useCurrentRegionLabel() {
         // 위치 권한 거부 등. 화면에서는 기본 문구로 대체한다.
         if (!cancelled) setStatus('error')
       },
+      GEOLOCATION_OPTIONS,
     )
 
     return () => {

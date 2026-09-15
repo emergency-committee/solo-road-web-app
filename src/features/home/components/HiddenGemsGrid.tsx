@@ -22,6 +22,7 @@ export function HiddenGemsGrid({ places }: { places: HomePlaceCardData[] }) {
             {...(place.placeholderVariant ? { placeholderVariant: place.placeholderVariant } : {})}
             title={place.title}
             subtitle={place.subtitle}
+            badges={place.badges}
             onClick={() => navigate({ to: '/place/$placeId', params: { placeId: place.id } })}
           />
         ))}
