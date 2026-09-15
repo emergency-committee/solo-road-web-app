@@ -38,6 +38,7 @@ declare global {
       /** 현재 화면에 보이는 지도 영역(뷰포트)의 좌표 범위. */
       getBounds(): LatLngBounds
       relayout(): void
+      getProjection(): Projection
     }
 
     class LatLngBounds {
@@ -45,6 +46,17 @@ declare global {
       extend(latlng: LatLng): void
       getSouthWest(): LatLng
       getNorthEast(): LatLng
+    }
+
+    class Point {
+      constructor(x: number, y: number)
+      x: number
+      y: number
+    }
+
+    interface Projection {
+      /** 위경도를 지도 컨테이너 기준 화면 픽셀 좌표로 변환한다. */
+      containerPointFromCoords(latlng: LatLng): Point
     }
 
     interface MarkerOptions {

@@ -8,6 +8,6 @@ export interface HomePlaceCardData {
   imageAlt: string
   placeholderVariant?: PlaceImagePlaceholderVariant
   subtitle: string
-  badges: { label: string; tone: 'primary' | 'secondary' }[]
+  badges: { label: string; tone: 'primary' | 'secondary'; color?: string }[]
   hasImage: boolean
 }

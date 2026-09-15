@@ -1,8 +1,15 @@
+import { useNavigate } from '@tanstack/react-router'
 import { Map, MapPin, Search, Utensils, X } from 'lucide-react'
 import { useState } from 'react'
-import { PlaceSuggestionList, usePlaceAutocomplete } from '@/features/place'
+import {
+  PlaceSuggestionList,
+  SearchSuggestionsPanel,
+  usePlaceAutocomplete,
+  usePlaceRecommendations,
+} from '@/features/place'
 import type { ApiPlaceSummary } from '@/features/place'
 import { FilterChipGroup } from '@/shared/components/FilterChip'
+import { useRecentSearches } from '@/shared/hooks/use-recent-searches'
 import { cn } from '@/shared/lib/utils'
 import {
   ALL_MAP_FILTERS,
@@ -31,8 +38,11 @@ export function MapSearchBar({
   onSelectPlace,
   filters,
 }: MapSearchBarProps) {
+  const navigate = useNavigate()
   const [isSearchFocused, setIsSearchFocused] = useState(false)
   const { suggestions } = usePlaceAutocomplete(keyword)
+  const { recentSearches, addRecentSearch, removeRecentSearch } = useRecentSearches()
+  const { data: recommendationsData } = usePlaceRecommendations()
   const currentFilters =
     filters ?? (mapMode === 'solo_dining' ? SOLO_DINING_MAP_FILTERS : ALL_MAP_FILTERS)
   const isSoloDining = mapMode === 'solo_dining'
@@ -97,10 +107,27 @@ export function MapSearchBar({
           <div className="bg-outline-variant mx-sm h-6 w-px" />
           <MapPin className="text-outline size-5" />
         </div>
-        {isSearchFocused && (
+        {isSearchFocused && keyword.trim() === '' && (
+          <SearchSuggestionsPanel
+            recentSearches={recentSearches}
+            onSelectRecentSearch={(term) => {
+              addRecentSearch(term)
+              setIsSearchFocused(false)
+              onKeywordChange(term)
+            }}
+            onRemoveRecentSearch={removeRecentSearch}
+            recommendedPlaces={(recommendationsData?.soloDining ?? []).slice(0, 5)}
+            onSelectPlace={(placeId) => {
+              setIsSearchFocused(false)
+              void navigate({ to: '/place/$placeId', params: { placeId: placeId.toString() } })
+            }}
+          />
+        )}
+        {isSearchFocused && keyword.trim() !== '' && (
           <PlaceSuggestionList
             suggestions={suggestions}
             onSelect={(place) => {
+              addRecentSearch(place.name)
               setIsSearchFocused(false)
               onSelectPlace(place)
             }}

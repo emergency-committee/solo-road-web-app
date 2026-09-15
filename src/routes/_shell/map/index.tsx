@@ -9,13 +9,14 @@ import {
   type MapRatingMode,
   MapRatingModeControl,
   MapSearchBar,
-  type MarkerIconType,
   PlacePreviewSheet,
 } from '@/features/map'
+import { classifyPlaceType } from '@/features/map/lib/category-style'
 import { CreatePlaceModal, usePlaces } from '@/features/place'
 import type { ApiPlacesParams, ApiPlaceSummary } from '@/features/place'
 import { useSavedPlaces } from '@/features/saved'
 import { formatDistanceMeters } from '@/shared/lib/format'
+import { GEOLOCATION_OPTIONS } from '@/shared/lib/geolocation'
 import { useDebouncedValue } from '@/shared/lib/use-debounced-value'
 
 interface MapSearch {
@@ -70,67 +71,13 @@ function toPlacesParams(filter: string, mapMode: MapMode): ApiPlacesParams {
   return { sort: 'DISTANCE' }
 }
 
-function getMarkerIconAndLabel(type: string): { icon: MarkerIconType; label: string } {
-  const upper = type.toUpperCase()
-  if (upper.includes('WELLNESS') || upper.includes('웰니스')) {
-    return { icon: 'wellness', label: '웰니스' }
-  }
-  if (upper.includes('STUDY') || upper.includes('스터디') || upper.includes('독서실')) {
-    return { icon: 'study', label: '스터디' }
-  }
-  if (upper.includes('EXHIBITION') || upper.includes('전시')) {
-    return { icon: 'exhibition', label: '전시·문화' }
-  }
-  if (upper.includes('ACTIVITY') || upper.includes('체험') || upper.includes('액티비티')) {
-    return { icon: 'activity', label: '체험·활동' }
-  }
-  if (upper.includes('SHOPPING') || upper.includes('쇼핑') || upper.includes('시장')) {
-    return { icon: 'shopping', label: '쇼핑' }
-  }
-  if (upper.includes('CAFE') || upper.includes('카페') || upper.includes('베이커리')) {
-    return { icon: 'coffee', label: '카페/디저트' }
-  }
-  if (
-    upper.includes('RESTAURANT') ||
-    upper.includes('식당') ||
-    upper.includes('한식') ||
-    upper.includes('일식') ||
-    upper.includes('중식')
-  ) {
-    return { icon: 'restaurant', label: '혼밥 식당' }
-  }
-  if (upper.includes('NATURE') || upper.includes('자연') || upper.includes('산책')) {
-    return { icon: 'nature', label: '자연/힐링' }
-  }
-  if (
-    upper.includes('CULTURE') ||
-    upper.includes('전시') ||
-    upper.includes('문화') ||
-    upper.includes('미술관')
-  ) {
-    return { icon: 'culture', label: '전시/문화' }
-  }
-  if (
-    upper.includes('ATTRACTION') ||
-    upper.includes('명소') ||
-    upper.includes('관광') ||
-    upper.includes('도서관')
-  ) {
-    return { icon: 'attraction', label: '혼행 명소' }
-  }
-  if (upper.includes('STAY') || upper.includes('숙소') || upper.includes('호텔')) {
-    return { icon: 'stay', label: '숙소' }
-  }
-  return { icon: 'spot', label: type }
-}
-
 function toMarkerData(
   place: ApiPlaceSummary,
   mapMode: MapMode,
   isRecommendationView: boolean,
   saved: boolean,
 ): MapMarkerData {
-  const { icon, label } = getMarkerIconAndLabel(place.type)
+  const { icon, label } = classifyPlaceType(place.type)
   return {
     id: place.placeId.toString(),
     name: place.name,
@@ -180,6 +127,7 @@ function MapPage() {
       () => {
         // 위치 권한이 없으면 기본 위치를 그대로 사용한다.
       },
+      GEOLOCATION_OPTIONS,
     )
   }, [])
 
@@ -246,8 +194,10 @@ function MapPage() {
 
   const handleRecenter = () => {
     if (!navigator.geolocation) return
-    navigator.geolocation.getCurrentPosition((position) =>
-      setCenter({ lat: position.coords.latitude, lng: position.coords.longitude }),
+    navigator.geolocation.getCurrentPosition(
+      (position) => setCenter({ lat: position.coords.latitude, lng: position.coords.longitude }),
+      undefined,
+      GEOLOCATION_OPTIONS,
     )
   }
 

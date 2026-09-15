@@ -10,6 +10,8 @@ import { StatBadge } from './StatBadge'
 interface PlaceCardBadge {
   label: string
   tone?: 'primary' | 'secondary' | 'success' | 'info' | 'neutral'
+  /** 주어지면 tone 대신 이 색으로 렌더링한다(예: 지도 마커 카테고리 색과 맞추기). */
+  color?: string
 }
 
 interface PlaceCardProps {
@@ -98,7 +100,12 @@ export function PlaceCard({
         {badges && badges.length > 0 && (
           <div className="gap-xs flex flex-wrap">
             {badges.map((badge) => (
-              <StatBadge key={badge.label} label={badge.label} tone={badge.tone ?? 'neutral'} />
+              <StatBadge
+                key={badge.label}
+                label={badge.label}
+                tone={badge.tone ?? 'neutral'}
+                {...(badge.color && { color: badge.color })}
+              />
             ))}
           </div>
         )}
