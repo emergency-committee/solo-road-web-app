@@ -1,6 +1,6 @@
 import { ArrowLeft, MapPin } from 'lucide-react'
 import { createPortal } from 'react-dom'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { KAKAO_JS_KEY } from '@/shared/api/config'
 import { ApiError } from '@/shared/api/errors'
 import { useCourseLegRoute } from '../hooks/use-course-leg-route'
@@ -15,6 +15,7 @@ interface CourseRouteViewerProps {
   destinationName: string
   origin: Coordinate
   destination: Coordinate
+  safetyRouteEnabled?: boolean
   onClose: () => void
 }
 
@@ -23,9 +24,10 @@ export function CourseRouteViewer({
   destinationName,
   origin,
   destination,
+  safetyRouteEnabled = true,
   onClose,
 }: CourseRouteViewerProps) {
-  const [activeRoute, setActiveRoute] = useState<RouteView>('safe')
+  const [activeRoute, setActiveRoute] = useState<RouteView>(safetyRouteEnabled ? 'safe' : 'fastest')
   const [bounds, setBounds] = useState<MapBounds | null>(null)
   const [showLights, setShowLights] = useState(true)
   const [showCctv, setShowCctv] = useState(true)
@@ -34,6 +36,10 @@ export function CourseRouteViewer({
   const infrastructure = useCourseRouteInfrastructure(bounds, { showLights, showCctv, showPolice })
   const kakaoJavaScriptKey = KAKAO_JS_KEY?.trim()
 
+  useEffect(() => {
+    if (!safetyRouteEnabled) setActiveRoute('fastest')
+  }, [safetyRouteEnabled])
+
   return createPortal(
     <section className="bg-surface fixed inset-y-0 left-1/2 z-[80] w-full max-w-[430px] -translate-x-1/2 overflow-hidden shadow-2xl">
       {kakaoJavaScriptKey ? (
@@ -41,11 +47,12 @@ export function CourseRouteViewer({
           appKey={kakaoJavaScriptKey}
           route={routeQuery.data ?? null}
           activeRoute={activeRoute}
+          safetyRouteEnabled={safetyRouteEnabled}
           origin={origin}
           destination={destination}
-          lights={showLights ? infrastructure.lights : []}
-          cctv={showCctv ? infrastructure.cctv : []}
-          police={showPolice ? infrastructure.police : []}
+          lights={safetyRouteEnabled && showLights ? infrastructure.lights : []}
+          cctv={safetyRouteEnabled && showCctv ? infrastructure.cctv : []}
+          police={safetyRouteEnabled && showPolice ? infrastructure.police : []}
           onBoundsChange={setBounds}
         />
       ) : (
@@ -73,26 +80,34 @@ export function CourseRouteViewer({
         </div>
       </header>
 
-      <div className="absolute top-[88px] left-3 z-30 flex items-center gap-2 rounded-[6px] bg-white/90 px-2 py-1.5 text-[9px] font-semibold text-gray-700 shadow-sm backdrop-blur-sm">
-        <LegendDot color="#f4b942" label="조명" />
-        <LegendDot color="#315eaf" label="CCTV" />
-        <LegendDot color="#2e7d5b" label="경찰" />
-        <span className="flex items-center gap-1">
-          <span className="h-0.5 w-4 rounded-full bg-[#006b7d]" /> 안심경로
-        </span>
-      </div>
+      {safetyRouteEnabled ? (
+        <div className="absolute top-[88px] left-3 z-30 flex items-center gap-2 rounded-[6px] bg-white/90 px-2 py-1.5 text-[9px] font-semibold text-gray-700 shadow-sm backdrop-blur-sm">
+          <LegendDot color="#f4b942" label="조명" />
+          <LegendDot color="#315eaf" label="CCTV" />
+          <LegendDot color="#2e7d5b" label="경찰" />
+          <span className="flex items-center gap-1">
+            <span className="h-0.5 w-4 rounded-full bg-[#006b7d]" /> 안심경로
+          </span>
+        </div>
+      ) : (
+        <div className="absolute top-[88px] left-3 z-30 rounded-[6px] bg-white/90 px-2.5 py-1.5 text-[10px] font-bold text-gray-700 shadow-sm backdrop-blur-sm">
+          빠른 경로만 제공되는 구간
+        </div>
+      )}
 
-      <CourseSafetyControls
-        showLights={showLights}
-        showCctv={showCctv}
-        lightCount={infrastructure.lights.length}
-        cctvCount={infrastructure.cctv.length}
-        policeCount={infrastructure.police.length}
-        onLightsChange={setShowLights}
-        onCctvChange={setShowCctv}
-        showPolice={showPolice}
-        onPoliceChange={setShowPolice}
-      />
+      {safetyRouteEnabled && (
+        <CourseSafetyControls
+          showLights={showLights}
+          showCctv={showCctv}
+          lightCount={infrastructure.lights.length}
+          cctvCount={infrastructure.cctv.length}
+          policeCount={infrastructure.police.length}
+          onLightsChange={setShowLights}
+          onCctvChange={setShowCctv}
+          showPolice={showPolice}
+          onPoliceChange={setShowPolice}
+        />
+      )}
 
       {routeQuery.isPending && (
         <div className="bg-inverse-surface/90 text-inverse-on-surface absolute top-1/2 left-1/2 z-40 -translate-x-1/2 -translate-y-1/2 rounded-full px-4 py-2 text-xs font-semibold shadow-lg">
@@ -110,6 +125,7 @@ export function CourseRouteViewer({
         <CourseRouteResultPanel
           route={routeQuery.data}
           activeRoute={activeRoute}
+          safetyRouteEnabled={safetyRouteEnabled}
           onRouteChange={setActiveRoute}
         />
       )}

@@ -1,4 +1,5 @@
-import { MessageCircle, Send } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { MessageCircle, Send, UserRound } from 'lucide-react'
 import { useState } from 'react'
 import {
   useCourseReviews,
@@ -132,12 +133,20 @@ export function CourseReviewsSection({ courseId, owner }: { courseId: number; ow
           {reviews.map((review) => (
             <article key={review.reviewId} className="py-4">
               <div className="mb-2 flex items-center justify-between gap-3">
-                <p className="text-sm font-bold">
-                  {review.userName}
-                  {review.userTitle && (
-                    <span className="text-primary ml-1 font-medium">· {review.userTitle}</span>
-                  )}
-                </p>
+                <Link
+                  to="/travelers/$travelerId"
+                  params={{ travelerId: review.userId.toString() }}
+                  className="hover:bg-surface-container -ml-1 flex min-w-0 items-center gap-2 rounded-lg px-1 py-1 transition-colors"
+                >
+                  <span className="bg-primary/10 text-primary grid size-8 shrink-0 place-items-center rounded-full">
+                    <UserRound className="size-4" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="text-on-surface block truncate text-sm font-bold">
+                      {review.userName}
+                    </span>
+                  </span>
+                </Link>
                 <span className="bg-surface-container text-on-surface-variant rounded px-2 py-1 text-[11px]">
                   {review.experienceType === 'FOLLOWED' ? '그대로 다녀옴' : '취향대로 변경'}
                 </span>

@@ -266,35 +266,43 @@ export function copyCourse(courseId: number) {
   const source = mockCommunityCourseDetails[courseId]
   if ((isCommunityMockEnabled() || isCommunityDemoCourse(courseId)) && source) {
     const copiedCourseId = courseId + 100000
+    const sourceSystemAuthor = source.systemAuthor === true
+    const copiedTitle = sourceSystemAuthor ? source.title : `${source.title} 나의 일정`
     mockCommunityCourseDetails[copiedCourseId] = {
       ...source,
       courseId: copiedCourseId,
-      title: `${source.title} 나의 일정`,
+      title: copiedTitle,
       visibility: 'PRIVATE',
       owner: true,
+      authorId: 999,
+      authorName: '솔로더 여행자',
+      authorLevel: 3,
+      authorTitle: '첫 번째 영감',
+      systemAuthor: false,
       liked: false,
       likeCount: 0,
       copyCount: 0,
       reviewCount: 0,
-      copiedFromCourseId: source.courseId,
-      copiedFromCourseTitle: source.title,
+      ...(sourceSystemAuthor
+        ? {}
+        : { copiedFromCourseId: source.courseId, copiedFromCourseTitle: source.title }),
       tags: [],
       stops: source.stops.map((stop) => ({ ...stop })),
     }
     if (!mockCopiedCourses.some((course) => course.courseId === copiedCourseId)) {
       mockCopiedCourses.unshift({
         courseId: copiedCourseId,
-        title: `${source.title} 나의 일정`,
+        title: copiedTitle,
         ...(source.region !== undefined && { region: source.region }),
         totalDistanceM: source.totalDistanceM,
         visibility: 'PRIVATE',
-        copiedFromCourseId: source.courseId,
+        ...(sourceSystemAuthor ? {} : { copiedFromCourseId: source.courseId }),
       })
     }
     return Promise.resolve({
       courseId: copiedCourseId,
-      copiedFromCourseId: courseId,
-      title: `${source.title} 나의 일정`,
+      ...(sourceSystemAuthor ? {} : { copiedFromCourseId: courseId }),
+      title: copiedTitle,
     })
   }
   return apiRequest<CopyCourseResponse>(`${API_PREFIX}/courses/${courseId.toString()}/copy`, {

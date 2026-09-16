@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
 import {
   ArrowLeft,
+  Bot,
   Copy,
   Globe2,
   Heart,
@@ -25,6 +26,7 @@ import {
   useCopyCourse,
   useCourseDetail,
   useCourseEditStore,
+  isSafetyRouteRegion,
   useToggleCourseLike,
   useUnpublishCourse,
   type CourseDetail,
@@ -59,6 +61,7 @@ function CourseDetailPage() {
   const [selectedLeg, setSelectedLeg] = useState<{
     origin: CourseDetailStop
     destination: CourseDetailStop
+    safetyRouteEnabled: boolean
   } | null>(null)
   const [copiedCourse, setCopiedCourse] = useState<{ courseId: number; title: string } | null>(null)
   const toggleLike = useToggleCourseLike(courseIdNumber)
@@ -165,22 +168,36 @@ function CourseDetailPage() {
             </div>
 
             <div className="border-outline-variant/30 mt-4 flex items-center justify-between border-t pt-3">
-              <Link
-                to="/travelers/$travelerId"
-                params={{ travelerId: course.authorId.toString() }}
-                className="flex min-w-0 items-center gap-2"
-              >
-                <div className="bg-primary/10 text-primary grid size-9 shrink-0 place-items-center rounded-full">
-                  <UserRound className="size-4" />
+              {course.systemAuthor ? (
+                <div className="flex min-w-0 items-center gap-2">
+                  <div className="bg-primary/10 text-primary grid size-9 shrink-0 place-items-center rounded-full">
+                    <Bot className="size-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-bold">AI 추천</p>
+                    <p className="text-on-surface-variant truncate text-xs">
+                      내 취향에 맞춰 제안된 코스예요
+                    </p>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-bold">{course.authorName}</p>
-                  <p className="text-on-surface-variant truncate text-xs">
-                    Lv.{course.authorLevel}
-                    {course.authorTitle ? ` · ${course.authorTitle}` : ''}
-                  </p>
-                </div>
-              </Link>
+              ) : (
+                <Link
+                  to="/travelers/$travelerId"
+                  params={{ travelerId: course.authorId.toString() }}
+                  className="flex min-w-0 items-center gap-2"
+                >
+                  <div className="bg-primary/10 text-primary grid size-9 shrink-0 place-items-center rounded-full">
+                    <UserRound className="size-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-bold">{course.authorName}</p>
+                    <p className="text-on-surface-variant truncate text-xs">
+                      Lv.{course.authorLevel}
+                      {course.authorTitle ? ` · ${course.authorTitle}` : ''}
+                    </p>
+                  </div>
+                </Link>
+              )}
               <div className="text-on-surface-variant flex shrink-0 items-center gap-3 text-xs">
                 <span className="flex items-center gap-1">
                   <Heart className="size-3.5" />
@@ -336,6 +353,8 @@ function CourseDetailPage() {
                 <Timeline>
                   {dayStops.map((stop, index) => {
                     const nextStop = nextStopById.get(stop.courseStopId)
+                    const safetyRouteEnabled =
+                      nextStop !== undefined && isSafetyRouteSupportedLeg(stop, nextStop)
                     return (
                       <TimelineItem
                         key={stop.courseStopId}
@@ -356,9 +375,17 @@ function CourseDetailPage() {
                                   originName={stop.name}
                                   destinationName={nextStop.name}
                                   label="도보 경로 상세"
-                                  description="빠른경로와 안심경로를 확인할 수 있어요"
+                                  description={
+                                    safetyRouteEnabled
+                                      ? '빠른경로와 안심경로를 확인할 수 있어요'
+                                      : '지원 지역 밖 구간이라 빠른 경로만 확인할 수 있어요'
+                                  }
                                   onClick={() =>
-                                    setSelectedLeg({ origin: stop, destination: nextStop })
+                                    setSelectedLeg({
+                                      origin: stop,
+                                      destination: nextStop,
+                                      safetyRouteEnabled,
+                                    })
                                   }
                                 />
                               ),
@@ -437,7 +464,9 @@ function CourseDetailPage() {
           <DialogHeader className="text-left">
             <DialogTitle className="text-xl">내 일정에 저장했어요</DialogTitle>
             <DialogDescription>
-              지금 보고 있는 화면은 원본 코스예요. 저장한 코스는 내 일정에서 따로 확인할 수 있어요.
+              {course.systemAuthor
+                ? 'AI 추천 코스를 내 일정으로 저장했어요. 이제 내 코스처럼 편집하고 공개할 수 있어요.'
+                : '지금 보고 있는 화면은 원본 코스예요. 저장한 코스는 내 일정에서 따로 확인할 수 있어요.'}
             </DialogDescription>
           </DialogHeader>
           {copiedCourse && (
@@ -481,6 +510,7 @@ function CourseDetailPage() {
             lat: selectedLeg.destination.latitude,
             lng: selectedLeg.destination.longitude,
           }}
+          safetyRouteEnabled={selectedLeg.safetyRouteEnabled}
           onClose={() => setSelectedLeg(null)}
         />
       )}
@@ -513,6 +543,7 @@ function DemoCourseDetailPage({ course, onBack }: { course: CourseDetail; onBack
   const [selectedLeg, setSelectedLeg] = useState<{
     origin: DemoCourseStop
     destination: DemoCourseStop
+    safetyRouteEnabled: boolean
   } | null>(null)
 
   return (
@@ -561,6 +592,8 @@ function DemoCourseDetailPage({ course, onBack }: { course: CourseDetail; onBack
           <Timeline>
             {stops.map((stop, index) => {
               const nextStop = stops[index + 1]
+              const safetyRouteEnabled =
+                nextStop !== undefined && isSafetyRouteSupportedLeg(stop, nextStop)
               return (
                 <TimelineItem
                   key={stop.id}
@@ -580,8 +613,18 @@ function DemoCourseDetailPage({ course, onBack }: { course: CourseDetail; onBack
                             originName={stop.title}
                             destinationName={nextStop.title}
                             label="도보 경로 상세"
-                            description="빠른경로와 안심경로를 확인할 수 있어요"
-                            onClick={() => setSelectedLeg({ origin: stop, destination: nextStop })}
+                            description={
+                              safetyRouteEnabled
+                                ? '빠른경로와 안심경로를 확인할 수 있어요'
+                                : '지원 지역 밖 구간이라 빠른 경로만 확인할 수 있어요'
+                            }
+                            onClick={() =>
+                              setSelectedLeg({
+                                origin: stop,
+                                destination: nextStop,
+                                safetyRouteEnabled,
+                              })
+                            }
                           />
                         ),
                       }
@@ -620,11 +663,37 @@ function DemoCourseDetailPage({ course, onBack }: { course: CourseDetail; onBack
             lat: selectedLeg.destination.latitude,
             lng: selectedLeg.destination.longitude,
           }}
+          safetyRouteEnabled={selectedLeg.safetyRouteEnabled}
           onClose={() => setSelectedLeg(null)}
         />
       )}
     </div>
   )
+}
+
+function isSafetyRouteSupportedLeg(
+  origin: Pick<CourseDetailStop, 'address'> | Pick<DemoCourseStop, 'subtitle'>,
+  destination: Pick<CourseDetailStop, 'address'> | Pick<DemoCourseStop, 'subtitle'>,
+) {
+  return (
+    isSafetyRouteSupportedAddress(addressText(origin)) &&
+    isSafetyRouteSupportedAddress(addressText(destination))
+  )
+}
+
+function addressText(stop: Pick<CourseDetailStop, 'address'> | Pick<DemoCourseStop, 'subtitle'>) {
+  if (hasAddress(stop)) return stop.address
+  return stop.subtitle
+}
+
+function hasAddress(
+  stop: Pick<CourseDetailStop, 'address'> | Pick<DemoCourseStop, 'subtitle'>,
+): stop is Pick<CourseDetailStop, 'address'> {
+  return 'address' in stop
+}
+
+function isSafetyRouteSupportedAddress(address?: string) {
+  return address !== undefined && isSafetyRouteRegion(address)
 }
 
 function CourseBottomActionBar({ children }: { children: ReactNode }) {

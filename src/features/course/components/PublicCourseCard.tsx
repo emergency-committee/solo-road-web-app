@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Clock3, Copy, Heart, MapPin, MessageCircle, Route } from 'lucide-react'
+import { Bot, Clock3, Copy, Heart, MapPin, MessageCircle, Route } from 'lucide-react'
 import type { PublicCourseItem } from '../types/course.types'
 import { paceLabel, soloImpressionLabel } from '../lib/course-community-labels'
 import { formatDurationMinutes } from '@/shared/lib/format'
@@ -15,6 +15,7 @@ export function PublicCourseCard({
   variant?: 'default' | 'compact'
 }) {
   const highlights = course.tags.filter((tag) => tag.category === 'HIGHLIGHT').slice(0, 2)
+  const authorLabel = course.systemAuthor ? 'AI 추천' : course.authorName
 
   if (variant === 'compact') {
     return (
@@ -38,7 +39,10 @@ export function PublicCourseCard({
             </p>
           </div>
           <div className="text-on-surface-variant flex items-center justify-between gap-2 text-[11px]">
-            <span className="min-w-0 truncate">{course.authorName}</span>
+            <span className="flex min-w-0 items-center gap-1 truncate">
+              {course.systemAuthor && <Bot className="size-3 shrink-0" />}
+              <span className="truncate">{authorLabel}</span>
+            </span>
             <span className="flex shrink-0 items-center gap-2">
               <span className="flex items-center gap-1">
                 <Heart className="size-3" /> {course.likeCount}
@@ -91,8 +95,15 @@ export function PublicCourseCard({
               )}
             </p>
           </div>
-          <div className="bg-primary/10 text-primary shrink-0 rounded-md px-2 py-1 text-xs font-bold">
-            Lv.{course.authorLevel}
+          <div className="bg-primary/10 text-primary inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-xs font-bold">
+            {course.systemAuthor ? (
+              <>
+                <Bot className="size-3.5" />
+                AI 추천
+              </>
+            ) : (
+              `Lv.${course.authorLevel}`
+            )}
           </div>
         </div>
 
@@ -120,9 +131,11 @@ export function PublicCourseCard({
 
         <div className="border-outline-variant/30 text-on-surface-variant flex items-center justify-between border-t pt-3 text-xs">
           <span className="min-w-0 truncate font-medium">
-            {course.authorTitle
-              ? `${course.authorName} · ${course.authorTitle}`
-              : course.authorName}
+            {course.systemAuthor
+              ? 'AI 추천'
+              : course.authorTitle
+                ? `${course.authorName} · ${course.authorTitle}`
+                : course.authorName}
           </span>
           <span className="ml-3 flex shrink-0 items-center gap-3">
             <span className="flex items-center gap-1">

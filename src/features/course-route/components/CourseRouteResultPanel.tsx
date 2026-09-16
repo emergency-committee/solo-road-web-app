@@ -11,12 +11,14 @@ import type {
 interface CourseRouteResultPanelProps {
   route: NavigateRouteResponse
   activeRoute: RouteView
+  safetyRouteEnabled?: boolean
   onRouteChange: (route: RouteView) => void
 }
 
 export function CourseRouteResultPanel({
   route,
   activeRoute,
+  safetyRouteEnabled = true,
   onRouteChange,
 }: CourseRouteResultPanelProps) {
   const [detailsOpen, setDetailsOpen] = useState(false)
@@ -25,13 +27,20 @@ export function CourseRouteResultPanel({
 
   return (
     <section className="absolute inset-x-3 bottom-3 z-20 max-h-[calc(100dvh-112px)] overflow-y-auto rounded-[8px] border border-white/70 bg-white/97 p-3 shadow-xl backdrop-blur-sm">
-      <div className="bg-surface-container grid h-11 grid-cols-2 rounded-[8px] p-1">
-        <RouteTab
-          selected={activeRoute === 'safe'}
-          label="안심 경로"
-          minutes={route.durationMinutes}
-          onClick={() => onRouteChange('safe')}
-        />
+      <div
+        className={cn(
+          'bg-surface-container grid h-11 rounded-[8px] p-1',
+          safetyRouteEnabled ? 'grid-cols-2' : 'grid-cols-1',
+        )}
+      >
+        {safetyRouteEnabled && (
+          <RouteTab
+            selected={activeRoute === 'safe'}
+            label="안심 경로"
+            minutes={route.durationMinutes}
+            onClick={() => onRouteChange('safe')}
+          />
+        )}
         <RouteTab
           selected={activeRoute === 'fastest'}
           label="빠른 경로"
@@ -54,29 +63,41 @@ export function CourseRouteResultPanel({
             </span>
           </div>
         </div>
-        <div className="bg-primary-fixed text-on-primary-fixed min-w-[66px] rounded-[8px] px-2 py-1.5 text-center">
-          <span className="block text-[10px] font-semibold">안심점수</span>
-          <strong className="text-lg leading-5">{active.safetyScore}</strong>
-          {activeRoute === 'safe' && (
-            <span className="mt-0.5 block text-[9px] font-bold">
-              {evidenceLabel(route.safety.evidenceLevel)}
-            </span>
-          )}
-        </div>
+        {safetyRouteEnabled && (
+          <div className="bg-primary-fixed text-on-primary-fixed min-w-[66px] rounded-[8px] px-2 py-1.5 text-center">
+            <span className="block text-[10px] font-semibold">안심점수</span>
+            <strong className="text-lg leading-5">{active.safetyScore}</strong>
+            {activeRoute === 'safe' && (
+              <span className="mt-0.5 block text-[9px] font-bold">
+                {evidenceLabel(route.safety.evidenceLevel)}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
-      <button
-        type="button"
-        aria-expanded={detailsOpen}
-        aria-controls="route-safety-details"
-        onClick={() => setDetailsOpen((open) => !open)}
-        className="text-primary border-outline-variant/60 mt-2 flex h-8 w-full items-center justify-center gap-1.5 border-t pt-2 text-[11px] font-bold"
-      >
-        {detailsOpen ? '상세 근거 접기' : '상세 근거 보기'}
-        {detailsOpen ? <ChevronDown className="size-3.5" /> : <ChevronUp className="size-3.5" />}
-      </button>
+      {safetyRouteEnabled ? (
+        <button
+          type="button"
+          aria-expanded={detailsOpen}
+          aria-controls="route-safety-details"
+          onClick={() => setDetailsOpen((open) => !open)}
+          className="text-primary border-outline-variant/60 mt-2 flex h-8 w-full items-center justify-center gap-1.5 border-t pt-2 text-[11px] font-bold"
+        >
+          {detailsOpen ? '상세 근거 접기' : '상세 근거 보기'}
+          {detailsOpen ? (
+            <ChevronDown className="size-3.5" />
+          ) : (
+            <ChevronUp className="size-3.5" />
+          )}
+        </button>
+      ) : (
+        <p className="text-on-surface-variant border-outline-variant/60 mt-2 border-t pt-2 text-[10px] leading-4">
+          서울·부산·제주 주소가 아닌 장소가 포함되어 빠른 경로만 보여드려요.
+        </p>
+      )}
 
-      {detailsOpen && (
+      {safetyRouteEnabled && detailsOpen && (
         <div id="route-safety-details">
           {activeRoute === 'safe' && (
             <div className="text-on-surface-variant border-outline-variant/60 mt-2 flex items-start gap-2 border-t pt-3 text-xs">

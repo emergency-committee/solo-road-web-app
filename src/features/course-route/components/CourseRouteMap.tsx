@@ -15,6 +15,7 @@ interface CourseRouteMapProps {
   appKey: string
   route: NavigateRouteResponse | null
   activeRoute: RouteView
+  safetyRouteEnabled?: boolean
   origin: Coordinate
   destination: Coordinate
   lights: LightItem[]
@@ -106,6 +107,7 @@ export function CourseRouteMap({
   appKey,
   route,
   activeRoute,
+  safetyRouteEnabled = true,
   origin,
   destination,
   lights,
@@ -195,7 +197,7 @@ export function CourseRouteMap({
       )
     }
 
-    if (route?.path.length) {
+    if (safetyRouteEnabled && route?.path.length) {
       overlays.push(
         new maps.Polyline({
           map,
@@ -208,14 +210,16 @@ export function CourseRouteMap({
       )
     }
 
-    route?.safety.safetyWaypoints.forEach((waypoint) => {
-      overlays.push(createSafetyWaypointOverlay(maps, map, waypoint))
-    })
+    if (safetyRouteEnabled) {
+      route?.safety.safetyWaypoints.forEach((waypoint) => {
+        overlays.push(createSafetyWaypointOverlay(maps, map, waypoint))
+      })
+    }
     if (origin) overlays.push(createPointOverlay(maps, map, origin, 'origin'))
     if (destination) overlays.push(createPointOverlay(maps, map, destination, 'destination'))
 
     return () => clearOverlays(overlays)
-  }, [activeRoute, destination, maps, origin, route])
+  }, [activeRoute, destination, maps, origin, route, safetyRouteEnabled])
 
   useEffect(() => {
     const map = mapRef.current

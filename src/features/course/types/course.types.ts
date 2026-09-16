@@ -99,6 +99,7 @@ export interface PublicCourseItem {
   authorName: string
   authorLevel: number
   authorTitle?: string
+  systemAuthor?: boolean
   likeCount: number
   copyCount: number
   reviewCount: number
@@ -149,6 +150,7 @@ export interface CourseDetailResponse {
   authorName: string
   authorLevel: number
   authorTitle?: string
+  systemAuthor?: boolean
   liked: boolean
   likeCount: number
   copyCount: number
@@ -184,7 +186,7 @@ export interface CourseLikeResponse {
 
 export interface CopyCourseResponse {
   courseId: number
-  copiedFromCourseId: number
+  copiedFromCourseId?: number
   title: string
 }
 
