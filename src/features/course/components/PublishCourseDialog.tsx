@@ -1,15 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Check, Globe2 } from 'lucide-react'
+import { createPortal } from 'react-dom'
+import { Check, Globe2, X } from 'lucide-react'
 import { PACE_OPTIONS, SOLO_IMPRESSION_OPTIONS } from '../lib/course-community-labels'
 import { useCourseTags, usePublishCourse } from '../hooks/use-course-community'
 import type { CourseDetailResponse, PaceType, SoloImpression } from '../types/course.types'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/components/ui/dialog'
 
 export function PublishCourseDialog({
   course,
@@ -27,9 +21,11 @@ export function PublishCourseDialog({
   const [paceType, setPaceType] = useState<PaceType | undefined>()
   const [authorComment, setAuthorComment] = useState('')
   const [tagIds, setTagIds] = useState<number[]>([])
+  const [submitted, setSubmitted] = useState(false)
 
   useEffect(() => {
     if (!open) return
+    setSubmitted(false)
     setDescription(course.description ?? '')
     setSoloImpression(course.soloImpression)
     setPaceType(course.paceType)
@@ -58,20 +54,40 @@ export function PublishCourseDialog({
 
   const valid =
     description.trim().length >= 10 && soloImpression !== undefined && paceType !== undefined
+  const descriptionInvalid = submitted && description.trim().length < 10
+  const soloImpressionInvalid = submitted && soloImpression === undefined
+  const paceTypeInvalid = submitted && paceType === undefined
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[88vh] overflow-y-auto p-5">
-        <DialogHeader className="text-left">
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <Globe2 className="text-primary size-5" /> 코스 공개하기
-          </DialogTitle>
-          <DialogDescription>
-            다른 여행자가 코스를 참고하고 자신의 일정으로 가져갈 수 있어요.
-          </DialogDescription>
-        </DialogHeader>
+  if (!open) return null
 
-        <div className="space-y-5">
+  return createPortal(
+    <div className="fixed inset-0 z-[10000] flex items-end justify-center bg-black/50 p-0 backdrop-blur-xs sm:items-center sm:p-4">
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="publish-course-title"
+        className="bg-background flex max-h-[88dvh] w-full max-w-[430px] flex-col overflow-hidden rounded-t-2xl shadow-2xl sm:rounded-2xl"
+      >
+        <header className="border-outline-variant/30 flex shrink-0 items-start justify-between gap-4 border-b px-5 py-4 text-left">
+          <div>
+            <h2 id="publish-course-title" className="flex items-center gap-2 text-xl font-bold">
+              <Globe2 className="text-primary size-5" /> 코스 공개하기
+            </h2>
+            <p className="text-on-surface-variant mt-1 text-sm">
+              다른 여행자가 코스를 참고하고 자신의 일정으로 가져갈 수 있어요.
+            </p>
+          </div>
+          <button
+            type="button"
+            aria-label="닫기"
+            onClick={() => onOpenChange(false)}
+            className="hover:bg-surface-container grid size-9 shrink-0 place-items-center rounded-full"
+          >
+            <X className="size-5" />
+          </button>
+        </header>
+
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-4">
           <label className="block space-y-2">
             <span className="text-sm font-semibold">어떤 코스인가요?</span>
             <textarea
@@ -80,12 +96,20 @@ export function PublishCourseDialog({
               maxLength={500}
               rows={3}
               placeholder="이 코스의 분위기와 추천 이유를 알려주세요."
-              className="border-outline-variant focus:border-primary w-full resize-none rounded-lg border bg-white p-3 text-sm outline-none"
+              className={`focus:border-primary w-full resize-none rounded-lg border bg-white p-3 text-sm outline-none ${
+                descriptionInvalid ? 'border-error' : 'border-outline-variant'
+              }`}
             />
+            {descriptionInvalid && (
+              <p className="text-error text-xs">코스 설명을 10자 이상 적어주세요.</p>
+            )}
           </label>
 
           <fieldset className="space-y-2">
             <legend className="mb-2 text-sm font-semibold">혼자 다녀보니 어땠나요?</legend>
+            {soloImpressionInvalid && (
+              <p className="text-error mb-2 text-xs">혼자 다녀본 느낌을 선택해주세요.</p>
+            )}
             {SOLO_IMPRESSION_OPTIONS.map((option) => (
               <button
                 key={option.value}
@@ -108,6 +132,9 @@ export function PublishCourseDialog({
 
           <fieldset>
             <legend className="mb-2 text-sm font-semibold">일정 템포</legend>
+            {paceTypeInvalid && (
+              <p className="text-error mb-2 text-xs">일정 템포를 선택해주세요.</p>
+            )}
             <div className="grid grid-cols-3 gap-2">
               {PACE_OPTIONS.map((option) => (
                 <button
@@ -151,11 +178,14 @@ export function PublishCourseDialog({
           {publish.isError && (
             <p className="text-error text-sm">공개하지 못했어요. 입력 내용을 확인해 주세요.</p>
           )}
+        </div>
 
+        <footer className="border-outline-variant/30 bg-background shrink-0 border-t px-5 py-4">
           <button
             type="button"
-            disabled={!valid || publish.isPending}
+            disabled={publish.isPending}
             onClick={() => {
+              setSubmitted(true)
               if (!valid) return
               publish.mutate(
                 {
@@ -178,9 +208,10 @@ export function PublishCourseDialog({
                 ? '수정 완료'
                 : '코스 공개하기'}
           </button>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </footer>
+      </section>
+    </div>,
+    document.body,
   )
 }
 

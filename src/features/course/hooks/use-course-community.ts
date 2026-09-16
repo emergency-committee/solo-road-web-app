@@ -16,7 +16,13 @@ import {
   unpublishCourse,
   type DiscoverCoursesParams,
 } from '../api/course-api'
-import type { CreateCourseReviewRequest, PublishCourseRequest } from '../types/course.types'
+import type {
+  CourseDetailResponse,
+  CreateCourseReviewRequest,
+  PublicCourseItem,
+  PublishCourseRequest,
+} from '../types/course.types'
+import type { PageResponse } from '@/shared/api/types'
 
 export function usePublicCourses(params: DiscoverCoursesParams = {}) {
   return useQuery({
@@ -59,11 +65,77 @@ export function useToggleCourseLike(courseId: number) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (liked: boolean) => setCourseLike(courseId, liked),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['courses', 'detail', courseId] })
+    onMutate: async (liked) => {
+      await queryClient.cancelQueries({ queryKey: ['courses', 'detail', courseId] })
+      await queryClient.cancelQueries({ queryKey: ['courses', 'public'] })
+      await queryClient.cancelQueries({ queryKey: ['courses', 'liked'] })
+
+      const previousDetail = queryClient.getQueryData<CourseDetailResponse>([
+        'courses',
+        'detail',
+        courseId,
+      ])
+      const previousPublicQueries = queryClient.getQueriesData<PageResponse<PublicCourseItem>>({
+        queryKey: ['courses', 'public'],
+      })
+      const previousLikedQueries = queryClient.getQueriesData<PageResponse<PublicCourseItem>>({
+        queryKey: ['courses', 'liked'],
+      })
+
+      queryClient.setQueryData<CourseDetailResponse>(['courses', 'detail', courseId], (current) =>
+        current ? applyDetailLike(current, liked) : current,
+      )
+      updatePublicCoursePages(queryClient, ['courses', 'public'], courseId, liked)
+      updatePublicCoursePages(queryClient, ['courses', 'liked'], courseId, liked)
+
+      return { previousDetail, previousPublicQueries, previousLikedQueries }
+    },
+    onError: (_error, _liked, context) => {
+      if (context?.previousDetail) {
+        queryClient.setQueryData(['courses', 'detail', courseId], context.previousDetail)
+      }
+      context?.previousPublicQueries.forEach(([queryKey, data]) => {
+        queryClient.setQueryData(queryKey, data)
+      })
+      context?.previousLikedQueries.forEach(([queryKey, data]) => {
+        queryClient.setQueryData(queryKey, data)
+      })
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData<CourseDetailResponse>(['courses', 'detail', courseId], (current) =>
+        current ? { ...current, liked: data.liked, likeCount: data.likeCount } : current,
+      )
       void queryClient.invalidateQueries({ queryKey: ['courses', 'public'] })
       void queryClient.invalidateQueries({ queryKey: ['courses', 'liked'] })
     },
+  })
+}
+
+function applyDetailLike(course: CourseDetailResponse, liked: boolean): CourseDetailResponse {
+  if (course.liked === liked) return course
+  return {
+    ...course,
+    liked,
+    likeCount: Math.max(0, course.likeCount + (liked ? 1 : -1)),
+  }
+}
+
+function updatePublicCoursePages(
+  queryClient: ReturnType<typeof useQueryClient>,
+  queryKey: readonly unknown[],
+  courseId: number,
+  liked: boolean,
+) {
+  queryClient.setQueriesData<PageResponse<PublicCourseItem>>({ queryKey }, (current) => {
+    if (!current) return current
+    return {
+      ...current,
+      content: current.content.map((course) =>
+        course.courseId === courseId
+          ? { ...course, likeCount: Math.max(0, course.likeCount + (liked ? 1 : -1)) }
+          : course,
+      ),
+    }
   })
 }
 
