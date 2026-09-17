@@ -101,6 +101,8 @@ export interface ApiPlaceDetail {
   soloInfo?: ApiSoloInfoSummary
   soloTagSummaries: ApiSoloTagSummary[]
   analysisTags: string[]
+  /** 등록된 이미지가 없으면 null. */
+  thumbnailUrl?: string | null
   isLiked: boolean
 }
 

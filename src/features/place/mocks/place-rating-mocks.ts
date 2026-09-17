@@ -203,6 +203,7 @@ const mockDetails: Record<number, ApiPlaceDetail> = {
     summary: '바 좌석과 1인 한상이 준비된 식당',
     address: '서울특별시 강남구 강남대로94길 12',
     priceLevel: '₩₩',
+    thumbnailUrl: 'https://picsum.photos/seed/solo-dining-oroti/480/480',
     businessVerified: true,
     soloFriendlyBadge: true,
     soloScore: {
@@ -235,6 +236,7 @@ const mockDetails: Record<number, ApiPlaceDetail> = {
     summary: '창가 1인석이 있는 조용한 베이크샵',
     address: '서울특별시 강남구 봉은사로4길 19',
     priceLevel: '₩₩',
+    thumbnailUrl: 'https://picsum.photos/seed/solo-dining-bakeshop/480/480',
     businessVerified: true,
     soloFriendlyBadge: true,
     soloScore: {
@@ -267,6 +269,7 @@ const mockDetails: Record<number, ApiPlaceDetail> = {
     summary: '도심 속 울창한 숲길과 고즈넉한 힐링 산책',
     address: '서울특별시 강남구 선릉로100길 1',
     priceLevel: '₩',
+    thumbnailUrl: 'https://picsum.photos/seed/solo-travel-seonjeongneung/480/480',
     businessVerified: true,
     soloFriendlyBadge: true,
     soloScore: {
@@ -299,6 +302,7 @@ const mockDetails: Record<number, ApiPlaceDetail> = {
     summary: '웅장한 서가와 혼자 사색하기 좋은 도심 랜드마크',
     address: '서울특별시 강남구 영동대로 513 코엑스몰 B1',
     priceLevel: '무료',
+    thumbnailUrl: 'https://picsum.photos/seed/solo-travel-byeolmadang/480/480',
     businessVerified: true,
     soloFriendlyBadge: true,
     soloScore: {
@@ -453,6 +457,7 @@ export function getMockPlaceDetail(placeId: number) {
       },
       soloTagSummaries: [],
       analysisTags: ['혼자 가기 좋은 곳'],
+      thumbnailUrl: mockPlaces.find((p) => p.placeId === placeId)?.thumbnailUrl ?? null,
       isLiked: false,
     }
   )
