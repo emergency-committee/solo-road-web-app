@@ -4,6 +4,7 @@ import { Bookmark, MapPinPlus, MessageSquarePlus, Navigation, Star } from 'lucid
 import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { EmptyState } from '@/shared/components/EmptyState'
+import { CATEGORY_COLOR, classifyPlaceType } from '@/features/map/lib/category-style'
 import {
   type ApiSoloInfoSummary,
   KeyHighlightsList,
@@ -47,11 +48,15 @@ function PlaceDetailPage() {
 
   if (isLoading) {
     return (
-      <main className="p-margin-mobile">
-        <p className="font-body-md text-on-surface-variant text-center">
-          장소 정보를 불러오는 중이에요...
-        </p>
-      </main>
+      <div className="bg-background min-h-screen">
+        <div className="bg-surface-container-high h-[397px] w-full animate-pulse" />
+        <main className="bg-surface px-margin-mobile pt-lg relative -mt-8 min-h-[calc(100vh-365px)] space-y-3 rounded-t-[32px] pb-28">
+          <div className="bg-surface-container-high h-5 w-20 animate-pulse rounded-full" />
+          <div className="bg-surface-container-high h-7 w-2/3 animate-pulse rounded-full" />
+          <div className="bg-surface-container-high h-4 w-full animate-pulse rounded-full" />
+          <div className="bg-surface-container-high h-24 w-full animate-pulse rounded-2xl" />
+        </main>
+      </div>
     )
   }
 
@@ -64,10 +69,11 @@ function PlaceDetailPage() {
   }
 
   const isDining = isDiningPlace(place.type)
+  const { label: categoryLabel, icon: categoryIcon } = classifyPlaceType(place.type)
   return (
     <div className="bg-background min-h-screen">
       <PlaceDetailHero
-        imageUrl={null}
+        imageUrl={place.thumbnailUrl ?? null}
         imageAlt={place.name}
         placeholderVariant={isDining ? 'food' : 'place'}
         saved={saved}
@@ -77,8 +83,14 @@ function PlaceDetailPage() {
       <main className="bg-surface px-margin-mobile pt-lg relative -mt-8 min-h-[calc(100vh-365px)] rounded-t-[32px] pb-28 shadow-[0_-8px_24px_rgba(0,0,0,0.05)]">
         <section className="mb-lg">
           <div className="mb-base flex items-start justify-between">
-            <span className="font-label-md text-label-md bg-secondary-fixed px-sm text-on-secondary-fixed rounded-full py-1">
-              {place.type}
+            <span
+              className="font-label-md text-label-md rounded-full px-sm py-1 font-bold"
+              style={{
+                backgroundColor: `${CATEGORY_COLOR[categoryIcon]}1a`,
+                color: CATEGORY_COLOR[categoryIcon],
+              }}
+            >
+              {categoryLabel}
             </span>
             {place.address && (
               <div className="text-outline flex items-center gap-1">

@@ -1,9 +1,16 @@
 import { useNavigate } from '@tanstack/react-router'
 import { PlaceCard } from '@/shared/components/PlaceCard'
+import { PlaceCardSkeleton } from '@/shared/components/PlaceCardSkeleton'
 import { SectionHeader } from '@/shared/components/SectionHeader'
 import type { HomePlaceCardData } from '../types/home.types'
 
-export function HiddenGemsGrid({ places }: { places: HomePlaceCardData[] }) {
+export function HiddenGemsGrid({
+  places,
+  isLoading = false,
+}: {
+  places: HomePlaceCardData[]
+  isLoading?: boolean
+}) {
   const navigate = useNavigate()
 
   return (
@@ -14,18 +21,20 @@ export function HiddenGemsGrid({ places }: { places: HomePlaceCardData[] }) {
         onAction={() => navigate({ to: '/recommend' })}
       />
       <div className="gap-md grid grid-cols-2">
-        {places.map((place) => (
-          <PlaceCard
-            key={place.id}
-            imageUrl={place.imageUrl}
-            imageAlt={place.imageAlt}
-            {...(place.placeholderVariant ? { placeholderVariant: place.placeholderVariant } : {})}
-            title={place.title}
-            subtitle={place.subtitle}
-            badges={place.badges}
-            onClick={() => navigate({ to: '/place/$placeId', params: { placeId: place.id } })}
-          />
-        ))}
+        {isLoading
+          ? Array.from({ length: 4 }).map((_, index) => <PlaceCardSkeleton key={index} />)
+          : places.map((place) => (
+              <PlaceCard
+                key={place.id}
+                imageUrl={place.imageUrl}
+                imageAlt={place.imageAlt}
+                {...(place.placeholderVariant ? { placeholderVariant: place.placeholderVariant } : {})}
+                title={place.title}
+                subtitle={place.subtitle}
+                badges={place.badges}
+                onClick={() => navigate({ to: '/place/$placeId', params: { placeId: place.id } })}
+              />
+            ))}
       </div>
     </section>
   )

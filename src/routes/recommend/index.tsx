@@ -1,12 +1,15 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Compass, Plus, Search, Utensils } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CreatePlaceModal, usePlaces } from '@/features/place'
+import { CATEGORY_COLOR, classifyPlaceType } from '@/features/map/lib/category-style'
 import { PlaceCard } from '@/shared/components/PlaceCard'
+import { PlaceCardSkeleton } from '@/shared/components/PlaceCardSkeleton'
 import { EmptyState } from '@/shared/components/EmptyState'
 import { TopAppBar } from '@/shared/components/layout/TopAppBar'
 import { FilterChipGroup } from '@/shared/components/FilterChip'
 import { formatDistanceMeters } from '@/shared/lib/format'
+import { GEOLOCATION_OPTIONS } from '@/shared/lib/geolocation'
 import { cn } from '@/shared/lib/utils'
 
 type RecommendTab = 'all' | 'travel' | 'dining'
@@ -81,6 +84,16 @@ function RecommendPage() {
   const [keyword, setKeyword] = useState('')
   const [filter, setFilter] = useState<string[]>(['all'])
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
+
+  useEffect(() => {
+    if (!navigator.geolocation) return
+    navigator.geolocation.getCurrentPosition(
+      (position) => setCoords({ lat: position.coords.latitude, lng: position.coords.longitude }),
+      () => setCoords(null),
+      GEOLOCATION_OPTIONS,
+    )
+  }, [])
 
   const currentFilters =
     activeTab === 'travel'
@@ -100,6 +113,7 @@ function RecommendPage() {
 
   const placesQuery = usePlaces({
     ...(keyword.trim() && { keyword: keyword.trim() }),
+    ...(coords && { lat: coords.lat, lng: coords.lng }),
     ...toPlacesParams(activeTab, filter[0] ?? 'all'),
   })
   const places = placesQuery.data?.content ?? []
@@ -190,9 +204,11 @@ function RecommendPage() {
 
         {/* 장소 목록 */}
         {placesQuery.isLoading ? (
-          <p className="font-body-sm text-body-sm text-on-surface-variant text-center py-10">
-            추천 장소를 불러오는 중이에요...
-          </p>
+          <div className="gap-4 grid grid-cols-1">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <PlaceCardSkeleton key={index} />
+            ))}
+          </div>
         ) : places.length === 0 ? (
           <EmptyState
             icon={<Search className="size-6" />}
@@ -203,33 +219,37 @@ function RecommendPage() {
           />
         ) : (
           <div className="gap-4 grid grid-cols-1">
-            {places.map((place) => (
-              <PlaceCard
-                key={place.placeId}
-                imageUrl={place.thumbnailUrl ?? null}
-                imageAlt={place.name}
-                placeholderVariant={getPlaceholderVariant(place.type)}
-                title={place.name}
-                subtitle={`${place.type} • ${formatDistanceMeters(place.distanceM)}`}
-                {...(place.rating != null && { rating: place.rating })}
-                badges={
-                  place.soloFriendlyBadge
-                    ? [
-                        {
-                          label:
-                            place.type === 'RESTAURANT' || place.type === 'CAFE'
-                              ? '혼밥 추천'
-                              : '혼행 추천',
-                          tone: 'secondary',
-                        },
-                      ]
-                    : []
-                }
-                onClick={() =>
-                  navigate({ to: '/place/$placeId', params: { placeId: place.placeId.toString() } })
-                }
-              />
-            ))}
+            {places.map((place) => {
+              const { label: categoryLabel, icon: categoryIcon } = classifyPlaceType(place.type)
+              return (
+                <PlaceCard
+                  key={place.placeId}
+                  imageUrl={place.thumbnailUrl ?? null}
+                  imageAlt={place.name}
+                  placeholderVariant={getPlaceholderVariant(place.type)}
+                  title={place.name}
+                  subtitle={formatDistanceMeters(place.distanceM)}
+                  {...(place.rating != null && { rating: place.rating })}
+                  badges={[
+                    { label: categoryLabel, tone: 'neutral', color: CATEGORY_COLOR[categoryIcon] },
+                    ...(place.soloFriendlyBadge
+                      ? [
+                          {
+                            label:
+                              place.type === 'RESTAURANT' || place.type === 'CAFE'
+                                ? '혼밥 추천'
+                                : '혼행 추천',
+                            tone: 'secondary' as const,
+                          },
+                        ]
+                      : []),
+                  ]}
+                  onClick={() =>
+                    navigate({ to: '/place/$placeId', params: { placeId: place.placeId.toString() } })
+                  }
+                />
+              )
+            })}
           </div>
         )}
       </main>

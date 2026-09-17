@@ -22,7 +22,9 @@ export const Route = createFileRoute('/_shell/')({
 
 function HomePage() {
   const { label: regionLabel, status: regionStatus, coords } = useCurrentRegionLabel()
-  const { data } = usePlaceRecommendations(coords ? { lat: coords.lat, lng: coords.lng } : {})
+  const { data, isLoading: isRecommendationsLoading } = usePlaceRecommendations(
+    coords ? { lat: coords.lat, lng: coords.lng } : {},
+  )
   const navigate = useNavigate()
   const [keyword, setKeyword] = useState('')
   const [isSearchFocused, setIsSearchFocused] = useState(false)
@@ -136,8 +138,8 @@ function HomePage() {
         </section>
 
         <MiniMapPreviewCard />
-        <SoloFriendlySection places={soloDiningPlaces} />
-        <HiddenGemsGrid places={hiddenGems} />
+        <SoloFriendlySection places={soloDiningPlaces} isLoading={isRecommendationsLoading} />
+        <HiddenGemsGrid places={hiddenGems} isLoading={isRecommendationsLoading} />
       </main>
     </div>
   )
