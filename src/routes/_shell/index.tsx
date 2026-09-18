@@ -77,7 +77,7 @@ function HomePage() {
         imageUrl: place.thumbnailUrl ?? null,
         imageAlt: place.name,
         placeholderVariant: 'place' as const,
-        subtitle: '',
+        subtitle: place.distanceM !== undefined ? formatDistanceMeters(place.distanceM) : '',
         badges: [{ label, tone: 'secondary' as const, color: CATEGORY_COLOR[icon] }],
         hasImage: place.thumbnailUrl != null,
       }

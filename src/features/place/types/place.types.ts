@@ -19,6 +19,7 @@ export interface ApiHiddenGemItem {
   placeId: number
   name: string
   type: string
+  distanceM?: number
   /** 등록된 이미지가 없으면 null. */
   thumbnailUrl?: string | null
 }
