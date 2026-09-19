@@ -70,6 +70,7 @@ function PlaceDetailPage() {
 
   const isDining = isDiningPlace(place.type)
   const { label: categoryLabel, icon: categoryIcon } = classifyPlaceType(place.type)
+  const reviewCount = reviewPage?.totalElements ?? reviewPage?.content.length ?? 0
   return (
     <div className="bg-background min-h-screen">
       <PlaceDetailHero
@@ -119,7 +120,7 @@ function PlaceDetailPage() {
             <div>
               <h2 className="text-lg font-bold">방문 후기</h2>
               <p className="text-on-surface-variant text-xs">
-                {reviewPage?.totalElements ?? 0}명이 경험을 나눴어요
+                {reviewCount}명이 경험을 나눴어요
               </p>
             </div>
             <Link

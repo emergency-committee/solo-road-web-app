@@ -375,8 +375,9 @@ function SortableCourseStop({
         dragHandle={
           <button
             type="button"
+            data-no-drag-scroll
             aria-label={`${stop.title} 순서 변경`}
-            className="text-outline hover:bg-surface-container touch-none self-center rounded-lg p-2 active:cursor-grabbing"
+            className="text-outline hover:bg-surface-container flex min-h-16 w-12 touch-none items-center justify-center self-stretch rounded-lg active:cursor-grabbing active:bg-surface-container"
             {...attributes}
             {...listeners}
           >

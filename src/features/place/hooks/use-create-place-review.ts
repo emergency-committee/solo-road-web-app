@@ -21,6 +21,7 @@ export function useCreatePlaceReview(placeId: number) {
         queryClient.invalidateQueries({ queryKey: ['places'] }),
         queryClient.invalidateQueries({ queryKey: ['places', 'detail', placeId] }),
         queryClient.invalidateQueries({ queryKey: ['places', 'reviews', placeId] }),
+        queryClient.invalidateQueries({ queryKey: ['reviews', 'my'] }),
       ])
     },
   })

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { hasDisplayableSoloRating, soloRatingMessage } from './solo-rating'
 
 describe('solo rating presentation', () => {
-  it('presents a public rating when a precomputed solo score exists', () => {
+  it('presents a public rating when a solo rating exists', () => {
     expect(hasDisplayableSoloRating(5, 0)).toBe(true)
     expect(hasDisplayableSoloRating(null, 8)).toBe(false)
   })

@@ -8,6 +8,7 @@ export function useDeleteReview() {
     mutationFn: (reviewId: number) => deleteReview(reviewId),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['reviews', 'my'] })
+      void queryClient.invalidateQueries({ queryKey: ['places'] })
     },
   })
 }

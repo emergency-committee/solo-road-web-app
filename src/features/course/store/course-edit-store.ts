@@ -38,8 +38,12 @@ export const useCourseEditStore = create<CourseEditState>((set) => ({
       const reorderedStops = [...state.stops]
       const [movedStop] = reorderedStops.splice(fromIndex, 1)
       if (!movedStop) return state
+      const targetStop = state.stops[toIndex]
 
-      reorderedStops.splice(toIndex, 0, movedStop)
+      reorderedStops.splice(toIndex, 0, {
+        ...movedStop,
+        dayNumber: targetStop?.dayNumber ?? movedStop.dayNumber,
+      })
       return { stops: reorderedStops }
     }),
   updateStopMemo: (id, memo) =>

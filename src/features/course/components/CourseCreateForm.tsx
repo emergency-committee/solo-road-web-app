@@ -725,8 +725,9 @@ function SortableManualStop({
     >
       <button
         type="button"
+        data-no-drag-scroll
         aria-label={`${stop.name} 순서 변경`}
-        className="text-outline hover:bg-surface-container touch-none rounded-lg p-1.5 active:cursor-grabbing"
+        className="text-outline hover:bg-surface-container flex min-h-14 w-11 touch-none items-center justify-center rounded-lg active:cursor-grabbing active:bg-surface-container"
         {...attributes}
         {...listeners}
       >

@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Route as RouteIcon } from 'lucide-react'
-import { useMyCourses } from '@/features/course'
+import { useDeleteCourse, useMyCourses } from '@/features/course'
 import { SavedCourseGrid } from '@/features/saved'
 import { EmptyState } from '@/shared/components/EmptyState'
 import { TopAppBar } from '@/shared/components/layout/TopAppBar'
@@ -11,6 +11,7 @@ export const Route = createFileRoute('/_shell/my/saved-courses')({
 
 function SavedCoursesPage() {
   const { data, isLoading } = useMyCourses()
+  const deleteCourse = useDeleteCourse()
   const courses = data?.content ?? []
 
   return (
@@ -27,7 +28,17 @@ function SavedCoursesPage() {
         ) : courses.length === 0 ? (
           <EmptyState icon={<RouteIcon className="size-6" />} title="아직 만든 코스가 없어요" />
         ) : (
-          <SavedCourseGrid courses={courses} />
+          <SavedCourseGrid
+            courses={courses}
+            deletingCourseId={deleteCourse.variables ?? null}
+            onDelete={(course) => {
+              if (!window.confirm(`'${course.title}' 코스를 삭제할까요?`)) return
+              deleteCourse.mutate(course.courseId)
+            }}
+          />
+        )}
+        {deleteCourse.isError && (
+          <p className="text-error mt-3 text-center text-xs">코스를 삭제하지 못했어요.</p>
         )}
       </main>
     </div>
