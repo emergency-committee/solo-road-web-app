@@ -42,6 +42,7 @@ import { Timeline, TimelineItem } from '@/shared/components/Timeline'
 import { TopAppBar } from '@/shared/components/layout/TopAppBar'
 import { loadKakaoMapsSdk } from '@/features/map/lib/load-kakao-maps'
 import { formatDurationMinutes } from '@/shared/lib/format'
+import { Switch } from '@/shared/components/ui/switch'
 
 export const Route = createFileRoute('/_shell/course/$courseId/edit')({
   validateSearch: (search: Record<string, unknown>): { copy?: true } => ({
@@ -176,6 +177,7 @@ function CourseEditPage() {
           longitude: stop.longitude ?? 126.978,
           summary: defaultPlaceSummary(stop),
           soloFriendlyBadge: false,
+          visibility: stop.visibility ?? 'PRIVATE',
         })
         return { ...stop, placeId: createdPlace.placeId }
       }),
@@ -520,6 +522,7 @@ function PlaceSearchResults({
   const [searching, setSearching] = useState(false)
   const [searchError, setSearchError] = useState('')
   const [previewPlace, setPreviewPlace] = useState<PlacePreview | null>(null)
+  const [shareOnMap, setShareOnMap] = useState(false)
   const existingKakaoPlaceIds = new Set(
     stops.map((stop) => stop.kakaoPlaceId).filter((id): id is string => Boolean(id)),
   )
@@ -639,6 +642,13 @@ function PlaceSearchResults({
         </div>
       )}
 
+      <div className="px-md pb-sm">
+        <div className="border-outline-variant/40 bg-surface-container-low flex items-center justify-between rounded-xl border px-4 py-3">
+          <span className="text-sm font-bold text-on-surface">공유 지도에 공개하기</span>
+          <Switch checked={shareOnMap} onCheckedChange={setShareOnMap} />
+        </div>
+      </div>
+
       <div className="max-h-80 overflow-y-auto px-4 pb-4">
         {!keyword ? (
           <p className="text-body-sm text-on-surface-variant py-lg text-center">
@@ -692,7 +702,7 @@ function PlaceSearchResults({
                       type="button"
                       disabled={added}
                       aria-label={`${place.place_name} ${added ? '추가됨' : '추가'}`}
-                      onClick={() => onAdd(toCourseStop(place, selectedDay))}
+                      onClick={() => onAdd(toCourseStop(place, selectedDay, shareOnMap))}
                       className="disabled:bg-surface-container disabled:text-on-surface-variant flex h-8 shrink-0 items-center justify-center gap-1 rounded-lg bg-[#f05a47] px-2 text-xs font-bold text-white"
                     >
                       {added ? (
@@ -796,6 +806,7 @@ function PlaceMapPreview({ place, onClose }: { place: PlacePreview; onClose: () 
 function toCourseStop(
   place: kakao.maps.services.PlacesSearchResult,
   dayNumber: number,
+  shareOnMap: boolean,
 ): CourseStop {
   const type = categoryFromKakao(place)
   const address = place.road_address_name || place.address_name
@@ -809,6 +820,7 @@ function toCourseStop(
     subtitle: address,
     type,
     address,
+    visibility: shareOnMap ? 'PUBLIC' : 'PRIVATE',
     latitude: Number(place.y),
     longitude: Number(place.x),
     imageAlt: place.place_name,

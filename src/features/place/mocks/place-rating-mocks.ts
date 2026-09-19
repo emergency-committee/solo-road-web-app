@@ -540,9 +540,12 @@ export function createMockPlace(request: CreatePlaceRequest): CreatePlaceRespons
   const newPlaceId = Date.now()
   const typeUpper = (request.type || 'ATTRACTION').toUpperCase()
   const rating = request.rating ?? 4.5
-  const firstSoloRating = request.firstReviewSoloRating ?? rating
-  const firstReviewContent =
-    request.firstReviewContent || request.soloTip || '혼자 방문하기 좋아서 추천해요.'
+  const hasInitialReview =
+    request.firstReviewSoloRating !== undefined ||
+    Boolean(request.firstReviewContent?.trim()) ||
+    Boolean(request.firstReviewTagIds?.length)
+  const firstSoloRating = hasInitialReview ? (request.firstReviewSoloRating ?? rating) : null
+  const firstReviewContent = request.firstReviewContent || request.soloTip || ''
   const selectedTags = mockReviewTags.filter((tag) =>
     (request.firstReviewTagIds ?? []).includes(tag.reviewTagId),
   )
@@ -555,7 +558,7 @@ export function createMockPlace(request: CreatePlaceRequest): CreatePlaceRespons
     soloScore: 0,
     scoreStatus: 'PENDING',
     soloRating: firstSoloRating,
-    soloReviewCount: 1,
+    soloReviewCount: hasInitialReview ? 1 : 0,
     summary: request.summary ?? defaultPlaceSummary(typeUpper),
     latitude: request.latitude,
     longitude: request.longitude,
@@ -565,8 +568,9 @@ export function createMockPlace(request: CreatePlaceRequest): CreatePlaceRespons
     isLiked: false,
   }
 
-  // 최상단에 새 장소 추가
-  mockPlaces.unshift(summary)
+  if ((request.visibility ?? 'PRIVATE') === 'PUBLIC') {
+    mockPlaces.unshift(summary)
+  }
 
   mockDetails[newPlaceId] = {
     placeId: newPlaceId,
@@ -582,7 +586,7 @@ export function createMockPlace(request: CreatePlaceRequest): CreatePlaceRespons
       soloScore: 0,
       scoreStatus: 'PENDING',
       soloRating: firstSoloRating,
-      soloReviewCount: 1,
+      soloReviewCount: hasInitialReview ? 1 : 0,
     },
     soloInfo: {
       hasSoloSeat: request.hasSoloSeat ?? true,
@@ -592,28 +596,32 @@ export function createMockPlace(request: CreatePlaceRequest): CreatePlaceRespons
       soloSeatStatus: 'UNVERIFIED',
       cautionNote: request.soloTip || null,
     },
-    soloTagSummaries: selectedTags.map((tag) => ({
-      tagId: tag.reviewTagId,
-      name: tag.tagName,
-      positiveCount: 1,
-      negativeCount: 0,
-    })),
+    soloTagSummaries: hasInitialReview
+      ? selectedTags.map((tag) => ({
+          tagId: tag.reviewTagId,
+          name: tag.tagName,
+          positiveCount: 1,
+          negativeCount: 0,
+        }))
+      : [],
     analysisTags: selectedTags.length > 0 ? selectedTags.map((tag) => tag.tagName) : ['사용자 추천 장소'],
     isLiked: false,
   }
 
-  mockReviews[newPlaceId] = [
-    {
-      reviewId: Date.now() + 1,
-      userId: 999,
-      rating,
-      visitedAlone: true,
-      soloRating: firstSoloRating,
-      contents: firstReviewContent,
-      tags: selectedTags.map((tag) => tag.tagName),
-      createdAt: new Date().toISOString(),
-    },
-  ]
+  mockReviews[newPlaceId] = hasInitialReview
+    ? [
+        {
+          reviewId: Date.now() + 1,
+          userId: 999,
+          rating,
+          visitedAlone: true,
+          soloRating: firstSoloRating,
+          contents: firstReviewContent || '혼자 방문하기 좋아서 추천해요.',
+          tags: selectedTags.map((tag) => tag.tagName),
+          createdAt: new Date().toISOString(),
+        },
+      ]
+    : []
 
   return {
     placeId: newPlaceId,
@@ -625,6 +633,7 @@ export function createMockPlace(request: CreatePlaceRequest): CreatePlaceRespons
     summary: summary.summary,
     rating: summary.rating ?? undefined,
     soloFriendlyBadge: summary.soloFriendlyBadge,
+    visibility: request.visibility ?? 'PRIVATE',
     thumbnailUrl: summary.thumbnailUrl ?? undefined,
     createdAt: new Date().toISOString(),
   }

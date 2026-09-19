@@ -165,6 +165,7 @@ export function CreatePlaceModal({ open, onClose, initialMode = 'travel' }: Crea
         firstReviewTagIds: tagIds,
         rating,
         soloFriendlyBadge: true,
+        visibility: 'PUBLIC',
         ...(isDining ? { hasSoloSeat, hasSoloMenu } : {}),
       },
       {

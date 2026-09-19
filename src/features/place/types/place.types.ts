@@ -172,6 +172,7 @@ export interface CreatePlaceRequest {
   firstReviewContent?: string
   firstReviewTagIds?: number[]
   soloFriendlyBadge?: boolean
+  visibility?: 'PRIVATE' | 'PUBLIC'
   soloTip?: string
   hasSoloSeat?: boolean
   hasSoloMenu?: boolean
@@ -188,6 +189,7 @@ export interface CreatePlaceResponse {
   summary?: string | undefined
   rating?: number | undefined
   soloFriendlyBadge: boolean
+  visibility: 'PRIVATE' | 'PUBLIC'
   thumbnailUrl?: string | undefined
   createdAt: string
 }

@@ -10,6 +10,7 @@ export interface CourseStop {
   type?: string
   address?: string
   kakaoPlaceId?: string
+  visibility?: 'PRIVATE' | 'PUBLIC'
   memo?: string
   latitude?: number
   longitude?: number

@@ -56,6 +56,7 @@ export interface ManualCourseStopInput {
   latitude: number
   longitude: number
   dayNumber: number
+  visibility: 'PRIVATE' | 'PUBLIC'
 }
 
 const QUICK_REGIONS = ['서울', '부산', '제주']
@@ -82,6 +83,7 @@ interface ManualCourseStop {
   latitude: number
   longitude: number
   dayNumber: number
+  visibility: 'PRIVATE' | 'PUBLIC'
 }
 
 interface ManualPlacePreview {
@@ -135,6 +137,7 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
   const [manualSearching, setManualSearching] = useState(false)
   const [manualStops, setManualStops] = useState<ManualCourseStop[]>([])
   const [selectedManualDay, setSelectedManualDay] = useState(1)
+  const [manualShareOnMap, setManualShareOnMap] = useState(false)
   const [previewPlace, setPreviewPlace] = useState<ManualPlacePreview | null>(null)
   const manualDragSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -265,6 +268,7 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
                 latitude: stop.latitude,
                 longitude: stop.longitude,
                 dayNumber: stop.dayNumber,
+                visibility: stop.visibility,
               })),
           }),
         })
@@ -468,6 +472,11 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
             )}
           </div>
 
+          <div className="border-outline-variant/40 bg-surface-container-low flex items-center justify-between rounded-xl border px-4 py-3">
+            <span className="text-sm font-bold text-on-surface">공유 지도에 공개하기</span>
+            <Switch checked={manualShareOnMap} onCheckedChange={setManualShareOnMap} />
+          </div>
+
           <div className="gap-sm flex">
             <div className="relative min-w-0 flex-1">
               <Search className="text-outline absolute top-1/2 left-3 size-4 -translate-y-1/2" />
@@ -541,7 +550,7 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
                             onClick={() =>
                               setManualStops((prev) => [
                                 ...prev,
-                                toManualCourseStop(place, selectedManualDay),
+                                toManualCourseStop(place, selectedManualDay, manualShareOnMap),
                               ])
                             }
                             className="disabled:bg-surface-container disabled:text-on-surface-variant flex h-8 items-center justify-center gap-1 rounded-lg bg-[#f05a47] px-2 text-xs font-bold text-white"
@@ -859,6 +868,7 @@ function ManualPlaceMapPreview({
 function toManualCourseStop(
   place: kakao.maps.services.PlacesSearchResult,
   dayNumber: number,
+  shareOnMap: boolean,
 ): ManualCourseStop {
   const address = place.road_address_name || place.address_name
   return {
@@ -870,5 +880,6 @@ function toManualCourseStop(
     latitude: Number(place.y),
     longitude: Number(place.x),
     dayNumber,
+    visibility: shareOnMap ? 'PUBLIC' : 'PRIVATE',
   }
 }
