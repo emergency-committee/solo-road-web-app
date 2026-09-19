@@ -63,7 +63,7 @@ export {
   formatCourseDayDate,
   formatTripLength,
 } from './lib/course-schedule'
-export { mockCourseDetails, mockSavedCourseRows } from './mocks/course-mocks'
+export { mockCourseDetails } from './mocks/course-mocks'
 export { resolveFeaturedCourses } from './lib/featured-course-fallback'
 export { getCourseDayColor } from './lib/course-map-days'
 export type { DateRange } from './components/CourseDateRangeCalendar'
