@@ -14,6 +14,10 @@ export interface UpdateProfileRequest {
   nickname?: string
 }
 
+export function getMyProfile() {
+  return apiRequest<UserProfileResponse>(`${API_PREFIX}/users/me`)
+}
+
 export function updateMyProfile(req: UpdateProfileRequest) {
   return apiRequest<UserProfileResponse>(`${API_PREFIX}/users/me/profile`, {
     method: 'PATCH',

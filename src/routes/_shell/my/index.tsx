@@ -9,7 +9,13 @@ import {
   SlidersHorizontal,
 } from 'lucide-react'
 import { useState } from 'react'
-import { ProfileEditDialog, ProfileHeader, ProfileMenuList, ProfileStatsGrid } from '@/features/profile'
+import {
+  ProfileEditDialog,
+  ProfileHeader,
+  ProfileMenuList,
+  ProfileStatsGrid,
+  useMyProfile,
+} from '@/features/profile'
 import { useLogout } from '@/features/auth'
 import { useSessionStore } from '@/shared/auth/session-store'
 import { useSavedPlaces } from '@/features/saved'
@@ -24,10 +30,12 @@ function MyPage() {
   const navigate = useNavigate()
   const logout = useLogout()
   const user = useSessionStore((state) => state.user)
+  const profileQuery = useMyProfile()
   const savedPlacesQuery = useSavedPlaces(0, 1)
   const myReviewsQuery = useMyReviews(0, 1)
   const [profileDialogOpen, setProfileDialogOpen] = useState(false)
-  const nickname = user?.nickname ?? '솔로더 여행자'
+  const nickname = profileQuery.data?.nickname ?? user?.nickname ?? '솔로더 여행자'
+  const profileImageUrl = profileQuery.data?.profileImageUrl ?? user?.profileImageUrl
 
   return (
     <main className="px-margin-mobile pt-lg mx-auto min-h-screen max-w-2xl pb-8">
@@ -37,7 +45,7 @@ function MyPage() {
         name={nickname}
         avatarAlt="프로필 사진"
         onEdit={() => setProfileDialogOpen(true)}
-        {...(user?.profileImageUrl ? { avatarUrl: user.profileImageUrl } : {})}
+        {...(profileImageUrl ? { avatarUrl: profileImageUrl } : {})}
       />
       <ProfileStatsGrid
         stats={[
