@@ -61,10 +61,10 @@ function toPlacesParams(filter: string, mapMode: MapMode): ApiPlacesParams {
   if (filter === 'wellness') return { type: 'WELLNESS' }
   if (filter === 'study') return { type: 'STUDY' }
   if (filter === 'exhibition') return { type: 'EXHIBITION' }
-  if (filter === 'attraction') return { type: 'ATTRACTION' }
+  // '명소/랜드마크': 백엔드 단일 타입이 없어 관광지 계열 묶음(EXHIBITION+NATURE+ACTIVITY)으로 조회한다.
+  if (filter === 'attraction') return { type: 'EXHIBITION,NATURE,ACTIVITY' }
   if (filter === 'nature') return { type: 'NATURE' }
-  if (filter === 'culture') return { type: 'CULTURE' }
-  if (filter === 'stay') return { type: 'STAY' }
+  if (filter === 'culture') return { type: 'EXHIBITION' }
   if (filter === 'activity') return { type: 'ACTIVITY' }
   if (filter === 'shopping') return { type: 'SHOPPING' }
   if (mapMode === 'solo_dining') return { diningOnly: true, sort: 'DISTANCE' }

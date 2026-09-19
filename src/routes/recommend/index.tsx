@@ -20,7 +20,7 @@ const TRAVEL_FILTERS = [
   { value: 'nature', label: '자연/산책' },
   { value: 'culture', label: '전시/문화' },
   { value: 'cafe', label: '조용한 카페' },
-  { value: 'stay', label: '숙소' },
+  // 'stay'(숙소): 인제스트 데이터가 아직 없어 뺐다. 숙박 데이터 적재되면 다시 추가.
 ]
 
 const DINING_FILTERS = [
@@ -54,13 +54,16 @@ export const Route = createFileRoute('/recommend/')({
   component: RecommendPage,
 })
 
+// '명소/랜드마크'는 백엔드에 단일 타입이 없다 — L6에서 관광지를 EXHIBITION/NATURE/ACTIVITY로
+// 쪼개놨으므로 그 묶음을 가리킨다. 백엔드 type 파라미터는 쉼표 구분 목록을 지원한다.
+const ATTRACTION_TYPES = 'EXHIBITION,NATURE,ACTIVITY'
+
 function toPlacesParams(tab: RecommendTab, filter: string) {
   if (tab === 'travel') {
-    if (filter === 'attraction') return { type: 'ATTRACTION' }
+    if (filter === 'attraction') return { type: ATTRACTION_TYPES }
     if (filter === 'nature') return { type: 'NATURE' }
-    if (filter === 'culture') return { type: 'CULTURE' }
+    if (filter === 'culture') return { type: 'EXHIBITION' }
     if (filter === 'cafe') return { type: 'CAFE' }
-    if (filter === 'stay') return { type: 'STAY' }
     return {}
   }
   if (tab === 'dining') {
@@ -70,9 +73,9 @@ function toPlacesParams(tab: RecommendTab, filter: string) {
     return { soloFriendlyOnly: true }
   }
   // all
-  if (filter === 'attraction') return { type: 'ATTRACTION' }
+  if (filter === 'attraction') return { type: ATTRACTION_TYPES }
   if (filter === 'nature') return { type: 'NATURE' }
-  if (filter === 'culture') return { type: 'CULTURE' }
+  if (filter === 'culture') return { type: 'EXHIBITION' }
   if (filter === 'restaurant') return { type: 'RESTAURANT' }
   if (filter === 'cafe') return { type: 'CAFE' }
   return {}
