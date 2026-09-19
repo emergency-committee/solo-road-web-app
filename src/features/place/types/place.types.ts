@@ -112,6 +112,17 @@ export interface ApiPlaceSaveResponse {
   saved: boolean
 }
 
+export interface ApiPlaceMatch {
+  placeId: number
+  name: string
+  type: string
+  address: string
+  latitude: number
+  longitude: number
+  distanceM: number
+  similarityPercent: number
+}
+
 export interface ApiReview {
   reviewId: number
   userId: number

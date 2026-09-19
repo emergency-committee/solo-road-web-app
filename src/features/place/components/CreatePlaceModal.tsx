@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useNavigate } from '@tanstack/react-router'
 import {
   Compass,
   MapPin,
@@ -13,6 +14,8 @@ import {
 } from 'lucide-react'
 import { useCreatePlace } from '../hooks/use-create-place'
 import { useReviewTags } from '../hooks/use-create-place-review'
+import { getPlaceMatch } from '../api/place-api'
+import type { ApiPlaceMatch } from '../types/place.types'
 import { loadKakaoMapsSdk } from '@/features/map/lib/load-kakao-maps'
 import { cn } from '@/shared/lib/utils'
 
@@ -62,6 +65,7 @@ function categoryFromKakao(place: kakao.maps.services.PlacesSearchResult) {
 }
 
 export function CreatePlaceModal({ open, onClose, initialMode = 'travel' }: CreatePlaceModalProps) {
+  const navigate = useNavigate()
   const [recommendType, setRecommendType] = useState<'travel' | 'dining'>(initialMode)
   const [name, setName] = useState('')
   const [category, setCategory] = useState(initialMode === 'travel' ? 'ATTRACTION' : 'RESTAURANT')
@@ -79,6 +83,9 @@ export function CreatePlaceModal({ open, onClose, initialMode = 'travel' }: Crea
   const [soloRating, setSoloRating] = useState(5)
   const [tagIds, setTagIds] = useState<number[]>([])
   const [isSuccess, setIsSuccess] = useState(false)
+  const [matchedPlace, setMatchedPlace] = useState<ApiPlaceMatch | null>(null)
+  const [matchChecking, setMatchChecking] = useState(false)
+  const [confirmedNewPlace, setConfirmedNewPlace] = useState(false)
 
   const createPlaceMutation = useCreatePlace()
   const isDining = DINING_CATEGORIES.has(category)
@@ -132,22 +139,36 @@ export function CreatePlaceModal({ open, onClose, initialMode = 'travel' }: Crea
 
   const handleSelectPlace = (place: kakao.maps.services.PlacesSearchResult) => {
     const nextCategory = categoryFromKakao(place)
+    const nextName = place.place_name
+    const nextLatitude = Number(place.y)
+    const nextLongitude = Number(place.x)
     setName(place.place_name)
     setCategory(nextCategory)
     setRecommendType(DINING_CATEGORIES.has(nextCategory) ? 'dining' : 'travel')
     setAddress(place.road_address_name || place.address_name)
-    setLatitude(Number(place.y))
-    setLongitude(Number(place.x))
+    setLatitude(nextLatitude)
+    setLongitude(nextLongitude)
     setKeyword(place.place_name)
     setSearchResults([])
     setTagIds([])
     setSearchError('')
+    setMatchedPlace(null)
+    setConfirmedNewPlace(false)
+    setMatchChecking(true)
+    getPlaceMatch({ name: nextName, lat: nextLatitude, lng: nextLongitude })
+      .then((match) => setMatchedPlace(match))
+      .catch(() => setMatchedPlace(null))
+      .finally(() => setMatchChecking(false))
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim() || latitude == null || longitude == null) {
       setSearchError('카카오 장소 검색 결과에서 등록할 장소를 선택해 주세요.')
+      return
+    }
+    if (matchedPlace && !confirmedNewPlace) {
+      setSearchError('이미 등록된 장소인지 먼저 확인해 주세요.')
       return
     }
 
@@ -179,6 +200,8 @@ export function CreatePlaceModal({ open, onClose, initialMode = 'travel' }: Crea
             setAddress('서울특별시 강남구')
             setLatitude(null)
             setLongitude(null)
+            setMatchedPlace(null)
+            setConfirmedNewPlace(false)
             setFirstReviewContent('')
             setTagIds([])
             setRating(5)
@@ -334,6 +357,50 @@ export function CreatePlaceModal({ open, onClose, initialMode = 'travel' }: Crea
                     <p className="text-on-surface mt-0.5 text-sm font-bold">{name}</p>
                     <p className="text-on-surface-variant mt-0.5 line-clamp-1 text-xs">{address}</p>
                   </div>
+                )}
+                {matchChecking && (
+                  <p className="text-on-surface-variant mt-2 text-[11px]">
+                    이미 등록된 장소인지 확인하고 있어요.
+                  </p>
+                )}
+                {matchedPlace && !confirmedNewPlace && (
+                  <div className="border-secondary/30 bg-secondary/10 mt-2 rounded-xl border px-3 py-3">
+                    <p className="text-secondary text-xs font-bold">이미 지도에 있는 장소일 수 있어요</p>
+                    <p className="text-on-surface mt-1 text-sm font-bold">{matchedPlace.name}</p>
+                    <p className="text-on-surface-variant mt-0.5 line-clamp-1 text-xs">
+                      {matchedPlace.address} · {matchedPlace.distanceM}m 근처
+                    </p>
+                    <div className="mt-3 grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onClose()
+                          void navigate({
+                            to: '/place/$placeId',
+                            params: { placeId: matchedPlace.placeId.toString() },
+                          })
+                        }}
+                        className="border-secondary/40 text-secondary h-9 rounded-lg border bg-white text-xs font-bold"
+                      >
+                        이 장소 보기
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setConfirmedNewPlace(true)
+                          setSearchError('')
+                        }}
+                        className="bg-secondary text-on-secondary h-9 rounded-lg text-xs font-bold"
+                      >
+                        아니요, 새 장소예요
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {confirmedNewPlace && matchedPlace && (
+                  <p className="text-on-surface-variant mt-2 text-[11px]">
+                    새 장소로 등록할게요.
+                  </p>
                 )}
               </div>
 

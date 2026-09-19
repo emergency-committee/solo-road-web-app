@@ -34,7 +34,7 @@ function CourseCreatePage() {
             longitude: stop.longitude,
             summary: defaultPlaceSummary(stop),
             soloFriendlyBadge: false,
-            visibility: stop.visibility ?? 'PRIVATE',
+            visibility: 'PRIVATE',
           }),
         ),
       )

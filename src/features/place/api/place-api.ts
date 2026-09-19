@@ -9,6 +9,7 @@ import type {
   ApiPlaceRecommendations,
   ApiPlacesParams,
   ApiPlaceSummary,
+  ApiPlaceMatch,
   ApiReview,
   ApiReviewTag,
   CreatePlaceRequest,
@@ -69,6 +70,41 @@ export async function getPlaces(params: ApiPlacesParams = {}) {
     if (PLACE_DEMO_ENABLED) return getMockPlaces(params)
     throw error
   }
+}
+
+export async function getPlaceMatch(params: {
+  name: string
+  lat: number
+  lng: number
+  radius?: number
+}) {
+  if (AUTH_MOCK_ENABLED || PLACE_DEMO_ENABLED) {
+    const nearby = getMockPlaces({
+      keyword: params.name,
+      lat: params.lat,
+      lng: params.lng,
+      radius: params.radius ?? 50,
+      size: 1,
+    }).content[0]
+    if (!nearby) return null
+    return {
+      placeId: nearby.placeId,
+      name: nearby.name,
+      type: nearby.type,
+      address: nearby.summary ?? '',
+      latitude: nearby.latitude,
+      longitude: nearby.longitude,
+      distanceM: nearby.distanceM ?? 0,
+      similarityPercent: 100,
+    } satisfies ApiPlaceMatch
+  }
+  const qs = buildQueryString({
+    name: params.name,
+    lat: params.lat,
+    lng: params.lng,
+    radius: params.radius ?? 50,
+  })
+  return apiRequest<ApiPlaceMatch | null>(`${API_PREFIX}/places/match${qs}`)
 }
 
 export function getPlaceDetail(placeId: number) {
