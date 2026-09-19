@@ -78,12 +78,12 @@ export async function getPlaceMatch(params: {
   lng: number
   radius?: number
 }) {
-  if (AUTH_MOCK_ENABLED || PLACE_DEMO_ENABLED) {
+  if (AUTH_MOCK_ENABLED) {
     const nearby = getMockPlaces({
       keyword: params.name,
       lat: params.lat,
       lng: params.lng,
-      radius: params.radius ?? 50,
+      radius: params.radius ?? 120,
       size: 1,
     }).content[0]
     if (!nearby) return null
@@ -102,9 +102,14 @@ export async function getPlaceMatch(params: {
     name: params.name,
     lat: params.lat,
     lng: params.lng,
-    radius: params.radius ?? 50,
+    radius: params.radius ?? 120,
   })
-  return apiRequest<ApiPlaceMatch | null>(`${API_PREFIX}/places/match${qs}`)
+  try {
+    return await apiRequest<ApiPlaceMatch | null>(`${API_PREFIX}/places/match${qs}`)
+  } catch (error) {
+    if (!PLACE_DEMO_ENABLED) throw error
+    return null
+  }
 }
 
 export function getPlaceDetail(placeId: number) {
