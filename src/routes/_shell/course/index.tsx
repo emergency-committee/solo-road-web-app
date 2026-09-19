@@ -10,7 +10,6 @@ import {
 import {
   PublicCourseCard,
   formatCourseDateRange,
-  mockSavedCourseRows,
   resolveFeaturedCourses,
   useCourseRecommendations,
   useLikedCourses,
@@ -217,35 +216,6 @@ function CoursePage() {
         )}
       </section>
 
-      <section className="space-y-md">
-        <SectionHeader title="안심경로 검증 코스" />
-        <div className="gap-md grid grid-cols-1">
-          {mockSavedCourseRows.map((course) => (
-            <Link
-              key={course.id}
-              to="/course/$courseId"
-              params={{ courseId: course.id }}
-              className="group border-outline-variant/20 hover:bg-surface-container-high bg-surface-container flex min-h-24 rounded-xl border p-4 transition-colors"
-            >
-              <div className="bg-primary/10 text-primary mr-3 grid size-10 shrink-0 place-items-center rounded-full">
-                <RouteIcon className="size-5" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <h6 className="font-label-md text-label-md mb-xs text-primary tracking-widest uppercase">
-                  Safety Demo
-                </h6>
-                <h5 className="font-body-md text-body-md text-on-surface font-bold break-keep">
-                  {course.title}
-                </h5>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 break-keep">
-                  {course.location}
-                </p>
-              </div>
-              <ChevronRight className="text-on-surface-variant group-hover:text-primary mr-md size-5 shrink-0 self-center transition-colors" />
-            </Link>
-          ))}
-        </div>
-      </section>
     </main>
   )
 }

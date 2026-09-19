@@ -162,9 +162,11 @@ function CourseDetailPage() {
                   {formatDurationMinutes(course.totalDurationMinutes)}
                 </p>
               </div>
-              <div className="font-label-md text-label-md bg-secondary-container px-xs text-on-secondary-fixed shrink-0 rounded-full py-1">
-                {formatDistanceMeters(course.totalDistanceM)}
-              </div>
+              {course.totalDistanceM > 0 && (
+                <div className="font-label-md text-label-md bg-secondary-container px-xs text-on-secondary-fixed shrink-0 rounded-full py-1">
+                  {formatDistanceMeters(course.totalDistanceM)}
+                </div>
+              )}
             </div>
 
             <div className="border-outline-variant/30 mt-4 flex items-center justify-between border-t pt-3">

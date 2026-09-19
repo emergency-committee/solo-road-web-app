@@ -368,9 +368,11 @@ function SortableCourseStop({
         isLast={index === total - 1}
         durationLabel={stop.durationLabel}
         title={stop.title}
+        {...(stop.address || stop.subtitle ? { subtitle: stop.address ?? stop.subtitle } : {})}
         {...(stop.imageUrl ? { imageUrl: stop.imageUrl } : {})}
         imageAlt={stop.imageAlt}
         editable
+        compact
         onEdit={() => setEditingMemo((open) => !open)}
         onRemove={onRemove}
         dragHandle={
@@ -378,7 +380,7 @@ function SortableCourseStop({
             type="button"
             data-no-drag-scroll
             aria-label={`${stop.title} 순서 변경`}
-            className="text-outline hover:bg-surface-container flex min-h-16 w-12 touch-none items-center justify-center self-stretch rounded-lg active:cursor-grabbing active:bg-surface-container"
+            className="text-outline hover:bg-surface-container flex min-h-12 w-10 touch-none items-center justify-center self-stretch rounded-lg active:cursor-grabbing active:bg-surface-container"
             {...attributes}
             {...listeners}
           >

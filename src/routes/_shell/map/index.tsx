@@ -156,7 +156,7 @@ function MapPage() {
     // 그 외에는 실제로 지도에 보이는 영역(bbox) 기준으로 불러와, 축소하면 넓게 흩어져 보이고
     // 확대하면 그 범위만큼만 보이게 한다.
     ...(filterParams.radius == null && bbox && { bbox }),
-    size: 60,
+    size: filterValue[0] === 'solo-friendly' ? 100 : 60,
   })
   const savedPlacesQuery = useSavedPlaces(0, 500)
   const savedPlaceIds = useMemo(

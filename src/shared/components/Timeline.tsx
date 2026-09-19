@@ -27,6 +27,7 @@ interface TimelineItemProps {
   onEdit?: () => void
   onRemove?: () => void
   dragHandle?: ReactNode
+  compact?: boolean
   className?: string
 }
 
@@ -54,6 +55,7 @@ export function TimelineItem({
   onEdit,
   onRemove,
   dragHandle,
+  compact = false,
   className,
 }: TimelineItemProps) {
   return (
@@ -84,20 +86,30 @@ export function TimelineItem({
           </div>
         )}
         <div className="border-outline-variant hover:border-primary overflow-hidden rounded-xl border bg-white shadow-sm transition-colors">
-          <div className="flex min-h-24">
+          <div className={cn('flex', compact ? 'min-h-20' : 'min-h-24')}>
             {imageUrl && (
               <div className="w-1/3 shrink-0">
                 <img src={imageUrl} alt={imageAlt ?? title} className="size-full object-cover" />
               </div>
             )}
-            <div className="p-md flex min-w-0 flex-1 justify-between gap-2">
+            <div
+              className={cn(
+                'flex min-w-0 flex-1 justify-between gap-2',
+                compact ? 'px-4 py-3' : 'p-md',
+              )}
+            >
               <div className="flex min-w-0 flex-1 flex-col justify-between">
                 <div className="min-w-0">
                   <h4 className="font-headline-lg-mobile text-on-surface line-clamp-2 text-[16px] leading-tight font-semibold break-keep [overflow-wrap:anywhere]">
                     {title}
                   </h4>
                   {subtitle && (
-                    <p className="text-body-sm text-on-surface-variant line-clamp-2 leading-snug break-keep [overflow-wrap:anywhere]">
+                    <p
+                      className={cn(
+                        'text-body-sm text-on-surface-variant leading-snug break-keep [overflow-wrap:anywhere]',
+                        compact ? 'mt-1 line-clamp-1' : 'line-clamp-2',
+                      )}
+                    >
                       {subtitle}
                     </p>
                   )}
@@ -130,18 +142,29 @@ export function TimelineItem({
             </div>
           </div>
           {editable && (
-            <div className="border-outline-variant/20 p-sm flex gap-2 border-t">
+            <div
+              className={cn(
+                'border-outline-variant/20 flex gap-2 border-t',
+                compact ? 'px-3 py-1.5' : 'p-sm',
+              )}
+            >
               <button
                 type="button"
                 onClick={onEdit}
-                className="font-label-md text-on-surface-variant hover:bg-surface-variant/40 flex-1 rounded-lg py-2 transition-colors"
+                className={cn(
+                  'font-label-md text-on-surface-variant hover:bg-surface-variant/40 flex-1 rounded-lg transition-colors',
+                  compact ? 'py-1.5' : 'py-2',
+                )}
               >
                 메모
               </button>
               <button
                 type="button"
                 onClick={onRemove}
-                className="font-label-md hover:bg-error-container/20 text-error flex-1 rounded-lg py-2 transition-colors"
+                className={cn(
+                  'font-label-md hover:bg-error-container/20 text-error flex-1 rounded-lg transition-colors',
+                  compact ? 'py-1.5' : 'py-2',
+                )}
               >
                 삭제
               </button>

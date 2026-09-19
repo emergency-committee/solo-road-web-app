@@ -491,6 +491,14 @@ export function createMockPlaceReview(
 
   const detail = mockDetails[placeId]
   const summary = mockPlaces.find((place) => place.placeId === placeId)
+  const generalRatings = (mockReviews[placeId] ?? []).map((item) => item.rating)
+  const generalRating =
+    generalRatings.length > 0
+      ? generalRatings.reduce((sum, itemRating) => sum + itemRating, 0) / generalRatings.length
+      : null
+  if (detail) detail.rating = generalRating
+  if (summary) summary.rating = generalRating
+
   if (request.visitedAlone && request.soloRating !== undefined) {
     const soloRatings = (mockReviews[placeId] ?? [])
       .map((item) => item.soloRating)
@@ -539,12 +547,14 @@ function defaultPlaceSummary(type: string) {
 export function createMockPlace(request: CreatePlaceRequest): CreatePlaceResponse {
   const newPlaceId = Date.now()
   const typeUpper = (request.type || 'ATTRACTION').toUpperCase()
-  const rating = request.rating ?? 4.5
   const hasInitialReview =
+    request.rating !== undefined ||
     request.firstReviewSoloRating !== undefined ||
     Boolean(request.firstReviewContent?.trim()) ||
     Boolean(request.firstReviewTagIds?.length)
-  const firstSoloRating = hasInitialReview ? (request.firstReviewSoloRating ?? rating) : null
+  const reviewRating = request.rating ?? 4.5
+  const rating = hasInitialReview ? reviewRating : null
+  const firstSoloRating = hasInitialReview ? (request.firstReviewSoloRating ?? reviewRating) : null
   const firstReviewContent = request.firstReviewContent || request.soloTip || ''
   const selectedTags = mockReviewTags.filter((tag) =>
     (request.firstReviewTagIds ?? []).includes(tag.reviewTagId),
@@ -613,7 +623,7 @@ export function createMockPlace(request: CreatePlaceRequest): CreatePlaceRespons
         {
           reviewId: Date.now() + 1,
           userId: 999,
-          rating,
+          rating: reviewRating,
           visitedAlone: true,
           soloRating: firstSoloRating,
           contents: firstReviewContent || '혼자 방문하기 좋아서 추천해요.',
