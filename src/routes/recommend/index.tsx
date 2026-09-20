@@ -19,7 +19,7 @@ interface RecommendSearch {
 }
 
 const TRAVEL_FILTERS = [
-  { value: 'all', label: '전체 혼행' },
+  { value: 'all', label: '전체' },
   { value: 'attraction', label: '명소/랜드마크' },
   { value: 'nature', label: '자연/산책' },
   { value: 'culture', label: '전시/문화' },
@@ -28,10 +28,10 @@ const TRAVEL_FILTERS = [
 ]
 
 const DINING_FILTERS = [
+  { value: 'all', label: '전체' },
   { value: 'solo-friendly', label: '혼밥 편한 곳' },
   { value: 'restaurant', label: '혼밥 맛집' },
   { value: 'cafe', label: '카페/디저트' },
-  { value: 'all', label: '전체' },
 ]
 
 const ALL_FILTERS = [
@@ -80,7 +80,7 @@ function toPlacesParams(tab: RecommendTab, filter: string) {
       return { diningOnly: true, soloFriendlyOnly: true, sort: 'SOLO_SCORE' }
     if (filter === 'restaurant') return { type: 'RESTAURANT' }
     if (filter === 'cafe') return { type: 'CAFE' }
-    return { diningOnly: true, soloFriendlyOnly: true }
+    return { diningOnly: true }
   }
   // all
   if (filter === 'attraction') return { type: ATTRACTION_TYPES }
@@ -95,9 +95,7 @@ function RecommendPage() {
   const navigate = useNavigate()
   const { tab: activeTab = 'all' } = Route.useSearch()
   const [keyword, setKeyword] = useState('')
-  const [filter, setFilter] = useState<string[]>(
-    activeTab === 'dining' ? ['solo-friendly'] : ['all'],
-  )
+  const [filter, setFilter] = useState<string[]>(['all'])
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
 
@@ -118,11 +116,7 @@ function RecommendPage() {
         : ALL_FILTERS
 
   const handleTabChange = (tab: RecommendTab) => {
-    if (tab === 'dining') {
-      setFilter(['solo-friendly'])
-    } else {
-      setFilter(['all'])
-    }
+    setFilter(['all'])
     void navigate({ to: '/recommend', search: { tab }, replace: true })
   }
 
