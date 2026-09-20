@@ -14,7 +14,6 @@ import {
   Check,
   GripVertical,
   MapPin,
-  MapPinPlus,
   MapPinned,
   Moon,
   PencilLine,
@@ -28,12 +27,10 @@ import {
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Switch } from '@/shared/components/ui/switch'
 import { FilterChipGroup } from '@/shared/components/FilterChip'
 import { toIsoDateString } from '@/shared/lib/format'
 import { loadKakaoMapsSdk } from '@/features/map/lib/load-kakao-maps'
 import { CourseDateRangeCalendar, type DateRange } from './CourseDateRangeCalendar'
-import { isSafetyRouteRegion } from '../lib/course-region'
 import { calculateTripDays, formatTripLength } from '../lib/course-schedule'
 
 export interface CourseCreateFormData {
@@ -70,12 +67,6 @@ const VIBE_OPTIONS = [
   { value: 'urban', label: '도심 속', icon: Building2 },
 ]
 
-interface InterestPlace {
-  id: string
-  label: string
-  imageUrl: string
-}
-
 interface ManualCourseStop {
   id: string
   kakaoPlaceId: string
@@ -93,16 +84,6 @@ interface ManualPlacePreview {
   latitude: number
   longitude: number
 }
-
-const INITIAL_INTEREST_PLACES: InterestPlace[] = [
-  { id: 'park', label: '공원 & 자연', imageUrl: 'https://picsum.photos/seed/course-park/300/160' },
-  { id: 'cafe', label: '분위기 카페', imageUrl: 'https://picsum.photos/seed/course-cafe/300/160' },
-  {
-    id: 'night-view',
-    label: '야경 명소',
-    imageUrl: 'https://picsum.photos/seed/course-night-view/620/160',
-  },
-]
 
 function categoryFromKakao(place: kakao.maps.services.PlacesSearchResult) {
   if (place.category_group_code === 'FD6') return 'RESTAURANT'
@@ -126,10 +107,7 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
   const [title, setTitle] = useState('')
   const [region, setRegion] = useState('')
   const [dateRange, setDateRange] = useState<DateRange>({ start: null, end: null })
-  const [interestPlaces, setInterestPlaces] = useState(INITIAL_INTEREST_PLACES)
   const [vibe, setVibe] = useState<string[]>(['nature'])
-  const [safetyPriority, setSafetyPriority] = useState(true)
-  const [safetyPreferenceTouched, setSafetyPreferenceTouched] = useState(false)
   const [manualInput, setManualInput] = useState('')
   const [manualSearchError, setManualSearchError] = useState('')
   const [manualSearchResults, setManualSearchResults] = useState<
@@ -159,7 +137,6 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
     dateRange.start !== null &&
     dateRange.end !== null &&
     (creationMode === 'ai' ? startPoint !== null : title.trim().length > 0 && manualStops.length > 0)
-  const safetyRouteSupported = isSafetyRouteRegion(region)
   const selectedStartDate = dateRange.start ? toIsoDateString(dateRange.start) : undefined
   const selectedEndDate = dateRange.end ? toIsoDateString(dateRange.end) : undefined
   const selectedTripDays = calculateTripDays(selectedStartDate, selectedEndDate)
@@ -174,11 +151,6 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
 
   function changeRegion(nextRegion: string) {
     setRegion(nextRegion)
-    if (!isSafetyRouteRegion(nextRegion)) {
-      setSafetyPriority(false)
-    } else if (!safetyPreferenceTouched) {
-      setSafetyPriority(true)
-    }
   }
 
   async function searchKakaoPlaces() {
@@ -306,7 +278,7 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
           startDate: toIsoDateString(dateRange.start),
           endDate: toIsoDateString(dateRange.end),
           preferredMood: creationMode === 'ai' ? (vibe[0] ?? 'nature') : '',
-          safetyPriority: safetyRouteSupported && safetyPriority,
+          safetyPriority: false,
           ...(creationMode === 'ai' &&
             startPoint && {
               startPointName: startPoint.name,
@@ -365,7 +337,7 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
         </div>
         <p className="font-label-md text-label-md text-on-surface-variant">
           {creationMode === 'ai'
-            ? '관심 장소와 분위기를 바탕으로 코스를 추천받아요.'
+            ? '선호하는 분위기를 바탕으로 코스를 추천받아요.'
             : '원하는 장소를 찾아 나만의 일정을 직접 구성해요.'}
         </p>
       </section>
@@ -519,57 +491,6 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
           )}
         </section>
       )}
-
-      {creationMode === 'ai' && (
-        <section className="space-y-md">
-          <div className="mb-xs flex items-center justify-between">
-            <label className="font-label-md text-label-md text-on-surface-variant tracking-wider uppercase">
-              04. 관심 장소
-            </label>
-            <button
-              type="button"
-              className="text-primary font-label-md hover:bg-primary/5 gap-xs px-sm py-base flex items-center rounded-full"
-            >
-              <MapPinPlus className="size-[18px]" />
-              장소 검색/추가
-            </button>
-          </div>
-          <div className="gap-sm grid grid-cols-2">
-            {interestPlaces.map((place, i) => (
-              <div
-                key={place.id}
-                className={
-                  i === interestPlaces.length - 1 && interestPlaces.length % 2 === 1
-                    ? 'group hover:border-primary relative col-span-2 h-28 cursor-pointer overflow-hidden rounded-xl border-2 border-transparent'
-                    : 'group hover:border-primary relative h-28 cursor-pointer overflow-hidden rounded-xl border-2 border-transparent'
-                }
-              >
-                <img
-                  src={place.imageUrl}
-                  alt={place.label}
-                  className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="bottom-xs left-xs absolute text-white">
-                  <p className="font-label-md text-label-md">{place.label}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setInterestPlaces((prev) => prev.filter((p) => p.id !== place.id))}
-                  aria-label="삭제"
-                  className="hover:bg-error top-xs right-xs absolute rounded-full bg-black/40 p-1 text-white transition-colors"
-                >
-                  <X className="size-4" />
-                </button>
-              </div>
-            ))}
-          </div>
-          <p className="font-label-md text-label-md text-on-surface-variant">
-            AI 추천 코스에서 우선 반영할 후보예요.
-          </p>
-        </section>
-      )}
-
       {creationMode === 'manual' && (
         <section className="space-y-md">
           <div>
@@ -775,7 +696,7 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
       {creationMode === 'ai' && (
         <section className="space-y-md">
           <label className="font-label-md text-label-md text-on-surface-variant tracking-wider uppercase">
-            05. 선호하는 분위기
+            04. 선호하는 분위기
           </label>
           <FilterChipGroup
             options={VIBE_OPTIONS.map(({ value, label }) => ({ value, label }))}
@@ -784,40 +705,6 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
           />
         </section>
       )}
-
-      <section
-        className={`p-md rounded-xl border ${safetyRouteSupported ? 'border-primary/20 bg-primary/5' : 'border-outline-variant/40 bg-surface-container-low'}`}
-      >
-        <div className="flex items-center justify-between">
-          <div className="gap-md flex items-center">
-            <div
-              className={`p-sm rounded-full ${safetyRouteSupported ? 'bg-primary-container/10 text-primary' : 'bg-surface-container-high text-outline'}`}
-            >
-              <Sparkles className="size-5" />
-            </div>
-            <div>
-              <p className="font-body-md text-body-md text-on-primary-fixed-variant font-bold">
-                안심경로 함께 보기
-              </p>
-              <p className="font-label-md text-label-md text-on-surface-variant">
-                {!region.trim()
-                  ? '서울·부산·제주에서 이용할 수 있어요.'
-                  : safetyRouteSupported
-                    ? '안전시설을 반영한 도보 경로를 함께 안내해요.'
-                    : `${region.trim()}은 일반 코스로 만들어요. 안심경로는 준비 중이에요.`}
-              </p>
-            </div>
-          </div>
-          <Switch
-            checked={safetyRouteSupported && safetyPriority}
-            disabled={!safetyRouteSupported}
-            onCheckedChange={(checked) => {
-              setSafetyPreferenceTouched(true)
-              setSafetyPriority(checked)
-            }}
-          />
-        </div>
-      </section>
 
       <button
         type="submit"
