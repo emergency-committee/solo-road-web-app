@@ -45,6 +45,9 @@ export interface CourseCreateFormData {
   preferredMood: string
   safetyPriority: boolean
   stops?: ManualCourseStopInput[]
+  startPointName?: string
+  startLatitude?: number
+  startLongitude?: number
 }
 
 export interface ManualCourseStopInput {
@@ -139,12 +142,23 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
   const manualDragSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
   )
+  const [startPointQuery, setStartPointQuery] = useState('')
+  const [startPointResults, setStartPointResults] = useState<
+    kakao.maps.services.PlacesSearchResult[]
+  >([])
+  const [startPointSearching, setStartPointSearching] = useState(false)
+  const [startPointError, setStartPointError] = useState('')
+  const [startPoint, setStartPoint] = useState<{
+    name: string
+    latitude: number
+    longitude: number
+  } | null>(null)
 
   const isValid =
     region.trim().length > 0 &&
     dateRange.start !== null &&
     dateRange.end !== null &&
-    (creationMode === 'ai' || (title.trim().length > 0 && manualStops.length > 0))
+    (creationMode === 'ai' ? startPoint !== null : title.trim().length > 0 && manualStops.length > 0)
   const safetyRouteSupported = isSafetyRouteRegion(region)
   const selectedStartDate = dateRange.start ? toIsoDateString(dateRange.start) : undefined
   const selectedEndDate = dateRange.end ? toIsoDateString(dateRange.end) : undefined
@@ -200,6 +214,49 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
     }
   }
 
+  async function searchStartPointPlaces() {
+    const query = startPointQuery.trim()
+    if (!query) return
+    setStartPointSearching(true)
+    setStartPointError('')
+
+    try {
+      const kakaoSdk = await loadKakaoMapsSdk()
+      const places = new kakaoSdk.maps.services.Places()
+      places.keywordSearch(
+        query,
+        (result, status) => {
+          setStartPointSearching(false)
+          if (status === kakaoSdk.maps.services.Status.OK) {
+            setStartPointResults(result.slice(0, 8))
+            return
+          }
+          setStartPointResults([])
+          setStartPointError(
+            status === kakaoSdk.maps.services.Status.ZERO_RESULT
+              ? '검색 결과가 없어요. 장소명을 조금 더 정확히 입력해 주세요.'
+              : '장소 검색을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.',
+          )
+        },
+        { size: 8 },
+      )
+    } catch {
+      setStartPointSearching(false)
+      setStartPointResults([])
+      setStartPointError('장소 검색을 사용할 수 없어요. 잠시 후 다시 시도해 주세요.')
+    }
+  }
+
+  function selectStartPoint(place: kakao.maps.services.PlacesSearchResult) {
+    setStartPoint({
+      name: place.place_name,
+      latitude: Number(place.y),
+      longitude: Number(place.x),
+    })
+    setStartPointResults([])
+    setStartPointQuery('')
+  }
+
   function handleManualStopDragEnd({ active, over }: DragEndEvent) {
     if (!over || active.id === over.id) return
 
@@ -250,6 +307,12 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
           endDate: toIsoDateString(dateRange.end),
           preferredMood: creationMode === 'ai' ? (vibe[0] ?? 'nature') : '',
           safetyPriority: safetyRouteSupported && safetyPriority,
+          ...(creationMode === 'ai' &&
+            startPoint && {
+              startPointName: startPoint.name,
+              startLatitude: startPoint.latitude,
+              startLongitude: startPoint.longitude,
+            }),
           ...(creationMode === 'manual' && {
             stops: manualStops
               .map((stop, originalIndex) => ({ stop, originalIndex }))
@@ -374,9 +437,94 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
 
       {creationMode === 'ai' && (
         <section className="space-y-md">
+          <label className="font-label-md text-label-md text-on-surface-variant tracking-wider uppercase">
+            03. 출발지
+          </label>
+          <p className="font-label-md text-label-md text-on-surface-variant">
+            코스가 시작할 장소를 검색해서 선택해주세요.
+          </p>
+          {startPoint ? (
+            <div className="border-primary/20 bg-primary/5 px-md py-sm flex items-center justify-between rounded-xl border">
+              <div className="gap-sm flex min-w-0 items-center">
+                <MapPin className="text-primary size-4 shrink-0" />
+                <span className="truncate text-sm font-bold">{startPoint.name}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setStartPoint(null)}
+                aria-label="출발지 다시 선택"
+                className="text-on-surface-variant hover:bg-surface-container grid size-8 shrink-0 place-items-center rounded-full"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="gap-sm flex">
+                <div className="relative min-w-0 flex-1">
+                  <Search className="text-outline absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+                  <input
+                    type="search"
+                    value={startPointQuery}
+                    onChange={(event) => setStartPointQuery(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        event.preventDefault()
+                        void searchStartPointPlaces()
+                      }
+                    }}
+                    placeholder="출발할 장소 검색 (예: 서울역)"
+                    className="border-outline-variant focus:border-primary h-11 w-full rounded-xl border bg-white pr-3 pl-10 outline-none"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void searchStartPointPlaces()}
+                  disabled={!startPointQuery.trim() || startPointSearching}
+                  className="bg-primary text-on-primary h-11 shrink-0 rounded-xl px-4 font-semibold disabled:opacity-50"
+                >
+                  {startPointSearching ? '검색 중' : '검색'}
+                </button>
+              </div>
+              {startPointSearching ? (
+                <p className="text-body-sm text-on-surface-variant py-sm text-center">
+                  장소를 찾고 있어요...
+                </p>
+              ) : startPointError ? (
+                <p className="text-body-sm text-error py-sm text-center">{startPointError}</p>
+              ) : startPointResults.length > 0 ? (
+                <ul className="border-outline-variant/30 bg-surface divide-outline-variant/30 max-h-60 divide-y overflow-y-auto rounded-xl border shadow-sm">
+                  {startPointResults.map((place) => (
+                    <li key={place.id}>
+                      <button
+                        type="button"
+                        onClick={() => selectStartPoint(place)}
+                        className="hover:bg-surface-container flex w-full items-center gap-3 px-3 py-3 text-left"
+                      >
+                        <div className="bg-primary/8 text-primary grid size-10 shrink-0 place-items-center rounded-lg">
+                          <MapPin className="size-4" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold">{place.place_name}</p>
+                          <p className="text-body-sm text-on-surface-variant truncate">
+                            {place.road_address_name || place.address_name}
+                          </p>
+                        </div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </>
+          )}
+        </section>
+      )}
+
+      {creationMode === 'ai' && (
+        <section className="space-y-md">
           <div className="mb-xs flex items-center justify-between">
             <label className="font-label-md text-label-md text-on-surface-variant tracking-wider uppercase">
-              03. 관심 장소
+              04. 관심 장소
             </label>
             <button
               type="button"
@@ -627,7 +775,7 @@ export function CourseCreateForm({ onSubmit, submitting = false }: CourseCreateF
       {creationMode === 'ai' && (
         <section className="space-y-md">
           <label className="font-label-md text-label-md text-on-surface-variant tracking-wider uppercase">
-            04. 선호하는 분위기
+            05. 선호하는 분위기
           </label>
           <FilterChipGroup
             options={VIBE_OPTIONS.map(({ value, label }) => ({ value, label }))}
