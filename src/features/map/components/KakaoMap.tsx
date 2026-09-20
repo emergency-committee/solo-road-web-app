@@ -23,6 +23,8 @@ interface KakaoMapProps {
    */
   maxLevel?: number
   markers?: MapMarkerData[]
+  /** false면 가까운 마커도 숨기지 않고 전달받은 마커를 모두 표시한다. */
+  declutterMarkers?: boolean
   ratingMode?: MapRatingMode
   selectedId?: string | null
   onSelectMarker?: (marker: MapMarkerData) => void
@@ -102,6 +104,7 @@ export function KakaoMap({
   level = 4,
   maxLevel = 12,
   markers = [],
+  declutterMarkers = true,
   ratingMode = 'solo',
   selectedId = null,
   onSelectMarker,
@@ -238,10 +241,10 @@ export function KakaoMap({
   // 지도 준비 전에는 필터링 없이 원본 마커를 그대로 쓴다(최초 idle 전 깜빡임 방지).
   const visibleMarkers = useMemo(() => {
     const map = mapRef.current
-    if (!map || status !== 'ready') return markers
+    if (!map || status !== 'ready' || !declutterMarkers) return markers
     return dedupeByScreenDistance(markers, map)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [markers, status, viewportTick])
+  }, [markers, status, viewportTick, declutterMarkers])
 
   // 장소 마커 동기화 (추가/삭제/선택 상태 반영)
   useEffect(() => {

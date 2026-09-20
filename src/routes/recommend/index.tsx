@@ -14,6 +14,10 @@ import { cn } from '@/shared/lib/utils'
 
 type RecommendTab = 'all' | 'travel' | 'dining'
 
+interface RecommendSearch {
+  tab?: RecommendTab
+}
+
 const TRAVEL_FILTERS = [
   { value: 'all', label: '전체 혼행' },
   { value: 'attraction', label: '명소/랜드마크' },
@@ -51,12 +55,17 @@ function getPlaceholderVariant(type: string) {
 }
 
 export const Route = createFileRoute('/recommend/')({
+  validateSearch: (search: Record<string, unknown>): RecommendSearch => {
+    const tab = search.tab
+    return tab === 'all' || tab === 'travel' || tab === 'dining' ? { tab } : {}
+  },
   component: RecommendPage,
 })
 
 // '명소/랜드마크'는 백엔드에 단일 타입이 없다 — L6에서 관광지를 EXHIBITION/NATURE/ACTIVITY로
 // 쪼개놨으므로 그 묶음을 가리킨다. 백엔드 type 파라미터는 쉼표 구분 목록을 지원한다.
 const ATTRACTION_TYPES = 'EXHIBITION,NATURE,ACTIVITY'
+const TRAVEL_TYPES = 'WELLNESS,STUDY,EXHIBITION,NATURE,ACTIVITY,SHOPPING'
 
 function toPlacesParams(tab: RecommendTab, filter: string) {
   if (tab === 'travel') {
@@ -64,13 +73,14 @@ function toPlacesParams(tab: RecommendTab, filter: string) {
     if (filter === 'nature') return { type: 'NATURE' }
     if (filter === 'culture') return { type: 'EXHIBITION' }
     if (filter === 'cafe') return { type: 'CAFE' }
-    return {}
+    return { type: TRAVEL_TYPES }
   }
   if (tab === 'dining') {
-    if (filter === 'solo-friendly') return { soloFriendlyOnly: true, sort: 'SOLO_SCORE' }
+    if (filter === 'solo-friendly')
+      return { diningOnly: true, soloFriendlyOnly: true, sort: 'SOLO_SCORE' }
     if (filter === 'restaurant') return { type: 'RESTAURANT' }
     if (filter === 'cafe') return { type: 'CAFE' }
-    return { soloFriendlyOnly: true }
+    return { diningOnly: true, soloFriendlyOnly: true }
   }
   // all
   if (filter === 'attraction') return { type: ATTRACTION_TYPES }
@@ -83,9 +93,11 @@ function toPlacesParams(tab: RecommendTab, filter: string) {
 
 function RecommendPage() {
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<RecommendTab>('all')
+  const { tab: activeTab = 'all' } = Route.useSearch()
   const [keyword, setKeyword] = useState('')
-  const [filter, setFilter] = useState<string[]>(['all'])
+  const [filter, setFilter] = useState<string[]>(
+    activeTab === 'dining' ? ['solo-friendly'] : ['all'],
+  )
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
 
@@ -106,12 +118,12 @@ function RecommendPage() {
         : ALL_FILTERS
 
   const handleTabChange = (tab: RecommendTab) => {
-    setActiveTab(tab)
     if (tab === 'dining') {
       setFilter(['solo-friendly'])
     } else {
       setFilter(['all'])
     }
+    void navigate({ to: '/recommend', search: { tab }, replace: true })
   }
 
   const placesQuery = usePlaces({

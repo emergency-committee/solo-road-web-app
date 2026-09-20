@@ -18,7 +18,7 @@ export function HiddenGemsGrid({
       <SectionHeader
         title="여유로운 숨은 명소"
         actionLabel="더 보기"
-        onAction={() => navigate({ to: '/recommend' })}
+        onAction={() => navigate({ to: '/recommend', search: { tab: 'travel' } })}
       />
       <div className="gap-md grid grid-cols-2">
         {isLoading

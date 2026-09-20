@@ -226,6 +226,7 @@ function MapPage() {
       <KakaoMap
         center={center}
         markers={markers}
+        declutterMarkers={!isRecommendationView}
         ratingMode={ratingMode}
         selectedId={selectedMarker?.id ?? null}
         onSelectMarker={setSelectedMarker}

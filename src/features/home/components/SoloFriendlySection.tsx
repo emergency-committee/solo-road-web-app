@@ -18,7 +18,7 @@ export function SoloFriendlySection({
       <SectionHeader
         title="지금 혼밥하기 좋은 곳"
         actionLabel="전체보기"
-        onAction={() => navigate({ to: '/recommend' })}
+        onAction={() => navigate({ to: '/recommend', search: { tab: 'dining' } })}
       />
       <div className="no-scrollbar -mx-margin-mobile gap-md px-margin-mobile pb-xs flex overflow-x-auto">
         {isLoading
