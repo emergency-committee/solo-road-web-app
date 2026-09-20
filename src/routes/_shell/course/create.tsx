@@ -64,11 +64,18 @@ function CourseCreatePage() {
       return
     }
 
+    if (!data.startPointName || data.startLatitude == null || data.startLongitude == null) {
+      return
+    }
+
     generateCourse.mutate(
       {
         region: data.region,
         startDate: data.startDate,
         endDate: data.endDate,
+        startPointName: data.startPointName,
+        startLatitude: data.startLatitude,
+        startLongitude: data.startLongitude,
         preferredMood: data.preferredMood,
         safetyPriority: data.safetyPriority,
       },
