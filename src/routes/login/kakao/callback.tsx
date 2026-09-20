@@ -56,8 +56,13 @@ function KakaoCallbackPage() {
             }),
           },
         })
-        const needsOnboarding = result.isNewUser || !useSessionStore.getState().hasOnboarded
-        await navigate({ to: needsOnboarding ? '/onboarding' : '/' })
+        // isNewUser는 서버가 판단하는 온보딩 완료 여부의 근거다. 로컬 hasOnboarded는
+        // 브라우저 캐시/스토리지가 지워지면 사라지므로, 여기서 OR로 묶으면 이미 온보딩을
+        // 마친 기존 유저도 캐시가 지워졌다는 이유만으로 다시 온보딩하게 된다.
+        if (!result.isNewUser) {
+          useSessionStore.getState().setOnboarded()
+        }
+        await navigate({ to: result.isNewUser ? '/onboarding' : '/' })
       } catch {
         setFailureMessage('카카오 로그인에 실패했습니다. 다시 시도해 주세요.')
       }
