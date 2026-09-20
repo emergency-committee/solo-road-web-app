@@ -42,6 +42,9 @@ const DINING_TYPES = [
   '디저트',
 ]
 
+const SOLO_TRAVEL_TYPES = 'WELLNESS,STUDY,EXHIBITION,NATURE,ACTIVITY,SHOPPING'
+const SOLO_RECOMMENDATION_MIN_SCORE = 19
+
 function isDiningPlace(type: string): boolean {
   const upper = type.toUpperCase()
   return DINING_TYPES.some((candidate) => upper.includes(candidate))
@@ -50,10 +53,11 @@ function isDiningPlace(type: string): boolean {
 function toPlacesParams(filter: string, mapMode: MapMode): ApiPlacesParams {
   if (filter === 'solo-friendly') {
     return {
-      ...(mapMode === 'solo_dining' && { diningOnly: true }),
+      ...(mapMode === 'solo_dining'
+        ? { diningOnly: true }
+        : { type: SOLO_TRAVEL_TYPES }),
       soloFriendlyOnly: true,
       sort: 'SOLO_SCORE',
-      radius: 10_000,
     }
   }
   if (filter === 'restaurant') return { type: 'RESTAURANT' }
@@ -152,10 +156,9 @@ function MapPage() {
     ...(debouncedKeyword && { keyword: debouncedKeyword }),
     lat: center.lat,
     lng: center.lng,
-    // '혼밥/혼행 추천' 칩은 중심 기준 고정 반경(radius) 추천이라 화면 영역과 무관하게 유지한다.
-    // 그 외에는 실제로 지도에 보이는 영역(bbox) 기준으로 불러와, 축소하면 넓게 흩어져 보이고
-    // 확대하면 그 범위만큼만 보이게 한다.
-    ...(filterParams.radius == null && bbox && { bbox }),
+    // 모든 필터를 현재 보이는 지도 영역 기준으로 조회한다. 최초 bounds 계산 전의 짧은 구간만
+    // 지도 중심 10km를 임시 범위로 사용해 전국 결과가 먼저 노출되는 것을 막는다.
+    ...(bbox ? { bbox } : { radius: 10_000 }),
     size: filterValue[0] === 'solo-friendly' ? 100 : 60,
   })
   const savedPlacesQuery = useSavedPlaces(0, 500)
@@ -167,7 +170,9 @@ function MapPage() {
   const isRecommendationView = filterValue[0] === 'solo-friendly'
   const markers: MapMarkerData[] = useMemo(() => {
     const visiblePlaces = (placesQuery.data?.content ?? []).filter(
-      (place) => mapMode !== 'solo_dining' || isDiningPlace(place.type),
+      (place) =>
+        (mapMode !== 'solo_dining' || isDiningPlace(place.type)) &&
+        (!isRecommendationView || (place.soloScore ?? 0) >= SOLO_RECOMMENDATION_MIN_SCORE),
     )
     const placesById = new Map(visiblePlaces.map((place) => [place.placeId, place]))
 
