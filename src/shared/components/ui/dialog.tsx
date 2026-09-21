@@ -6,7 +6,6 @@ import { Dialog as DialogPrimitive } from 'radix-ui'
 
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/components/ui/button'
-import { getAppFrameElement } from '@/shared/lib/app-frame'
 
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
@@ -17,13 +16,7 @@ function DialogTrigger({ ...props }: React.ComponentProps<typeof DialogPrimitive
 }
 
 function DialogPortal({ ...props }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
-  return (
-    <DialogPrimitive.Portal
-      data-slot="dialog-portal"
-      container={getAppFrameElement() ?? undefined}
-      {...props}
-    />
-  )
+  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
 }
 
 function DialogClose({ ...props }: React.ComponentProps<typeof DialogPrimitive.Close>) {
@@ -38,7 +31,7 @@ function DialogOverlay({
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50',
+        'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-y-0 left-1/2 z-50 w-full max-w-[var(--mobile-frame-width)] -translate-x-1/2 bg-black/50',
         className,
       )}
       {...props}
