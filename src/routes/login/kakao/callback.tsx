@@ -121,7 +121,7 @@ function KakaoCallbackPage() {
 
     return (
       <main className="px-margin-mobile flex min-h-screen items-center justify-center">
-        <section className="w-full max-w-sm text-center">
+        <section className="w-full max-w-96 text-center">
           <p className="text-primary mb-2 text-sm font-semibold">탈퇴 대기 중인 계정</p>
           <h1 className="text-on-surface text-2xl font-bold">계정을 복구할까요?</h1>
           <p className="text-on-surface-variant mt-3 text-sm leading-6">
