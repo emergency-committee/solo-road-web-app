@@ -106,8 +106,11 @@ export function enableDragScroll() {
   }
 
   function onDragStart(event: DragEvent) {
-    // 이미지·링크의 네이티브 드래그가 스크롤을 가로채지 않게 한다.
-    if (dragging) event.preventDefault()
+    // 이미지·링크의 네이티브 드래그(브라우저가 자체 임계값으로 먼저 감지해 dragstart를 쏘고,
+    // 이후 pointermove를 끊어버릴 수 있다)가 스크롤을 가로채지 않게 한다. 우리 쪽 5px 임계값
+    // (dragging 플래그)이 아직 안 넘었어도, pointerdown이 스크롤 가능한 영역 안에서
+    // 시작됐다면(targetX/targetY) 무조건 막는다 — 그래야 네이티브 드래그가 먼저 끼어들 때도 막힌다.
+    if (targetX || targetY) event.preventDefault()
   }
 
   document.addEventListener('pointerdown', onPointerDown, true)

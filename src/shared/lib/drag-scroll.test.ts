@@ -112,4 +112,26 @@ describe('enableDragScroll', () => {
     click()
     expect(clicks).toBe(2)
   })
+
+  it('pointermove 임계값을 넘기 전에 네이티브 dragstart가 먼저 와도 막는다', () => {
+    // 브라우저가 링크/이미지의 네이티브 드래그를 자체 임계값으로 먼저 감지해
+    // pointermove 없이 곧장 dragstart를 쏘는 경우(실제로 soloroad.site에서 재현된 버그).
+    const row = makeBox('overflow-x: auto', {
+      scrollHeight: 40,
+      clientHeight: 40,
+      scrollWidth: 900,
+      clientWidth: 430,
+    })
+    const link = document.createElement('a')
+    link.href = 'https://soloroad.site/course/6'
+    row.appendChild(link)
+    document.body.appendChild(row)
+    enableDragScroll()
+
+    link.dispatchEvent(pointer('pointerdown', 100, 400))
+    const dragStart = new Event('dragstart', { bubbles: true, cancelable: true })
+    const prevented = !link.dispatchEvent(dragStart)
+
+    expect(prevented).toBe(true)
+  })
 })
