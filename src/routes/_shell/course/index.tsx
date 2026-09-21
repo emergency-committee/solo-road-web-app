@@ -162,10 +162,9 @@ function CoursePage() {
                     </span>
                   </p>
                   <p className="text-outline mt-0.5 truncate text-[11px]">
-                    {course.region ?? '지역 정보 없음'} ·{' '}
-                    {course.totalDistanceM > 0
-                      ? `${(course.totalDistanceM / 1000).toFixed(1)}km`
-                      : '거리 계산 전'}
+                    {course.region ?? '지역 정보 없음'}
+                    {course.totalDistanceM > 0 &&
+                      ` · ${(course.totalDistanceM / 1000).toFixed(1)}km`}
                   </p>
                 </div>
                 <ChevronRight className="text-on-surface-variant size-5 shrink-0" />
