@@ -14,6 +14,7 @@ import {
 import { classifyPlaceType } from '@/features/map/lib/category-style'
 import { CreatePlaceModal, usePlaces } from '@/features/place'
 import type { ApiPlacesParams, ApiPlaceSummary } from '@/features/place'
+import { SOLO_RECOMMENDATION_MIN_SCORE, SOLO_TRAVEL_TYPES } from '@/features/place/lib/solo-rating'
 import { useSavedPlaces } from '@/features/saved'
 import { formatDistanceMeters } from '@/shared/lib/format'
 import { GEOLOCATION_OPTIONS } from '@/shared/lib/geolocation'
@@ -42,9 +43,6 @@ const DINING_TYPES = [
   '디저트',
 ]
 
-const SOLO_TRAVEL_TYPES = 'WELLNESS,STUDY,EXHIBITION,NATURE,ACTIVITY,SHOPPING'
-const SOLO_RECOMMENDATION_MIN_SCORE = 19
-
 function isDiningPlace(type: string): boolean {
   const upper = type.toUpperCase()
   return DINING_TYPES.some((candidate) => upper.includes(candidate))
@@ -53,9 +51,7 @@ function isDiningPlace(type: string): boolean {
 function toPlacesParams(filter: string, mapMode: MapMode): ApiPlacesParams {
   if (filter === 'solo-friendly') {
     return {
-      ...(mapMode === 'solo_dining'
-        ? { diningOnly: true }
-        : { type: SOLO_TRAVEL_TYPES }),
+      ...(mapMode === 'solo_dining' ? { diningOnly: true } : { type: SOLO_TRAVEL_TYPES }),
       soloFriendlyOnly: true,
       sort: 'SOLO_SCORE',
     }
@@ -103,7 +99,8 @@ function toMarkerData(
       isRecommendationView && place.scoreStatus === 'DONE'
         ? [
             {
-              label: mapMode === 'solo_dining' || isDiningPlace(place.type) ? '혼밥 추천' : '혼행 추천',
+              label:
+                mapMode === 'solo_dining' || isDiningPlace(place.type) ? '혼밥 추천' : '혼행 추천',
               tone: 'secondary' as const,
             },
           ]
@@ -263,7 +260,7 @@ function MapPage() {
           }}
           title={isSoloDining ? '혼밥 맛집 추천하기' : '장소 추천하기'}
           aria-label={isSoloDining ? '혼밥 맛집 추천하기' : '장소 추천하기'}
-          className="text-on-primary flex size-12 items-center justify-center rounded-full bg-primary shadow-md transition-transform hover:bg-primary/90 active:scale-90"
+          className="text-on-primary bg-primary hover:bg-primary/90 flex size-12 items-center justify-center rounded-full shadow-md transition-transform active:scale-90"
         >
           <MapPinPlus className="size-5" />
         </button>

@@ -1,3 +1,9 @@
+/** 혼행(여행) 카테고리로 취급하는 장소 타입 — 백엔드 type 파라미터는 쉼표 구분 다중 타입을 지원한다. */
+export const SOLO_TRAVEL_TYPES = 'WELLNESS,STUDY,EXHIBITION,NATURE,ACTIVITY,SHOPPING'
+
+/** 이 점수 이상만 "혼행 추천"으로 노출한다 (지도/추천 목록 공통 기준). */
+export const SOLO_RECOMMENDATION_MIN_SCORE = 19
+
 export function hasDisplayableSoloRating(
   soloRating: number | null | undefined,
   _reviewCount: number,

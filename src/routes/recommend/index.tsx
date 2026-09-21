@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Compass, Plus, Search, Utensils } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { CreatePlaceModal, usePlaces } from '@/features/place'
+import { SOLO_RECOMMENDATION_MIN_SCORE, SOLO_TRAVEL_TYPES } from '@/features/place/lib/solo-rating'
 import { CATEGORY_COLOR, classifyPlaceType } from '@/features/map/lib/category-style'
 import { PlaceCard } from '@/shared/components/PlaceCard'
 import { PlaceCardSkeleton } from '@/shared/components/PlaceCardSkeleton'
@@ -37,6 +38,7 @@ const DINING_FILTERS = [
 
 const ALL_FILTERS = [
   { value: 'all', label: '전체' },
+  { value: 'solo-friendly', label: '혼행 명소' },
   { value: 'restaurant', label: '식당' },
   { value: 'cafe', label: '카페' },
   { value: 'wellness', label: '웰니스' },
@@ -66,8 +68,6 @@ export const Route = createFileRoute('/recommend/')({
   component: RecommendPage,
 })
 
-const TRAVEL_TYPES = 'WELLNESS,STUDY,EXHIBITION,NATURE,ACTIVITY,SHOPPING'
-
 function toPlacesParams(tab: RecommendTab, filter: string) {
   if (tab === 'travel') {
     if (filter === 'wellness') return { type: 'WELLNESS' }
@@ -76,7 +76,7 @@ function toPlacesParams(tab: RecommendTab, filter: string) {
     if (filter === 'culture') return { type: 'EXHIBITION' }
     if (filter === 'activity') return { type: 'ACTIVITY' }
     if (filter === 'shopping') return { type: 'SHOPPING' }
-    return { type: TRAVEL_TYPES }
+    return { type: SOLO_TRAVEL_TYPES }
   }
   if (tab === 'dining') {
     if (filter === 'solo-friendly')
@@ -86,6 +86,8 @@ function toPlacesParams(tab: RecommendTab, filter: string) {
     return { diningOnly: true }
   }
   // all
+  if (filter === 'solo-friendly')
+    return { type: SOLO_TRAVEL_TYPES, soloFriendlyOnly: true, sort: 'SOLO_SCORE' }
   if (filter === 'wellness') return { type: 'WELLNESS' }
   if (filter === 'study') return { type: 'STUDY' }
   if (filter === 'nature') return { type: 'NATURE' }
@@ -127,7 +129,11 @@ function RecommendPage() {
     ...(coords && { lat: coords.lat, lng: coords.lng }),
     ...toPlacesParams(activeTab, filter[0] ?? 'all'),
   })
-  const places = placesQuery.data?.content ?? []
+  const isSoloTravelRecommendation = activeTab === 'all' && filter[0] === 'solo-friendly'
+  const places = (placesQuery.data?.content ?? []).filter(
+    (place) =>
+      !isSoloTravelRecommendation || (place.soloScore ?? 0) >= SOLO_RECOMMENDATION_MIN_SCORE,
+  )
 
   return (
     <div className="bg-surface min-h-screen">
