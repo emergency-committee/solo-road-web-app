@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import {
   CalendarDays,
   ChevronRight,
@@ -24,6 +24,7 @@ export const Route = createFileRoute('/_shell/course/')({
 })
 
 function CoursePage() {
+  const navigate = useNavigate()
   const recommendationsQuery = useCourseRecommendations()
   const myCoursesQuery = useMyCourses()
   const hotCoursesQuery = usePublicCourses({ sort: 'HOT', size: 2 })
@@ -175,7 +176,11 @@ function CoursePage() {
       </section>
 
       <section className="space-y-md">
-        <SectionHeader title="추천 코스" actionLabel="전체보기" />
+        <SectionHeader
+          title="추천 코스"
+          actionLabel="전체보기"
+          onAction={() => void navigate({ to: '/course/recommendations' })}
+        />
         {recommendations.length === 0 ? (
           <p className="font-body-sm text-body-sm text-on-surface-variant">
             {recommendationsQuery.isLoading
@@ -221,7 +226,6 @@ function CoursePage() {
           </div>
         )}
       </section>
-
     </main>
   )
 }
