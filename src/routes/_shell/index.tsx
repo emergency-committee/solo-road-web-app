@@ -20,6 +20,17 @@ export const Route = createFileRoute('/_shell/')({
   component: HomePage,
 })
 
+const HIDDEN_GEM_EXCLUDED_TYPES = new Set([
+  'STUDY',
+  '스터디',
+  '스터디카페',
+  'ACTIVITY',
+  '액티비티',
+  '체험/활동',
+  'SHOPPING',
+  '쇼핑',
+])
+
 function HomePage() {
   const { label: regionLabel, status: regionStatus, coords } = useCurrentRegionLabel()
   const { data, isLoading: isRecommendationsLoading } = usePlaceRecommendations(
@@ -67,19 +78,21 @@ function HomePage() {
   )
 
   const hiddenGems: HomePlaceCardData[] = sortByImageFirst(
-    (data?.hiddenGems ?? []).map((place) => {
-      const { label, icon } = classifyPlaceType(place.type)
-      return {
-        id: place.placeId.toString(),
-        title: place.name,
-        imageUrl: place.thumbnailUrl ?? null,
-        imageAlt: place.name,
-        placeholderVariant: 'place' as const,
-        subtitle: place.distanceM !== undefined ? formatDistanceMeters(place.distanceM) : '',
-        badges: [{ label, tone: 'secondary' as const, color: CATEGORY_COLOR[icon] }],
-        hasImage: place.thumbnailUrl != null,
-      }
-    }),
+    (data?.hiddenGems ?? [])
+      .filter((place) => !HIDDEN_GEM_EXCLUDED_TYPES.has(place.type.trim().toUpperCase()))
+      .map((place) => {
+        const { label, icon } = classifyPlaceType(place.type)
+        return {
+          id: place.placeId.toString(),
+          title: place.name,
+          imageUrl: place.thumbnailUrl ?? null,
+          imageAlt: place.name,
+          placeholderVariant: 'place' as const,
+          subtitle: place.distanceM !== undefined ? formatDistanceMeters(place.distanceM) : '',
+          badges: [{ label, tone: 'secondary' as const, color: CATEGORY_COLOR[icon] }],
+          hasImage: place.thumbnailUrl != null,
+        }
+      }),
   )
 
   return (
