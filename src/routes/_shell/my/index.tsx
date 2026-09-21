@@ -5,7 +5,6 @@ import {
   Heart,
   MessageSquare,
   Route as RouteIcon,
-  ShieldCheck,
   SlidersHorizontal,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -90,11 +89,6 @@ function MyPage() {
             icon: <SlidersHorizontal className="size-5" />,
             label: '여행 취향 설정',
             onClick: () => navigate({ to: '/my/preferences' }),
-          },
-          {
-            icon: <ShieldCheck className="size-5" />,
-            label: '권한 설정',
-            onClick: () => navigate({ to: '/my/permissions' }),
           },
         ]}
       />
