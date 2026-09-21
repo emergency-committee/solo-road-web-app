@@ -32,7 +32,7 @@ function CoursePage() {
   const recommendations = recommendationsQuery.data?.content ?? []
   const myCourses = myCoursesQuery.data?.content ?? []
   const liveHotCourses = hotCoursesQuery.data?.content ?? []
-  const hotCourses = resolveFeaturedCourses(liveHotCourses)
+  const hotCourses = hotCoursesQuery.isLoading ? [] : resolveFeaturedCourses(liveHotCourses)
   const likedCourses = likedCoursesQuery.data?.content ?? []
 
   return (
@@ -67,16 +67,22 @@ function CoursePage() {
             다른 코스 보기
           </Link>
         </div>
-        <div className="space-y-2">
-          {hotCourses.map((course, index) => (
-            <PublicCourseCard
-              key={course.courseId}
-              course={course}
-              rank={index + 1}
-              variant="compact"
-            />
-          ))}
-        </div>
+        {hotCoursesQuery.isLoading ? (
+          <p className="font-body-sm text-body-sm text-on-surface-variant">
+            주목받는 코스를 불러오는 중이에요...
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {hotCourses.map((course, index) => (
+              <PublicCourseCard
+                key={course.courseId}
+                course={course}
+                rank={index + 1}
+                variant="compact"
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       {likedCourses.length > 0 && (

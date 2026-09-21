@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import {
   OnboardingDetailStep,
   OnboardingLayout,
@@ -30,10 +30,12 @@ function OnboardingPage() {
   } = useSubmitOnboarding()
   const isNicknameValid = nickname.trim().length >= 2 && nickname.trim().length <= 12
 
+  const hasAutofilledNickname = useRef(false)
   useEffect(() => {
-    if (!nickname && user?.nickname) {
-      setNickname(user.nickname.slice(0, 12))
-    }
+    if (hasAutofilledNickname.current) return
+    if (nickname || !user?.nickname) return
+    hasAutofilledNickname.current = true
+    setNickname(user.nickname.slice(0, 12))
   }, [nickname, setNickname, user?.nickname])
 
   function handleSkip() {
