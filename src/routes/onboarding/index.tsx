@@ -20,7 +20,7 @@ export const Route = createFileRoute('/onboarding/')({
 
 function OnboardingPage() {
   const navigate = useNavigate()
-  const { step, goToStep, nickname, setNickname, gender, foodPreference, interests } =
+  const { step, goToStep, nickname, setNickname, gender, foodPreferences, interests } =
     useOnboardingStore()
   const user = useSessionStore((state) => state.user)
   const {
@@ -44,7 +44,7 @@ function OnboardingPage() {
 
   function handleComplete(detail: PreferenceSettingsSubmitData) {
     if (!isNicknameValid || isSubmitting) return
-    submitOnboarding({ nickname: nickname.trim(), gender, foodPreference, interests, ...detail })
+    submitOnboarding({ nickname: nickname.trim(), gender, foodPreferences, interests, ...detail })
   }
 
   return (

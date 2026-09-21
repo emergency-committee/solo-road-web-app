@@ -6,6 +6,8 @@ interface OnboardingRequestBody {
   gender: 'M' | 'F' | null
   foodStyle: string | null
   hashtagList: string[]
+  preferredMood: string | null
+  soloPreferenceScore: number | null
 }
 
 interface OnboardingResponseBody {
@@ -21,8 +23,6 @@ function toGenderCode(gender: OnboardingSubmitPayload['gender']): 'M' | 'F' | nu
   return null
 }
 
-// 백엔드(/api/v1/users/me/onboarding)는 nickname/gender/foodStyle/hashtagList(최대 3개)만 받는다.
-// mood/soloPriority/food(음식 관심사)는 대응하는 필드가 없어 아직 전송하지 않는다.
 export async function submitOnboarding(
   payload: OnboardingSubmitPayload,
 ): Promise<OnboardingResponseBody> {
@@ -30,7 +30,7 @@ export async function submitOnboarding(
     await new Promise((resolve) => setTimeout(resolve, 300))
     return {
       nickname: payload.nickname.trim(),
-      foodStyle: payload.foodPreference,
+      foodStyle: payload.foodPreferences.join(',') || null,
       hashtagList: payload.interests,
       preferredMood: null,
     }
@@ -39,8 +39,10 @@ export async function submitOnboarding(
   const body: OnboardingRequestBody = {
     nickname: payload.nickname.trim(),
     gender: toGenderCode(payload.gender),
-    foodStyle: payload.foodPreference,
+    foodStyle: payload.foodPreferences.join(',') || null,
     hashtagList: payload.interests,
+    preferredMood: payload.mood[0] ?? null,
+    soloPreferenceScore: payload.soloPriority ? 1 : 0,
   }
 
   return apiRequest<OnboardingResponseBody>('/api/v1/users/me/onboarding', {

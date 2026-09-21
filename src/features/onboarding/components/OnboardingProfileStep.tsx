@@ -9,9 +9,8 @@ import {
   UtensilsCrossed,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
+import { FOOD_PREFERENCE_OPTIONS } from '@/shared/constants/preference-options'
 import { useOnboardingStore } from '../store/onboarding-store'
-
-const FOOD_OPTIONS = ['한식', '중식', '일식', '양식', '분식', '아시안', '기타']
 
 const INTEREST_OPTIONS = [
   { value: '자연/풍경', label: '🌿 자연/풍경', icon: Trees },
@@ -30,8 +29,8 @@ export function OnboardingProfileStep() {
     setNickname,
     gender,
     setGender,
-    foodPreference,
-    setFoodPreference,
+    foodPreferences,
+    toggleFoodPreference,
     interests,
     toggleInterest,
   } = useOnboardingStore()
@@ -67,7 +66,7 @@ export function OnboardingProfileStep() {
           placeholder="2~12자로 입력해주세요"
           aria-label="사용할 닉네임"
           aria-invalid={nicknameLength < 2}
-          className="border-outline-variant bg-white text-on-surface placeholder:text-outline focus:border-primary focus:ring-primary/20 h-12 w-full rounded-xl border px-4 text-base outline-none transition focus:ring-2"
+          className="border-outline-variant text-on-surface placeholder:text-outline focus:border-primary focus:ring-primary/20 h-12 w-full rounded-xl border bg-white px-4 text-base transition outline-none focus:ring-2"
         />
         {nicknameLength > 0 && nicknameLength < 2 && (
           <p className="text-error text-xs">닉네임은 2자 이상 입력해주세요.</p>
@@ -105,24 +104,29 @@ export function OnboardingProfileStep() {
           2) 음식 취향
         </h3>
         <span className="font-label-md text-label-md text-outline">
-          가장 좋아하는 메뉴 1개를 선택해 주세요.
+          좋아하는 음식 종류를 최대 3개까지 선택해 주세요.
         </span>
         <div className="gap-xs flex flex-wrap">
-          {FOOD_OPTIONS.map((option) => (
-            <button
-              key={option}
-              type="button"
-              onClick={() => setFoodPreference(option)}
-              className={cn(
-                'font-label-md px-lg py-sm rounded-full border transition-all active:scale-95',
-                foodPreference === option
-                  ? 'border-primary bg-primary text-white'
-                  : 'border-outline-variant hover:bg-surface-container text-on-surface-variant bg-white',
-              )}
-            >
-              {option}
-            </button>
-          ))}
+          {FOOD_PREFERENCE_OPTIONS.map((option) => {
+            const active = foodPreferences.includes(option.value)
+            const disabled = !active && foodPreferences.length >= 3
+            return (
+              <button
+                key={option.value}
+                type="button"
+                disabled={disabled}
+                onClick={() => toggleFoodPreference(option.value)}
+                className={cn(
+                  'font-label-md px-lg py-sm rounded-full border transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-40',
+                  active
+                    ? 'border-primary bg-primary text-white'
+                    : 'border-outline-variant hover:bg-surface-container text-on-surface-variant bg-white',
+                )}
+              >
+                {option.label}
+              </button>
+            )
+          })}
         </div>
       </section>
 
