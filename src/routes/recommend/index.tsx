@@ -20,11 +20,12 @@ interface RecommendSearch {
 
 const TRAVEL_FILTERS = [
   { value: 'all', label: '전체' },
-  { value: 'attraction', label: '명소/랜드마크' },
-  { value: 'nature', label: '자연/산책' },
+  { value: 'wellness', label: '웰니스' },
+  { value: 'study', label: '스터디' },
   { value: 'culture', label: '전시/문화' },
-  { value: 'cafe', label: '조용한 카페' },
-  // 'stay'(숙소): 인제스트 데이터가 아직 없어 뺐다. 숙박 데이터 적재되면 다시 추가.
+  { value: 'nature', label: '자연/산책' },
+  { value: 'activity', label: '체험/활동' },
+  { value: 'shopping', label: '쇼핑' },
 ]
 
 const DINING_FILTERS = [
@@ -36,11 +37,14 @@ const DINING_FILTERS = [
 
 const ALL_FILTERS = [
   { value: 'all', label: '전체' },
-  { value: 'attraction', label: '혼행 명소' },
-  { value: 'nature', label: '자연/힐링' },
-  { value: 'culture', label: '전시/문화' },
-  { value: 'restaurant', label: '혼밥 맛집' },
+  { value: 'restaurant', label: '식당' },
   { value: 'cafe', label: '카페' },
+  { value: 'wellness', label: '웰니스' },
+  { value: 'study', label: '스터디' },
+  { value: 'culture', label: '전시/문화' },
+  { value: 'nature', label: '자연/산책' },
+  { value: 'activity', label: '체험/활동' },
+  { value: 'shopping', label: '쇼핑' },
 ]
 
 function getPlaceholderVariant(type: string) {
@@ -62,17 +66,16 @@ export const Route = createFileRoute('/recommend/')({
   component: RecommendPage,
 })
 
-// '명소/랜드마크'는 백엔드에 단일 타입이 없다 — L6에서 관광지를 EXHIBITION/NATURE/ACTIVITY로
-// 쪼개놨으므로 그 묶음을 가리킨다. 백엔드 type 파라미터는 쉼표 구분 목록을 지원한다.
-const ATTRACTION_TYPES = 'EXHIBITION,NATURE,ACTIVITY'
 const TRAVEL_TYPES = 'WELLNESS,STUDY,EXHIBITION,NATURE,ACTIVITY,SHOPPING'
 
 function toPlacesParams(tab: RecommendTab, filter: string) {
   if (tab === 'travel') {
-    if (filter === 'attraction') return { type: ATTRACTION_TYPES }
+    if (filter === 'wellness') return { type: 'WELLNESS' }
+    if (filter === 'study') return { type: 'STUDY' }
     if (filter === 'nature') return { type: 'NATURE' }
     if (filter === 'culture') return { type: 'EXHIBITION' }
-    if (filter === 'cafe') return { type: 'CAFE' }
+    if (filter === 'activity') return { type: 'ACTIVITY' }
+    if (filter === 'shopping') return { type: 'SHOPPING' }
     return { type: TRAVEL_TYPES }
   }
   if (tab === 'dining') {
@@ -83,9 +86,12 @@ function toPlacesParams(tab: RecommendTab, filter: string) {
     return { diningOnly: true }
   }
   // all
-  if (filter === 'attraction') return { type: ATTRACTION_TYPES }
+  if (filter === 'wellness') return { type: 'WELLNESS' }
+  if (filter === 'study') return { type: 'STUDY' }
   if (filter === 'nature') return { type: 'NATURE' }
   if (filter === 'culture') return { type: 'EXHIBITION' }
+  if (filter === 'activity') return { type: 'ACTIVITY' }
+  if (filter === 'shopping') return { type: 'SHOPPING' }
   if (filter === 'restaurant') return { type: 'RESTAURANT' }
   if (filter === 'cafe') return { type: 'CAFE' }
   return {}
@@ -109,11 +115,7 @@ function RecommendPage() {
   }, [])
 
   const currentFilters =
-    activeTab === 'travel'
-      ? TRAVEL_FILTERS
-      : activeTab === 'dining'
-        ? DINING_FILTERS
-        : ALL_FILTERS
+    activeTab === 'travel' ? TRAVEL_FILTERS : activeTab === 'dining' ? DINING_FILTERS : ALL_FILTERS
 
   const handleTabChange = (tab: RecommendTab) => {
     setFilter(['all'])
@@ -136,7 +138,7 @@ function RecommendPage() {
           <button
             type="button"
             onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center gap-1 text-xs font-bold text-primary bg-primary/10 hover:bg-primary/20 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+            className="text-primary bg-primary/10 hover:bg-primary/20 flex cursor-pointer items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-bold transition-colors"
           >
             <Plus className="size-3.5" />
             <span>장소 추천</span>
@@ -146,14 +148,14 @@ function RecommendPage() {
 
       <main className="px-margin-mobile pt-4 pb-20">
         {/* 상단 추천 탭 (전체 vs 혼행 vs 혼밥) */}
-        <div className="bg-surface-container-high p-1 rounded-2xl flex items-center mb-4">
+        <div className="bg-surface-container-high mb-4 flex items-center rounded-2xl p-1">
           <button
             type="button"
             onClick={() => handleTabChange('all')}
             className={cn(
-              'flex-1 py-2 text-xs font-bold rounded-xl transition-all',
+              'flex-1 rounded-xl py-2 text-xs font-bold transition-all',
               activeTab === 'all'
-                ? 'bg-surface text-on-surface shadow-xs font-bold'
+                ? 'bg-surface text-on-surface font-bold shadow-xs'
                 : 'text-on-surface-variant hover:text-on-surface',
             )}
           >
@@ -163,9 +165,9 @@ function RecommendPage() {
             type="button"
             onClick={() => handleTabChange('travel')}
             className={cn(
-              'flex-1 py-2 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1',
+              'flex flex-1 items-center justify-center gap-1 rounded-xl py-2 text-xs font-bold transition-all',
               activeTab === 'travel'
-                ? 'bg-primary text-white shadow-xs font-bold'
+                ? 'bg-primary font-bold text-white shadow-xs'
                 : 'text-on-surface-variant hover:text-on-surface',
             )}
           >
@@ -176,9 +178,9 @@ function RecommendPage() {
             type="button"
             onClick={() => handleTabChange('dining')}
             className={cn(
-              'flex-1 py-2 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1',
+              'flex flex-1 items-center justify-center gap-1 rounded-xl py-2 text-xs font-bold transition-all',
               activeTab === 'dining'
-                ? 'bg-[#ff6b4a] text-white shadow-xs font-bold'
+                ? 'bg-[#ff6b4a] font-bold text-white shadow-xs'
                 : 'text-on-surface-variant hover:text-on-surface',
             )}
           >
@@ -213,7 +215,7 @@ function RecommendPage() {
 
         {/* 장소 목록 */}
         {placesQuery.isLoading ? (
-          <div className="gap-4 grid grid-cols-1">
+          <div className="grid grid-cols-1 gap-4">
             {Array.from({ length: 4 }).map((_, index) => (
               <PlaceCardSkeleton key={index} />
             ))}
@@ -227,7 +229,7 @@ function RecommendPage() {
             onAction={() => setIsCreateModalOpen(true)}
           />
         ) : (
-          <div className="gap-4 grid grid-cols-1">
+          <div className="grid grid-cols-1 gap-4">
             {places.map((place) => {
               const { label: categoryLabel, icon: categoryIcon } = classifyPlaceType(place.type)
               return (
@@ -254,7 +256,10 @@ function RecommendPage() {
                       : []),
                   ]}
                   onClick={() =>
-                    navigate({ to: '/place/$placeId', params: { placeId: place.placeId.toString() } })
+                    navigate({
+                      to: '/place/$placeId',
+                      params: { placeId: place.placeId.toString() },
+                    })
                   }
                 />
               )
