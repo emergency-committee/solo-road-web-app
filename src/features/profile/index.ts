@@ -1,5 +1,6 @@
 export { ProfileHeader } from './components/ProfileHeader'
 export { ProfileEditDialog } from './components/ProfileEditDialog'
+export { WithdrawAccountDialog } from './components/WithdrawAccountDialog'
 export { ProfileStatsGrid } from './components/ProfileStatsGrid'
 export { ProfileMenuList } from './components/ProfileMenuList'
 export type { ProfileMenuItem } from './components/ProfileMenuList'

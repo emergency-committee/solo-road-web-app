@@ -26,7 +26,7 @@ export const useSessionStore = create<SessionState>()(
       hasOnboarded: false,
       setSession: ({ user }) => set({ user }),
       setOnboarded: () => set({ hasOnboarded: true }),
-      clearSession: () => set({ user: null }),
+      clearSession: () => set({ user: null, hasOnboarded: false }),
     }),
     {
       name: 'solo-road-session',

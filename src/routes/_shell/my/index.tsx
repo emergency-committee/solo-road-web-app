@@ -14,6 +14,7 @@ import {
   ProfileHeader,
   ProfileMenuList,
   ProfileStatsGrid,
+  WithdrawAccountDialog,
   useMyProfile,
 } from '@/features/profile'
 import { useLogout } from '@/features/auth'
@@ -34,6 +35,7 @@ function MyPage() {
   const savedPlacesQuery = useSavedPlaces(0, 1)
   const myReviewsQuery = useMyReviews(0, 1)
   const [profileDialogOpen, setProfileDialogOpen] = useState(false)
+  const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false)
   const nickname = profileQuery.data?.nickname ?? user?.nickname ?? '솔로더 여행자'
   const profileImageUrl = profileQuery.data?.profileImageUrl ?? user?.profileImageUrl
 
@@ -108,7 +110,7 @@ function MyPage() {
         ]}
       />
 
-      <div className="mt-xl flex justify-center">
+      <div className="mt-xl flex flex-col items-center gap-3">
         <button
           type="button"
           onClick={() => void logout()}
@@ -116,12 +118,20 @@ function MyPage() {
         >
           로그아웃
         </button>
+        <button
+          type="button"
+          onClick={() => setWithdrawDialogOpen(true)}
+          className="text-outline hover:text-error text-sm underline underline-offset-4 transition-colors"
+        >
+          회원 탈퇴
+        </button>
       </div>
       <ProfileEditDialog
         open={profileDialogOpen}
         onOpenChange={setProfileDialogOpen}
         nickname={nickname}
       />
+      <WithdrawAccountDialog open={withdrawDialogOpen} onOpenChange={setWithdrawDialogOpen} />
     </main>
   )
 }
