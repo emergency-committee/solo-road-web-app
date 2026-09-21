@@ -57,8 +57,9 @@ function CourseRecommendationsPage() {
                   {course.title}
                 </h4>
                 <p className="text-on-surface-variant mt-2 text-xs">
-                  {course.region ?? '지역 정보 없음'} ·{' '}
-                  {formatDurationMinutes(course.totalDurationMinutes)}
+                  {course.region ?? '지역 정보 없음'}
+                  {course.totalDurationMinutes != null &&
+                    ` · ${formatDurationMinutes(course.totalDurationMinutes)}`}
                 </p>
                 {course.badges.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-1.5">

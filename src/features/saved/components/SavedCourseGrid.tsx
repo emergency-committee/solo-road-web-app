@@ -17,7 +17,7 @@ export function SavedCourseGrid({
       {courses.map((course) => (
         <div
           key={course.courseId}
-          className="group border-outline-variant/20 bg-surface-container flex min-h-24 items-center rounded-xl border p-md transition-colors hover:bg-surface-container-high"
+          className="group border-outline-variant/20 bg-surface-container p-md hover:bg-surface-container-high flex min-h-24 items-center rounded-xl border transition-colors"
         >
           <Link
             to="/course/$courseId"
@@ -29,11 +29,12 @@ export function SavedCourseGrid({
             </div>
             <div className="min-w-0 flex-1">
               <div>
-                <h5 className="font-body-md text-body-md text-on-surface line-clamp-1 font-bold break-keep [overflow-wrap:anywhere]">
+                <h5 className="font-body-md text-body-md text-on-surface line-clamp-1 font-bold [overflow-wrap:anywhere] break-keep">
                   {course.title}
                 </h5>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 line-clamp-2 break-keep [overflow-wrap:anywhere]">
-                  {course.region ?? '지역 정보 없음'} • {formatDistanceMeters(course.totalDistanceM)}
+                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 line-clamp-2 [overflow-wrap:anywhere] break-keep">
+                  {course.region ?? '지역 정보 없음'}
+                  {course.totalDistanceM > 0 && ` • ${formatDistanceMeters(course.totalDistanceM)}`}
                 </p>
               </div>
             </div>

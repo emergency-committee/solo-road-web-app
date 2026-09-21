@@ -158,8 +158,12 @@ function CourseDetailPage() {
                   {course.region ?? '지역 미정'}
                   <span aria-hidden>·</span>
                   {formatTripLength(course.startDate, course.endDate, course.tripDays)}
-                  <span aria-hidden>·</span>
-                  {formatDurationMinutes(course.totalDurationMinutes)}
+                  {course.totalDurationMinutes != null && (
+                    <>
+                      <span aria-hidden>·</span>
+                      {formatDurationMinutes(course.totalDurationMinutes)}
+                    </>
+                  )}
                 </p>
               </div>
               {course.totalDistanceM > 0 && (
