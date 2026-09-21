@@ -21,6 +21,7 @@ interface RecommendSearch {
 
 const TRAVEL_FILTERS = [
   { value: 'all', label: '전체' },
+  { value: 'solo-friendly', label: '혼행 명소' },
   { value: 'wellness', label: '웰니스' },
   { value: 'study', label: '스터디' },
   { value: 'culture', label: '전시/문화' },
@@ -38,7 +39,6 @@ const DINING_FILTERS = [
 
 const ALL_FILTERS = [
   { value: 'all', label: '전체' },
-  { value: 'solo-friendly', label: '혼행 명소' },
   { value: 'restaurant', label: '식당' },
   { value: 'cafe', label: '카페' },
   { value: 'wellness', label: '웰니스' },
@@ -70,6 +70,8 @@ export const Route = createFileRoute('/recommend/')({
 
 function toPlacesParams(tab: RecommendTab, filter: string) {
   if (tab === 'travel') {
+    if (filter === 'solo-friendly')
+      return { type: SOLO_TRAVEL_TYPES, soloFriendlyOnly: true, sort: 'SOLO_SCORE' }
     if (filter === 'wellness') return { type: 'WELLNESS' }
     if (filter === 'study') return { type: 'STUDY' }
     if (filter === 'nature') return { type: 'NATURE' }
@@ -86,8 +88,6 @@ function toPlacesParams(tab: RecommendTab, filter: string) {
     return { diningOnly: true }
   }
   // all
-  if (filter === 'solo-friendly')
-    return { type: SOLO_TRAVEL_TYPES, soloFriendlyOnly: true, sort: 'SOLO_SCORE' }
   if (filter === 'wellness') return { type: 'WELLNESS' }
   if (filter === 'study') return { type: 'STUDY' }
   if (filter === 'nature') return { type: 'NATURE' }
@@ -129,7 +129,7 @@ function RecommendPage() {
     ...(coords && { lat: coords.lat, lng: coords.lng }),
     ...toPlacesParams(activeTab, filter[0] ?? 'all'),
   })
-  const isSoloTravelRecommendation = activeTab === 'all' && filter[0] === 'solo-friendly'
+  const isSoloTravelRecommendation = activeTab === 'travel' && filter[0] === 'solo-friendly'
   const places = (placesQuery.data?.content ?? []).filter(
     (place) =>
       !isSoloTravelRecommendation || (place.soloScore ?? 0) >= SOLO_RECOMMENDATION_MIN_SCORE,
